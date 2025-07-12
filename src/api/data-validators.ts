@@ -12,7 +12,6 @@ export function checkPriceLineOptions(options: PriceLineOptions): void {
 		return;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/tslint/config
 	assert(typeof options.price === 'number', `the type of 'price' price line's property must be a number, got '${typeof options.price}'`);
 }
 
@@ -63,24 +62,21 @@ function checkBarItem(type: 'Bar' | 'Candlestick', barItem: SeriesDataItemTypeMa
 		return;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
 	const barData = barItem as any; // Type assertion for bar data
 	assert(
-		// eslint-disable-next-line @typescript-eslint/tslint/config
 		typeof barData.open === 'number',
 		`${type} series item data value of open must be a number, got=${typeof barData.open}, value=${barData.open}`
 	);
 	assert(
-		// eslint-disable-next-line @typescript-eslint/tslint/config
 		typeof barData.high === 'number',
 		`${type} series item data value of high must be a number, got=${typeof barData.high}, value=${barData.high}`
 	);
 	assert(
-		// eslint-disable-next-line @typescript-eslint/tslint/config
 		typeof barData.low === 'number',
 		`${type} series item data value of low must be a number, got=${typeof barData.low}, value=${barData.low}`
 	);
 	assert(
-		// eslint-disable-next-line @typescript-eslint/tslint/config
 		typeof barData.close === 'number',
 		`${type} series item data value of close must be a number, got=${typeof barData.close}, value=${barData.close}`
 	);
@@ -91,9 +87,9 @@ function checkLineItem(type: 'Area' | 'Baseline' | 'Line' | 'Histogram', lineIte
 		return;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
 	const lineData = lineItem as any; // Type assertion for line data
 	assert(
-		// eslint-disable-next-line @typescript-eslint/tslint/config
 		typeof lineData.value === 'number' || lineData.value === null,
 		`${type} series item data value must be a number, got=${typeof lineData.value}, value=${lineData.value}`);
 }
