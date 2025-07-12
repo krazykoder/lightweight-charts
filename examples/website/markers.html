@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Series Markers Examples</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Series Markers Examples</h1>
+    </header>
+    <main>
+        <!-- Markers on Line Series -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Markers on Line Series</h3>
+                <pre>
+const chart1 = LightweightCharts.createChart(document.getElementById('chart-container1'), { width: 600, height: 300 });
+const lineSeries1 = chart1.addLineSeries();
+const randomSlice1 = getRandomSlice();
+const slicedData1 = data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.end);
+lineSeries1.setData(slicedData1);
+lineSeries1.setMarkers([
+    { time: slicedData1[Math.floor(slicedData1.length * 0.2)].time, position: 'aboveBar', color: '#f68410', shape: 'circle', text: 'Signal 1' },
+    { time: slicedData1[Math.floor(slicedData1.length * 0.4)].time, position: 'belowBar', color: '#2196F3', shape: 'arrowUp', text: 'Buy' },
+    { time: slicedData1[Math.floor(slicedData1.length * 0.6)].time, position: 'aboveBar', color: '#E91E63', shape: 'arrowDown', text: 'Sell' }
+]);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container1"></div>
+        </div>
+
+        <!-- Markers on Bar Series -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Markers on Bar Series</h3>
+                <pre>
+const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), { width: 600, height: 300 });
+const barSeries2 = chart2.addBarSeries();
+const randomSlice2 = getRandomSlice();
+const slicedData2 = data.slice(randomSlice2.start, randomSlice2.end);
+barSeries2.setData(slicedData2);
+barSeries2.setMarkers([
+    { time: slicedData2[Math.floor(slicedData2.length * 0.2)].time, position: 'aboveBar', color: 'gold', shape: 'square', text: 'Event' },
+    { time: slicedData2[Math.floor(slicedData2.length * 0.5)].time, position: 'inBar', color: 'white', shape: 'circle' }
+]);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container2"></div>
+        </div>
+
+        <!-- Markers on Candlestick Series -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Markers on Candlestick Series</h3>
+                <pre>
+const chart3 = LightweightCharts.createChart(document.getElementById('chart-container3'), { width: 600, height: 300 });
+const candlestickSeries3 = chart3.addCandlestickSeries();
+const randomSlice3 = getRandomSlice();
+const slicedData3 = data.slice(randomSlice3.start, randomSlice3.end);
+candlestickSeries3.setData(slicedData3);
+candlestickSeries3.setMarkers([
+    { time: slicedData3[Math.floor(slicedData3.length * 0.1)].time, position: 'aboveBar', color: '#4CAF50', shape: 'triangleUp', text: 'Entry' },
+    { time: slicedData3[Math.floor(slicedData3.length * 0.4)].time, position: 'aboveBar', color: '#F44336', shape: 'triangleDown', text: 'Exit' },
+    { time: slicedData3[Math.floor(slicedData3.length * 0.8)].time, position: 'belowBar', color: 'purple', shape: 'circle', size: 2, text: 'Note' }
+]);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container3"></div>
+        </div>
+
+        <nav>
+            <a href="events.html">Prev</a>
+            <a href="index.html">Home</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        function getRandomSlice(maxDataLength = 500, minLength = 50, maxLength = 200) {
+            const start = Math.floor(Math.random() * (maxDataLength - minLength + 1));
+            const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
+            return { start, end };
+        }
+
+        // Markers on Line Series
+        const chart1 = LightweightCharts.createChart(document.getElementById('chart-container1'), { width: 600, height: 300 });
+        const lineSeries1 = chart1.addLineSeries();
+        const randomSlice1 = getRandomSlice();
+        const slicedData1 = data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.end);
+        lineSeries1.setData(slicedData1);
+        lineSeries1.setMarkers([
+            { time: slicedData1[Math.floor(slicedData1.length * 0.2)].time, position: 'aboveBar', color: '#f68410', shape: 'circle', text: 'Signal 1' },
+            { time: slicedData1[Math.floor(slicedData1.length * 0.4)].time, position: 'belowBar', color: '#2196F3', shape: 'arrowUp', text: 'Buy' },
+            { time: slicedData1[Math.floor(slicedData1.length * 0.6)].time, position: 'aboveBar', color: '#E91E63', shape: 'arrowDown', text: 'Sell' }
+        ]);
+
+        // Markers on Bar Series
+        const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), { width: 600, height: 300 });
+        const barSeries2 = chart2.addBarSeries();
+        const randomSlice2 = getRandomSlice();
+        const slicedData2 = data.slice(randomSlice2.start, randomSlice2.end);
+        barSeries2.setData(slicedData2);
+        barSeries2.setMarkers([
+            { time: slicedData2[Math.floor(slicedData2.length * 0.2)].time, position: 'aboveBar', color: 'gold', shape: 'square', text: 'Event' },
+            { time: slicedData2[Math.floor(slicedData2.length * 0.5)].time, position: 'inBar', color: 'white', shape: 'circle' }
+        ]);
+
+        // Markers on Candlestick Series
+        const chart3 = LightweightCharts.createChart(document.getElementById('chart-container3'), { width: 600, height: 300 });
+        const candlestickSeries3 = chart3.addCandlestickSeries();
+        const randomSlice3 = getRandomSlice();
+        const slicedData3 = data.slice(randomSlice3.start, randomSlice3.end);
+        candlestickSeries3.setData(slicedData3);
+        candlestickSeries3.setMarkers([
+            { time: slicedData3[Math.floor(slicedData3.length * 0.1)].time, position: 'aboveBar', color: '#4CAF50', shape: 'triangleUp', text: 'Entry' },
+            { time: slicedData3[Math.floor(slicedData3.length * 0.4)].time, position: 'aboveBar', color: '#F44336', shape: 'triangleDown', text: 'Exit' },
+            { time: slicedData3[Math.floor(slicedData3.length * 0.8)].time, position: 'belowBar', color: 'purple', shape: 'circle', size: 2, text: 'Note' }
+        ]);
+    </script>
+</body>
+</html>

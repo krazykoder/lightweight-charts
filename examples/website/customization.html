@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customization Examples</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Customization Examples</h1>
+    </header>
+    <main>
+        <!-- General Customization -->
+        <div class="container">
+            <div class="code-container">
+                <h3>General Customization</h3>
+                <pre>
+const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+    width: 600,
+    height: 300,
+    layout: {
+        backgroundColor: '#FAEBD7',
+        textColor: '#696969',
+    },
+    grid: {
+        vertLines: { color: 'rgba(70, 130, 180, 0.5)' },
+        horzLines: { color: 'rgba(70, 130, 180, 0.5)' },
+    },
+    priceScale: { borderColor: '#483D8B' },
+    timeScale: { borderColor: '#483D8B' },
+});
+const lineSeries = chart.addLineSeries();
+const randomSlice1 = getRandomSlice();
+lineSeries.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.end));
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container1"></div>
+        </div>
+
+        <!-- Crosshair: Styled Lines -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Crosshair: Styled Lines</h3>
+                <pre>
+const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+    width: 600,
+    height: 300,
+    crosshair: {
+        vertLine: {
+            color: '#FF0000',
+            width: 2,
+            style: LightweightCharts.LineStyle.Dashed,
+            labelVisible: true,
+        },
+        horzLine: {
+            color: '#0000FF',
+            width: 2,
+            style: LightweightCharts.LineStyle.Dotted,
+            labelVisible: true,
+        },
+    },
+});
+const barSeries2 = chart2.addBarSeries();
+const randomSlice2 = getRandomSlice();
+barSeries2.setData(data.slice(randomSlice2.start, randomSlice2.end));
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container2"></div>
+        </div>
+
+        <!-- Crosshair: Magnet Mode -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Crosshair: Magnet Mode</h3>
+                <pre>
+const chart3 = LightweightCharts.createChart(document.getElementById('chart-container3'), {
+    width: 600,
+    height: 300,
+    crosshair: {
+        mode: LightweightCharts.CrosshairMode.Magnet,
+    },
+});
+const lineSeries3 = chart3.addLineSeries({ color: '#26a69a' });
+const randomSlice3 = getRandomSlice();
+lineSeries3.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice3.start, randomSlice3.end));
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container3"></div>
+        </div>
+
+        <!-- Crosshair: Normal Mode with Candlestick -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Crosshair: Normal (Free-move)</h3>
+                <pre>
+const chart4 = LightweightCharts.createChart(document.getElementById('chart-container4'), {
+    width: 600,
+    height: 300,
+    crosshair: {
+        mode: LightweightCharts.CrosshairMode.Normal,
+    },
+});
+const candlestickSeries4 = chart4.addCandlestickSeries({ upColor: '#26a69a', downColor: '#ef5350', borderDownColor: '#ef5350', borderUpColor: '#26a69a', wickDownColor: '#ef5350', wickUpColor: '#26a69a' });
+const randomSlice4 = getRandomSlice();
+candlestickSeries4.setData(data.slice(randomSlice4.start, randomSlice4.end));
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container4"></div>
+        </div>
+
+        <nav>
+            <a href="price-scale.html">Prev</a>
+            <a href="events.html">Next</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        function getRandomSlice(maxDataLength = 500, minLength = 50, maxLength = 200) {
+            const start = Math.floor(Math.random() * (maxDataLength - minLength + 1));
+            const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
+            return { start, end };
+        }
+
+        // General Customization
+        const chart1 = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+            width: 600,
+            height: 300,
+            layout: { backgroundColor: '#FAEBD7', textColor: '#696969' },
+            grid: {
+                vertLines: { color: 'rgba(70, 130, 180, 0.5)' },
+                horzLines: { color: 'rgba(70, 130, 180, 0.5)' },
+            },
+            priceScale: { borderColor: '#483D8B' },
+            timeScale: { borderColor: '#483D8B' },
+        });
+        const lineSeries1 = chart1.addLineSeries();
+        const randomSlice1 = getRandomSlice();
+        lineSeries1.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.end));
+
+        // Crosshair: Styled Lines
+        const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+            width: 600,
+            height: 300,
+            crosshair: {
+                vertLine: { color: '#FF0000', width: 2, style: LightweightCharts.LineStyle.Dashed, labelVisible: true },
+                horzLine: { color: '#0000FF', width: 2, style: LightweightCharts.LineStyle.Dotted, labelVisible: true },
+            },
+        });
+        const barSeries2 = chart2.addBarSeries();
+        const randomSlice2 = getRandomSlice();
+        barSeries2.setData(data.slice(randomSlice2.start, randomSlice2.end));
+
+        // Crosshair: Magnet Mode
+        const chart3 = LightweightCharts.createChart(document.getElementById('chart-container3'), {
+            width: 600,
+            height: 300,
+            crosshair: { mode: LightweightCharts.CrosshairMode.Magnet },
+        });
+        const lineSeries3 = chart3.addLineSeries({ color: '#26a69a' });
+        const randomSlice3 = getRandomSlice();
+        lineSeries3.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice3.start, randomSlice3.end));
+
+        // Crosshair: Normal Mode with Candlestick
+        const chart4 = LightweightCharts.createChart(document.getElementById('chart-container4'), {
+            width: 600,
+            height: 300,
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        });
+        const candlestickSeries4 = chart4.addCandlestickSeries({ upColor: '#26a69a', downColor: '#ef5350', borderDownColor: '#ef5350', borderUpColor: '#26a69a', wickDownColor: '#ef5350', wickUpColor: '#26a69a' });
+        const randomSlice4 = getRandomSlice();
+        candlestickSeries4.setData(data.slice(randomSlice4.start, randomSlice4.end));
+    </script>
+</body>
+</html>

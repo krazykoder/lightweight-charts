@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar Series Examples</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Bar Series Examples</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="code-container">
+                <h3>Basic Bar Chart</h3>
+                <pre>
+const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+    width: 600,
+    height: 300,
+});
+const barSeries = chart.addBarSeries();
+const randomSlice1 = getRandomSlice();
+barSeries.setData(data.slice(randomSlice1.start, randomSlice1.end));
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container1"></div>
+        </div>
+        <div class="container">
+            <div class="code-container">
+                <h3>Customized Bar Chart</h3>
+                <pre>
+const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+    width: 600,
+    height: 300,
+});
+const barSeries2 = chart2.addBarSeries({
+    thinBars: false,
+    upColor: '#26a69a',
+    downColor: '#ef5350',
+});
+const randomSlice2 = getRandomSlice();
+barSeries2.setData(data.slice(randomSlice2.start, randomSlice2.end));
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container2"></div>
+        </div>
+        <nav>
+            <a href="area-series.html">Prev</a>
+            <a href="candlestick-series.html">Next</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        function getRandomSlice(maxDataLength = 500, minLength = 50, maxLength = 200) {
+            const start = Math.floor(Math.random() * (maxDataLength - minLength + 1));
+            const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
+            return { start, end };
+        }
+
+        const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+            width: 600,
+            height: 300,
+        });
+        const barSeries = chart.addBarSeries();
+        const randomSlice1 = getRandomSlice();
+        barSeries.setData(data.slice(randomSlice1.start, randomSlice1.end));
+
+        const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+            width: 600,
+            height: 300,
+        });
+        const barSeries2 = chart2.addBarSeries({
+            thinBars: false,
+            upColor: '#26a69a',
+            downColor: '#ef5350',
+        });
+        const randomSlice2 = getRandomSlice();
+        barSeries2.setData(data.slice(randomSlice2.start, randomSlice2.end));
+    </script>
+</body>
+</html>

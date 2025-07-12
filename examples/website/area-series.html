@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Series Examples</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Area Series Examples</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="code-container">
+                <h3>Basic Area Chart</h3>
+                <pre>
+const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+    width: 600,
+    height: 300,
+});
+const areaSeries = chart.addAreaSeries();
+const randomSlice1 = getRandomSlice();
+areaSeries.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.end));
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container1"></div>
+        </div>
+        <div class="container">
+            <div class="code-container">
+                <h3>Customized Area Chart</h3>
+                <pre>
+const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+    width: 600,
+    height: 300,
+});
+const areaSeries2 = chart2.addAreaSeries({
+    topColor: 'rgba(21, 146, 230, 0.4)',
+    bottomColor: 'rgba(21, 146, 230, 0)',
+    lineColor: 'rgba(21, 146, 230, 1)',
+    lineWidth: 2,
+});
+const randomSlice2 = getRandomSlice();
+areaSeries2.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice2.start, randomSlice2.end));
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container2"></div>
+        </div>
+        <div class="container">
+            <div class="code-container">
+                <h3>Area Chart with Gaps</h3>
+                <pre>
+const chart3 = LightweightCharts.createChart(document.getElementById('chart-container3'), {
+    width: 600,
+    height: 300,
+});
+const areaSeries3 = chart3.addAreaSeries({
+    lineType: LightweightCharts.LineType.WithGaps,
+});
+const randomSlice3 = getRandomSlice();
+const gappedData = data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice3.start, randomSlice3.end);
+gappedData[10].value = null;
+gappedData[20].value = null;
+areaSeries3.setData(gappedData);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container3"></div>
+        </div>
+        <div class="container">
+            <div class="code-container">
+                <h3>Area Chart with Multiple EMAs</h3>
+                <pre>
+const chart4 = LightweightCharts.createChart(document.getElementById('chart-container4'), {
+    width: 600,
+    height: 300,
+});
+const areaSeries4 = chart4.addAreaSeries({
+    topColor: 'rgba(33, 150, 243, 0.4)',
+    bottomColor: 'rgba(33, 150, 243, 0)',
+    lineColor: 'rgba(33, 150, 243, 1)',
+});
+const randomSlice4 = getRandomSlice();
+areaSeries4.setData(data.map(d => ({ time: d.time, value: d.close })).slice(randomSlice4.start, randomSlice4.end));
+
+const ema21Series = chart4.addLineSeries({ color: 'purple', lineWidth: 1 });
+ema21Series.setData(data.slice(randomSlice4.start, randomSlice4.end).map(d => ({ time: d.time, value: d.EMA_21 })));
+
+const ema42Series = chart4.addLineSeries({ color: 'orange', lineWidth: 1 });
+ema42Series.setData(data.slice(randomSlice4.start, randomSlice4.end).map(d => ({ time: d.time, value: d.EMA_42 })));
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container4"></div>
+        </div>
+        <nav>
+            <a href="index.html">Prev</a>
+            <a href="bar-series.html">Next</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        function getRandomSlice(maxDataLength = 500, minLength = 50, maxLength = 200) {
+            const start = Math.floor(Math.random() * (maxDataLength - minLength + 1));
+            const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
+            return { start, end };
+        }
+
+        const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+            width: 600,
+            height: 300,
+        });
+        const areaSeries = chart.addAreaSeries();
+        const randomSlice1 = getRandomSlice();
+        areaSeries.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.end));
+
+        const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+            width: 600,
+            height: 300,
+        });
+        const areaSeries2 = chart2.addAreaSeries({
+            topColor: 'rgba(21, 146, 230, 0.4)',
+            bottomColor: 'rgba(21, 146, 230, 0)',
+            lineColor: 'rgba(21, 146, 230, 1)',
+            lineWidth: 2,
+        });
+        const randomSlice2 = getRandomSlice();
+        areaSeries2.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice2.start, randomSlice2.end));
+
+        const chart3 = LightweightCharts.createChart(document.getElementById('chart-container3'), {
+            width: 600,
+            height: 300,
+        });
+        const areaSeries3 = chart3.addAreaSeries({
+            lineType: LightweightCharts.LineType.WithGaps,
+        });
+        const randomSlice3 = getRandomSlice();
+        const gappedData = data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice3.start, randomSlice3.end);
+        gappedData[10].value = null;
+        gappedData[20].value = null;
+        areaSeries3.setData(gappedData);
+
+        const chart4 = LightweightCharts.createChart(document.getElementById('chart-container4'), {
+            width: 600,
+            height: 300,
+        });
+        const areaSeries4 = chart4.addAreaSeries({
+            topColor: 'rgba(33, 150, 243, 0.4)',
+            bottomColor: 'rgba(33, 150, 243, 0)',
+            lineColor: 'rgba(33, 150, 243, 1)',
+        });
+        const randomSlice4 = getRandomSlice();
+        areaSeries4.setData(data.map(d => ({ time: d.time, value: d.close })).slice(randomSlice4.start, randomSlice4.end));
+
+        const ema21Series = chart4.addLineSeries({ color: 'purple', lineWidth: 1 });
+        ema21Series.setData(data.slice(randomSlice4.start, randomSlice4.end).map(d => ({ time: d.time, value: d.EMA_21 })));
+
+        const ema42Series = chart4.addLineSeries({ color: 'orange', lineWidth: 1 });
+        ema42Series.setData(data.slice(randomSlice4.start, randomSlice4.end).map(d => ({ time: d.time, value: d.EMA_42 })));
+    </script>
+</body>
+</html>

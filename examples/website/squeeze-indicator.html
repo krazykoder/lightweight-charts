@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squeeze Indicator Example</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Squeeze Indicator Example</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="code-container">
+                <h3>Candlestick Chart with Squeeze Indicator</h3>
+                <pre>
+// Main Chart (Candlesticks)
+const chart = LightweightCharts.createChart(
+    document.getElementById('chart-container1'), 
+    { width: 800, height: 400, timeScale: { tickMarkFormatter } }
+);
+const candlestickSeries = chart.addCandlestickSeries();
+const randomSlice = getRandomSlice();
+candlestickSeries.setData(data.slice(randomSlice.start, randomSlice.end));
+
+// Histogram Pane (Squeeze Indicator)
+const histogramPane = LightweightCharts.createChart(
+    document.getElementById('chart-container2'),
+    { width: 800, height: 200, timeScale: { tickMarkFormatter } }
+);
+const histogramSeries = histogramPane.addHistogramSeries({ base: 0 });
+const squeezeMarkersSeries = histogramPane.addLineSeries({
+    color: 'transparent', // Hide the line
+    lineWidth: 0,
+    crosshairMarkerVisible: false,
+    lastValueVisible: false,
+    priceLineVisible: false,
+});
+
+const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+const histogramData = data.map(d => ({
+    time: d.time,
+    value: d.SQZ_Hist,
+    color: sqzColors[d.SQZ_HistC] || 'gray',
+})).slice(randomSlice.start, randomSlice.end);
+histogramSeries.setData(histogramData);
+
+const squeezeMarkerData = data.map(d => ({
+    time: d.time,
+    value: d.SQZ === 1 ? 0 : null, // Place marker at 0 if squeeze is on
+})).slice(randomSlice.start, randomSlice.end);
+squeezeMarkersSeries.setMarkers(squeezeMarkerData.filter(d => d.value === 0).map(d => ({
+    time: d.time,
+    position: 'inBar',
+    color: 'yellow',
+    shape: 'circle',
+    size: 0.5,
+})));
+
+// Sync main chart and histogram pane
+let isSyncing = false;
+chart.timeScale().subscribeVisibleTimeRangeChange(range => {
+    if (isSyncing) return;
+    isSyncing = true;
+    if (range) histogramPane.timeScale().setVisibleRange(range);
+    isSyncing = false;
+});
+histogramPane.timeScale().subscribeVisibleTimeRangeChange(range => {
+    if (isSyncing) return;
+    isSyncing = true;
+    if (range) chart.timeScale().setVisibleRange(range);
+    isSyncing = false;
+});
+                </pre>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+                <div class="chart-container" id="chart-container1"></div>
+                <div class="chart-container" id="chart-container2"></div>
+            </div>
+        </div>
+        <nav>
+            <a href="markers.html">Prev</a>
+            <a href="index.html">Home</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        function getRandomSlice(maxDataLength = 500, minLength = 50, maxLength = 200) {
+            const start = Math.floor(Math.random() * (maxDataLength - minLength + 1));
+            const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
+            return { start, end };
+        }
+
+        const tickMarkFormatter = (time, tickMarkType, locale) => {
+            const date = new Date(time * 1000);
+            switch (tickMarkType) {
+                case LightweightCharts.TickMarkType.Year:
+                    return date.getFullYear();
+                case LightweightCharts.TickMarkType.Month:
+                    return new Intl.DateTimeFormat(locale, { month: 'short' }).format(date);
+                case LightweightCharts.TickMarkType.DayOfMonth:
+                    return date.getDate();
+                case LightweightCharts.TickMarkType.Time:
+                    return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(date);
+                default:
+                    return '';
+            }
+        };
+
+        // Main Chart (Candlesticks)
+        const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+            width: 800,
+            height: 400,
+            timeScale: { tickMarkFormatter, borderVisible: false },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        });
+        const candlestickSeries = chart.addCandlestickSeries();
+        const randomSlice = getRandomSlice();
+        candlestickSeries.setData(data.slice(randomSlice.start, randomSlice.end));
+
+        // Histogram Pane (Squeeze Indicator)
+        const histogramPane = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+            width: 800,
+            height: 200,
+            timeScale: { tickMarkFormatter, borderVisible: false },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        });
+        const histogramSeries = histogramPane.addHistogramSeries({ base: 0 });
+        const squeezeMarkersSeries = histogramPane.addLineSeries({
+            color: 'transparent',
+            lineWidth: 0,
+            crosshairMarkerVisible: false,
+            lastValueVisible: false,
+            priceLineVisible: false,
+        });
+
+        const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+        const histogramData = data.map(d => ({
+            time: d.time,
+            value: d.SQZ_Hist,
+            color: sqzColors[d.SQZ_HistC] || 'gray',
+        })).slice(randomSlice.start, randomSlice.end);
+        histogramSeries.setData(histogramData);
+
+        const squeezeMarkerData = data.map(d => ({
+            time: d.time,
+            value: d.SQZ === 1 ? 0 : null,
+        })).slice(randomSlice.start, randomSlice.end);
+
+        squeezeMarkersSeries.setMarkers(squeezeMarkerData.filter(d => d.value === 0).map(d => ({
+            time: d.time,
+            position: 'inBar',
+            color: 'yellow',
+            shape: 'circle',
+            size: 0.5,
+        })));
+
+        // Sync main chart and histogram pane
+        let isSyncing = false;
+        chart.timeScale().subscribeVisibleTimeRangeChange(range => {
+            if (isSyncing) return;
+            isSyncing = true;
+            if(range) histogramPane.timeScale().setVisibleRange(range);
+            isSyncing = false;
+        });
+        histogramPane.timeScale().subscribeVisibleTimeRangeChange(range => {
+            if (isSyncing) return;
+            isSyncing = true;
+            if(range) chart.timeScale().setVisibleRange(range);
+            isSyncing = false;
+        });
+
+        chart.subscribeCrosshairMove(param => {
+            if (param.point) histogramPane.moveCrosshair(param.point);
+        });
+        histogramPane.subscribeCrosshairMove(param => {
+            if (param.point) chart.moveCrosshair(param.point);
+        });
+
+    </script>
+</body>
+</html>
