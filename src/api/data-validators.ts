@@ -63,25 +63,26 @@ function checkBarItem(type: 'Bar' | 'Candlestick', barItem: SeriesDataItemTypeMa
 		return;
 	}
 
+	const barData = barItem as any; // Type assertion for bar data
 	assert(
 		// eslint-disable-next-line @typescript-eslint/tslint/config
-		typeof barItem.open === 'number',
-		`${type} series item data value of open must be a number, got=${typeof barItem.open}, value=${barItem.open}`
+		typeof barData.open === 'number',
+		`${type} series item data value of open must be a number, got=${typeof barData.open}, value=${barData.open}`
 	);
 	assert(
 		// eslint-disable-next-line @typescript-eslint/tslint/config
-		typeof barItem.high === 'number',
-		`${type} series item data value of high must be a number, got=${typeof barItem.high}, value=${barItem.high}`
+		typeof barData.high === 'number',
+		`${type} series item data value of high must be a number, got=${typeof barData.high}, value=${barData.high}`
 	);
 	assert(
 		// eslint-disable-next-line @typescript-eslint/tslint/config
-		typeof barItem.low === 'number',
-		`${type} series item data value of low must be a number, got=${typeof barItem.low}, value=${barItem.low}`
+		typeof barData.low === 'number',
+		`${type} series item data value of low must be a number, got=${typeof barData.low}, value=${barData.low}`
 	);
 	assert(
 		// eslint-disable-next-line @typescript-eslint/tslint/config
-		typeof barItem.close === 'number',
-		`${type} series item data value of close must be a number, got=${typeof barItem.close}, value=${barItem.close}`
+		typeof barData.close === 'number',
+		`${type} series item data value of close must be a number, got=${typeof barData.close}, value=${barData.close}`
 	);
 }
 
@@ -90,8 +91,9 @@ function checkLineItem(type: 'Area' | 'Baseline' | 'Line' | 'Histogram', lineIte
 		return;
 	}
 
+	const lineData = lineItem as any; // Type assertion for line data
 	assert(
 		// eslint-disable-next-line @typescript-eslint/tslint/config
-		typeof lineItem.value === 'number' || lineItem.value === null,
-		`${type} series item data value must be a number, got=${typeof lineItem.value}, value=${lineItem.value}`);
+		typeof lineData.value === 'number' || lineData.value === null,
+		`${type} series item data value must be a number, got=${typeof lineData.value}, value=${lineData.value}`);
 }
