@@ -27,5 +27,8 @@ debug.html
 
 !/src/typings/**/*.d.ts
 
+# tests
+/tests/
+
 # graphics tests out data
 /tests/e2e/graphics/.gendata/

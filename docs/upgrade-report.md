@@ -50,8 +50,8 @@ This upgrade focused on modernizing the development toolchain and dependencies w
 // Before
 const terser = require('rollup-plugin-terser').terser;
 
-// After
-const terser = require('@rollup/plugin-terser');
+// After  
+const terserPlugin = require('@rollup/plugin-terser');
 ```
 
 ### 3. Development Tools Upgrade

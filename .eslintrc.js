@@ -39,7 +39,6 @@ module.exports = {
 	},
 	plugins: [
 		'@typescript-eslint',
-		'@typescript-eslint/tslint',
 		'deprecation',
 		'eslint-plugin-tsdoc',
 		'import',
@@ -47,7 +46,6 @@ module.exports = {
 		'markdown',
 		'prefer-arrow',
 		'unicorn',
-		'jsdoc',
 	],
 	settings: {
 		jsdoc: {
@@ -288,104 +286,7 @@ module.exports = {
 				// 	},
 				// ],
 
-				// see https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/ROADMAP.md
-				'@typescript-eslint/tslint/config': [
-					'error',
-					{
-						rulesDirectory: [
-							'node_modules/tslint-eslint-rules/dist/rules',
-							'node_modules/tslint-microsoft-contrib',
-						],
-						rules: {
-							// tslint-microsoft-contrib
-							'no-typeof-undefined': true,
-							'no-unnecessary-local-variable': true,
-							'no-unnecessary-override': true,
 
-							// tslint-eslint-rules
-							'ter-indent': [
-								true,
-								'tab',
-								{
-									SwitchCase: 1,
-									VariableDeclarator: 1,
-								},
-							],
-
-							// tslint core
-							align: [
-								true,
-								'parameters',
-								'arguments',
-								'statements',
-							],
-							'ordered-imports': [
-								true,
-								{
-									'grouped-imports': true,
-									groups: [
-										{
-											name: 'nodejs-core',
-											match: '^(fs|path)$',
-											order: 9,
-										},
-										{
-											name: 'libraries',
-											match: '^[^\\.]+',
-											order: 10,
-										},
-										{
-											name: 'api',
-											match: '\\.\\./api/',
-											order: 20,
-										},
-										{
-											name: 'formatters',
-											match: '\\.\\./formatters/',
-											order: 30,
-										},
-										{
-											name: 'gui',
-											match: '\\.\\./gui/',
-											order: 40,
-										},
-										{
-											name: 'helpers',
-											match: '\\.\\./helpers/',
-											order: 50,
-										},
-										{
-											name: 'model',
-											match: '\\.\\./(renderers|views|model)/',
-											order: 60,
-										},
-										{
-											name: 'current directory',
-											match: '^\\.',
-											order: 70,
-										},
-									],
-								},
-							],
-							'static-this': true,
-							'strict-type-predicates': true,
-
-							// we can't use @typescript-eslint/typedef in couple with @typescript-eslint/explicit-function-return-type
-							// because it isn't the same - explicit-function-return-type requires to specify return type of arrow functions
-							// which cannot be disabled or configured somehow
-							// see https://github.com/typescript-eslint/typescript-eslint/issues/1731
-							// and https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/typedef.md
-							typedef: [
-								true,
-								'call-signature',
-								'parameter',
-								'arrow-parameter',
-								'property-declaration',
-								'member-variable-declaration',
-							],
-						},
-					},
-				],
 			},
 		},
 		{
@@ -719,7 +620,6 @@ module.exports = {
 		}],
 
 		'jsdoc/check-indentation': 'error',
-		'jsdoc/newline-after-description': 'error',
 
 		'import/no-default-export': 'error',
 

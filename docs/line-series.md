@@ -88,7 +88,6 @@ A line series interface can be customized using the following options:
         { time: '2018-12-05', value: null }, // Another gap
         { time: '2018-12-06', value: 28.89 },
     ]);
-    });
     ```
 
 - change options after series is created:
