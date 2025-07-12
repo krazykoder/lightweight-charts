@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histogram Series Examples</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Histogram Series Examples</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="code-container">
+                <h3>Histogram with Squeeze Data</h3>
+                <pre>
+const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+    width: 600,
+    height: 300,
+});
+const histogramSeries = chart.addHistogramSeries();
+const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+const randomSlice1 = getRandomSlice();
+const histogramData = data.map(d => ({
+    time: d.time,
+    value: d.SQZ_Hist,
+    color: sqzColors[d.SQZ_HistC] || 'gray',
+})).slice(randomSlice1.start, randomSlice1.end);
+histogramSeries.setData(histogramData);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container1"></div>
+        </div>
+        <div class="container">
+            <div class="code-container">
+                <h3>Histogram with Custom Base</h3>
+                <pre>
+const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+    width: 600,
+    height: 300,
+});
+const histogramSeries2 = chart2.addHistogramSeries({
+    base: 0,
+});
+const randomSlice2 = getRandomSlice();
+const histogramData2 = data.map(d => ({
+    time: d.time,
+    value: d.SQZ_Hist,
+})).slice(randomSlice2.start, randomSlice2.end);
+histogramSeries2.setData(histogramData2);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container2"></div>
+        </div>
+        <nav>
+            <a href="candlestick-series.html">Prev</a>
+            <a href="line-series.html">Next</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        function getRandomSlice(maxDataLength = 500, minLength = 50, maxLength = 200) {
+            const start = Math.floor(Math.random() * (maxDataLength - minLength + 1));
+            const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
+            return { start, end };
+        }
+
+        const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+            width: 600,
+            height: 300,
+        });
+        const histogramSeries = chart.addHistogramSeries();
+        const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+        const randomSlice1 = getRandomSlice();
+        const histogramData = data.map(d => ({
+            time: d.time,
+            value: d.SQZ_Hist,
+            color: sqzColors[d.SQZ_HistC] || 'gray',
+        })).slice(randomSlice1.start, randomSlice1.end);
+        histogramSeries.setData(histogramData);
+
+        const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+            width: 600,
+            height: 300,
+        });
+        const histogramSeries2 = chart2.addHistogramSeries({
+            base: 0,
+        });
+        const randomSlice2 = getRandomSlice();
+        const histogramData2 = data.map(d => ({
+            time: d.time,
+            value: d.SQZ_Hist,
+        })).slice(randomSlice2.start, randomSlice2.end);
+        histogramSeries2.setData(histogramData2);
+    </script>
+</body>
+</html>
