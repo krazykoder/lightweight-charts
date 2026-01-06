@@ -1,6 +1,6 @@
 /*!
  * @license
- * TradingView Lightweight Charts v3.8.0-dev+202507121752
+ * TradingView Lightweight Charts v3.8.0-local-dev+202601052352
  * Copyright (c) 2020 TradingView, Inc.
  * Licensed under Apache License 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
@@ -2711,6 +2711,17 @@
             if (!this._precalculatedCache.length) {
                 this._fillPrecalculatedCache(pixelRatio);
             }
+            if (this._data.histogramStyle === 1 /* HistogramStyle.Area */) {
+                this._drawArea(ctx, pixelRatio);
+            }
+            else {
+                this._drawColumns(ctx, pixelRatio);
+            }
+        };
+        PaneRendererHistogram.prototype._drawColumns = function (ctx, pixelRatio) {
+            if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
+                return;
+            }
             var tickWidth = Math.max(1, Math.floor(pixelRatio));
             var histogramBase = Math.round((this._data.histogramBase) * pixelRatio);
             var topHistogramBase = histogramBase - Math.floor(tickWidth / 2);
@@ -2731,6 +2742,35 @@
                     bottom = y - Math.floor(tickWidth / 2) + tickWidth;
                 }
                 ctx.fillRect(current.left, top_1, current.right - current.left + 1, bottom - top_1);
+            }
+        };
+        PaneRendererHistogram.prototype._drawArea = function (ctx, pixelRatio) {
+            if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
+                return;
+            }
+            var histogramBase = Math.round((this._data.histogramBase) * pixelRatio);
+            ctx.lineJoin = 'round';
+            for (var i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
+                var item = this._data.items[i];
+                var current = this._precalculatedCache[i - this._data.visibleRange.from];
+                var y = Math.round(item.y * pixelRatio);
+                ctx.fillStyle = item.color;
+                ctx.beginPath();
+                // Strategy:
+                // 1. Start at (current.roundedCenter, y)
+                // 2. We need the next point to form a trapezoid. 
+                // Check if i+1 is within visible range.
+                if (i < this._data.visibleRange.to - 1) {
+                    var nextCache = this._precalculatedCache[i - this._data.visibleRange.from + 1];
+                    var nextItem = this._data.items[i + 1];
+                    var nextY = Math.round(nextItem.y * pixelRatio);
+                    ctx.moveTo(current.roundedCenter, y);
+                    ctx.lineTo(nextCache.roundedCenter, nextY);
+                    ctx.lineTo(nextCache.roundedCenter, histogramBase);
+                    ctx.lineTo(current.roundedCenter, histogramBase);
+                    ctx.closePath();
+                    ctx.fill();
+                }
             }
         };
         // eslint-disable-next-line complexity
@@ -2820,6 +2860,7 @@
             barSpacing: barSpacing,
             histogramBase: NaN,
             visibleRange: null,
+            histogramStyle: 0 /* HistogramStyle.Columns */,
         };
     }
     function createRawItem(time, price, color) {
@@ -2887,6 +2928,7 @@
             this._histogramData.histogramBase = histogramBase;
             this._histogramData.visibleRange = visibleTimedValues(this._histogramData.items, visibleBars, false);
             this._histogramData.barSpacing = barSpacing;
+            this._histogramData.histogramStyle = this._series.options().histogramStyle;
             // need this to update cache
             this._renderer.setData(this._histogramData);
         };
@@ -7950,6 +7992,20 @@
          */
         LastPriceAnimationMode[LastPriceAnimationMode["OnDataUpdate"] = 2] = "OnDataUpdate";
     })(LastPriceAnimationMode || (LastPriceAnimationMode = {}));
+    /**
+     * Represents the possible histogram styles.
+     */
+    var HistogramStyle;
+    (function (HistogramStyle) {
+        /**
+         * Render the histogram as a vertical bars.
+         */
+        HistogramStyle[HistogramStyle["Columns"] = 0] = "Columns";
+        /**
+         * Render the histogram using a line style with the area filled.
+         */
+        HistogramStyle[HistogramStyle["Area"] = 1] = "Area";
+    })(HistogramStyle || (HistogramStyle = {}));
     function precisionByMinMove(minMove) {
         if (minMove >= 1) {
             return 0;
@@ -12169,6 +12225,7 @@
     var histogramStyleDefaults = {
         color: '#26a69a',
         base: 0,
+        histogramStyle: 0 /* HistogramStyle.Columns */,
     };
     var seriesOptionsDefaults = {
         title: '',
@@ -12698,7 +12755,7 @@
      * Returns the current version as a string. For example `'3.3.0'`.
      */
     function version() {
-        return "3.8.0-dev+202507121752";
+        return "3.8.0-local-dev+202601052352";
     }
 
     var LightweightChartsModule = /*#__PURE__*/Object.freeze({

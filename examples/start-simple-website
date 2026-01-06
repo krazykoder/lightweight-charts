@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+# Navigate to the repository root (one level up from website/)
+cd "$(dirname "$0")/.."
+
+echo "Copying distribution file to examples/website/dist/..."
+cp dist/lightweight-charts.standalone.production.js examples/website/dist/
+
+echo "Starting Python HTTP Server in examples/..."
+cd examples
+python3 -m http.server 8000

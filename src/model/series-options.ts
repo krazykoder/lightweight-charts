@@ -406,6 +406,21 @@ export interface BaselineStyleOptions {
 	lastPriceAnimation: LastPriceAnimationMode;
 }
 
+
+/**
+ * Represents the possible histogram styles.
+ */
+export const enum HistogramStyle {
+	/**
+	 * Render the histogram as a vertical bars.
+	 */
+	Columns, // Default
+	/**
+	 * Render the histogram using a line style with the area filled.
+	 */
+	Area,
+}
+
 /**
  * Represents style options for a histogram series.
  */
@@ -423,6 +438,13 @@ export interface HistogramStyleOptions {
 	 * @defaultValue `0`
 	 */
 	base: number;
+
+	/**
+	 * Histogram style.
+	 *
+	 * @defaultValue {@link HistogramStyle.Columns}
+	 */
+	histogramStyle: HistogramStyle;
 }
 
 /**

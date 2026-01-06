@@ -1,4 +1,5 @@
 import { PricedValue } from '../model/price-scale';
+import { HistogramStyle } from '../model/series-options';
 import { SeriesItemsIndexesRange, TimedValue, TimePointIndex } from '../model/time-data';
 
 import { IPaneRenderer } from './ipane-renderer';
@@ -17,6 +18,8 @@ export interface PaneRendererHistogramData {
 	histogramBase: number;
 
 	visibleRange: SeriesItemsIndexesRange | null;
+
+	histogramStyle: HistogramStyle;
 }
 
 interface PrecalculatedItemCoordinates {
@@ -44,6 +47,18 @@ export class PaneRendererHistogram implements IPaneRenderer {
 			this._fillPrecalculatedCache(pixelRatio);
 		}
 
+		if (this._data.histogramStyle === HistogramStyle.Area) {
+			this._drawArea(ctx, pixelRatio);
+		} else {
+			this._drawColumns(ctx, pixelRatio);
+		}
+	}
+
+	private _drawColumns(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
+			return;
+		}
+
 		const tickWidth = Math.max(1, Math.floor(pixelRatio));
 		const histogramBase = Math.round((this._data.histogramBase) * pixelRatio);
 		const topHistogramBase = histogramBase - Math.floor(tickWidth / 2);
@@ -67,6 +82,61 @@ export class PaneRendererHistogram implements IPaneRenderer {
 			}
 
 			ctx.fillRect(current.left, top, current.right - current.left + 1, bottom - top);
+		}
+	}
+
+	private _drawArea(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+		if (this._data === null || this._data.items.length === 0 || this._data.visibleRange === null) {
+			return;
+		}
+
+		const histogramBase = Math.round((this._data.histogramBase) * pixelRatio);
+
+		ctx.lineJoin = 'round';
+
+		for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
+			const item = this._data.items[i];
+			const current = this._precalculatedCache[i - this._data.visibleRange.from];
+			const y = Math.round(item.y * pixelRatio);
+
+			ctx.fillStyle = item.color;
+			ctx.beginPath();
+
+			// Strategy:
+			// 1. Start at (current.roundedCenter, y)
+			// 2. We need the next point to form a trapezoid. 
+			// Check if i+1 is within visible range.
+			if (i < this._data.visibleRange.to - 1) {
+				const nextCache = this._precalculatedCache[i - this._data.visibleRange.from + 1];
+				const nextItem = this._data.items[i + 1];
+				const nextY = Math.round(nextItem.y * pixelRatio);
+
+				ctx.fillStyle = nextItem.color;
+
+				ctx.moveTo(current.roundedCenter, y);
+				ctx.lineTo(nextCache.roundedCenter, nextY);
+				ctx.lineTo(nextCache.roundedCenter, histogramBase);
+				ctx.lineTo(current.roundedCenter, histogramBase);
+				ctx.closePath();
+				ctx.fill();
+			} else {
+				// Last visible point. 
+				// If we want to be consistent with Line series, we don't draw anything after the last point 
+				// unless we have the next point available.
+				// But usually histogram items are discrete.
+				// If we treat it as "area", a single point histogram area might be invisible if not connected?
+				// Or maybe it should look like a step?
+				// Detailed requirement: "Histogram Area should support perpoint coloring ... shape".
+				// "Area" usually implies connecting points.
+				// If we look at Line/Area renderer, they walk the line.
+				// But here we need per-point color. The only way to have per-point color in a continuous area
+				// is to draw segments individually.
+
+				// So for the last point, if it's the very last data point, we might stop. 
+				// If it's just the edge of visibility, maybe we shouldn't draw it or we need the next one.
+				// However, precalculated cache is only for visible range.
+				// Let's stick to drawing segments between i and i+1 provided both are in visible range.
+			}
 		}
 	}
 

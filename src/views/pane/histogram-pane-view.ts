@@ -6,6 +6,7 @@ import { Coordinate } from '../../model/coordinate';
 import { PlotRowValueIndex } from '../../model/plot-data';
 import { PriceScale } from '../../model/price-scale';
 import { Series } from '../../model/series';
+import { HistogramStyle } from '../../model/series-options';
 import { TimedValue, TimePointIndex, visibleTimedValues } from '../../model/time-data';
 import { TimeScale } from '../../model/time-scale';
 import { CompositeRenderer } from '../../renderers/composite-renderer';
@@ -20,6 +21,7 @@ function createEmptyHistogramData(barSpacing: number): PaneRendererHistogramData
 		barSpacing,
 		histogramBase: NaN,
 		visibleRange: null,
+		histogramStyle: HistogramStyle.Columns,
 	};
 }
 
@@ -80,7 +82,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._compositeRenderer.setRenderers([this._renderer]);
 	}
 
-	protected _updateOptions(): void {}
+	protected _updateOptions(): void { }
 
 	protected override _clearVisibleRange(): void {
 		super._clearVisibleRange();
@@ -102,6 +104,7 @@ export class SeriesHistogramPaneView extends SeriesPaneViewBase<'Histogram', Tim
 		this._histogramData.histogramBase = histogramBase;
 		this._histogramData.visibleRange = visibleTimedValues(this._histogramData.items, visibleBars, false);
 		this._histogramData.barSpacing = barSpacing;
+		this._histogramData.histogramStyle = this._series.options().histogramStyle;
 		// need this to update cache
 		this._renderer.setData(this._histogramData);
 	}

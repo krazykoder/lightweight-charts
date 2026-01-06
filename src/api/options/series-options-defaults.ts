@@ -3,6 +3,7 @@ import {
 	BarStyleOptions,
 	BaselineStyleOptions,
 	CandlestickStyleOptions,
+	HistogramStyle,
 	HistogramStyleOptions,
 	LastPriceAnimationMode,
 	LineStyleOptions,
@@ -85,6 +86,7 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 export const histogramStyleDefaults: HistogramStyleOptions = {
 	color: '#26a69a',
 	base: 0,
+	histogramStyle: HistogramStyle.Columns,
 };
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {

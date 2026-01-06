@@ -337,8 +337,14 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	public moveCrosshair(point: Point | null): void {
-		if (!point) return;
 		const paneWidgets = this._chartWidget.paneWidgets();
+		if (!point) {
+			for (const paneWidget of paneWidgets) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				paneWidget.mouseLeaveEvent({} as any);
+			}
+			return;
+		}
 		const event = {
 			localX: point.x,
 			localY: point.y,

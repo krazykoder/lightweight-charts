@@ -598,6 +598,19 @@ export declare class PriceFormatter implements IPriceFormatter {
 	private _calculateDecimal;
 	private _formatAsDecimal;
 }
+/**
+ * Represents the possible histogram styles.
+ */
+export declare const enum HistogramStyle {
+	/**
+	 * Render the histogram as a vertical bars.
+	 */
+	Columns = 0,// Default
+	/**
+	 * Render the histogram using a line style with the area filled.
+	 */
+	Area = 1
+}
 export declare const enum InvalidationLevel {
 	None = 0,
 	Cursor = 1,
@@ -1504,6 +1517,12 @@ export interface HistogramStyleOptions {
 	 * @defaultValue `0`
 	 */
 	base: number;
+	/**
+	 * Histogram style.
+	 *
+	 * @defaultValue {@link HistogramStyle.Columns}
+	 */
+	histogramStyle: HistogramStyle;
 }
 export interface HoveredObject {
 	hitTestData?: unknown;
