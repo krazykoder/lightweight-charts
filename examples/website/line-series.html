@@ -531,19 +531,30 @@ const lineSeries10 = chart10.addLineSeries({
         const chartsToSync = [chart9, chart10];
 
         // Sync Crosshair
-        chartsToSync.forEach((chart, index) => {
-            const otherChart = chartsToSync[index === 0 ? 1 : 0];
-            let isSyncing = false;
-            chart.subscribeCrosshairMove(param => {
-                if (isSyncing || param.sourceEvent === undefined) return;
-                isSyncing = true;
-                if (param.point) {
-                    otherChart.moveCrosshair(param.point);
-                } else {
-                    otherChart.moveCrosshair(null);
-                }
-                isSyncing = false;
-            });
+        // Sync Crosshair
+        let isSyncing9 = false;
+        let isSyncing10 = false;
+
+        chart9.subscribeCrosshairMove(param => {
+            if (isSyncing10) return;
+            isSyncing9 = true;
+            if (param.point) {
+                chart10.moveCrosshair(param.point);
+            } else {
+                chart10.moveCrosshair(null);
+            }
+            isSyncing9 = false;
+        });
+
+        chart10.subscribeCrosshairMove(param => {
+            if (isSyncing9) return;
+            isSyncing10 = true;
+            if (param.point) {
+                chart9.moveCrosshair(param.point);
+            } else {
+                chart9.moveCrosshair(null);
+            }
+            isSyncing10 = false;
         });
 
         // Sync Time Scale
