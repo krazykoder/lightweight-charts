@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,17 +8,63 @@
     <link rel="stylesheet" href="style.css">
     <script src="dist/lightweight-charts.standalone.production.js"></script>
 </head>
+
 <body>
     <header>
         <a href="index.html">Home</a>
         <h1>Line Series Examples</h1>
     </header>
-    <main>
-        <!-- Simple Line -->
-        <div class="container">
-            <div class="code-container">
-                <h3>Simple Line</h3>
-                <pre>
+    <!-- Playbook Chart -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Playbook: Mix & Match</h3>
+            <div class="controls">
+                <label>
+                    Line Type:
+                    <select id="lineTypeSelect">
+                        <option value="0">Simple</option>
+                        <option value="1">WithSteps</option>
+                        <option value="2">WithGaps</option>
+                        <option value="3">Circle</option>
+                        <option value="4">Cross</option>
+                        <option value="5">Area</option>
+                        <option value="6">SteppedArea</option>
+                    </select>
+                </label>
+                <label>
+                    Line Style:
+                    <select id="lineStyleSelect">
+                        <option value="0">Solid</option>
+                        <option value="1">Dotted</option>
+                        <option value="2">Dashed</option>
+                        <option value="3">LargeDashed</option>
+                        <option value="4">SparseDotted</option>
+                    </select>
+                </label>
+                <label>
+                    Per-Point Coloring:
+                    <input type="checkbox" id="perPointColorCheckbox">
+                </label>
+                <label>
+                    Area Opacity: <span id="opacityValue">0.5</span>
+                    <input type="range" id="opacityRange" min="0" max="1" step="0.1" value="0.5">
+                </label>
+                <label>
+                    Line Width:
+                    <input type="number" id="lineWidthInput" min="1" max="10" value="3">
+                </label>
+            </div>
+            <div class="chart-container" id="chart-container0"></div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Simple Line -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Simple Line</h3>
+            <pre>
 const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
     width: 600,
     height: 300,
@@ -26,15 +73,15 @@ const lineSeries = chart.addLineSeries();
 const randomSlice1 = getRandomSlice();
 lineSeries.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.end));
                 </pre>
-            </div>
-            <div class="chart-container" id="chart-container1"></div>
         </div>
+        <div class="chart-container" id="chart-container1"></div>
+    </div>
 
-        <!-- Stepped Line -->
-        <div class="container">
-            <div class="code-container">
-                <h3>Stepped Line</h3>
-                <pre>
+    <!-- Stepped Line -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Stepped Line</h3>
+            <pre>
 const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
     width: 600,
     height: 300,
@@ -46,15 +93,15 @@ const lineSeries2 = chart2.addLineSeries({
 const randomSlice2 = getRandomSlice();
 lineSeries2.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice2.start, randomSlice2.end));
                 </pre>
-            </div>
-            <div class="chart-container" id="chart-container2"></div>
         </div>
+        <div class="chart-container" id="chart-container2"></div>
+    </div>
 
-        <!-- Line with Gaps -->
-        <div class="container">
-            <div class="code-container">
-                <h3>Line with Gaps</h3>
-                <pre>
+    <!-- Line with Gaps -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Line with Gaps</h3>
+            <pre>
 const chart3 = LightweightCharts.createChart(document.getElementById('chart-container3'), {
     width: 600,
     height: 300,
@@ -70,15 +117,15 @@ gappedData[10].value = null;
 gappedData[25].value = null;
 lineSeries3.setData(gappedData);
                 </pre>
-            </div>
-            <div class="chart-container" id="chart-container3"></div>
         </div>
+        <div class="chart-container" id="chart-container3"></div>
+    </div>
 
-        <!-- Customized Line -->
-        <div class="container">
-            <div class="code-container">
-                <h3>Customized Line</h3>
-                <pre>
+    <!-- Customized Line -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Customized Line</h3>
+            <pre>
 const chart4 = LightweightCharts.createChart(document.getElementById('chart-container4'), {
     width: 600,
     height: 300,
@@ -95,14 +142,142 @@ const lineSeries4 = chart4.addLineSeries({
 const randomSlice4 = getRandomSlice();
 lineSeries4.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice4.start, randomSlice4.end));
                 </pre>
-            </div>
-            <div class="chart-container" id="chart-container4"></div>
         </div>
+        <div class="chart-container" id="chart-container4"></div>
+    </div>
 
-        <nav>
-            <a href="histogram-series.html">Prev</a>
-            <a href="time-scale.html">Next</a>
-        </nav>
+    <!-- Per-Point Coloring -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Per-Point Coloring</h3>
+            <pre>
+const chart5 = LightweightCharts.createChart(document.getElementById('chart-container5'), {
+    width: 600,
+    height: 300,
+});
+const lineSeries5 = chart5.addLineSeries();
+const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+const randomSlice5 = getRandomSlice();
+const coloredData = data.map(d => ({
+    time: d.time,
+    value: d.value,
+    color: sqzColors[d.SQZ_HistC] || 'gray', // Dynamic color from SQZ_HistC
+})).slice(randomSlice5.start, randomSlice5.end);
+lineSeries5.setData(coloredData);
+                </pre>
+        </div>
+        <div class="chart-container" id="chart-container5"></div>
+    </div>
+
+    <!-- Stepped Per-Point Coloring -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Stepped Per-Point Coloring</h3>
+            <pre>
+const chart6 = LightweightCharts.createChart(document.getElementById('chart-container6'), {
+    width: 600,
+    height: 300,
+});
+const lineSeries6 = chart6.addLineSeries({
+    lineType: LightweightCharts.LineType.WithSteps,
+});
+// Using same sqzColors and randomSlice from above
+const steppedColoredData = data.map(d => ({
+    time: d.time,
+    value: d.value,
+    color: sqzColors[d.SQZ_HistC] || 'gray',
+})).slice(randomSlice5.start, randomSlice5.end);
+lineSeries6.setData(steppedColoredData);
+                </pre>
+        </div>
+        <div class="chart-container" id="chart-container6"></div>
+    </div>
+
+    <!-- Circle Style -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Circle Style</h3>
+            <pre>
+const chart7 = LightweightCharts.createChart(document.getElementById('chart-container7'), {
+    width: 600,
+    height: 300,
+});
+const lineSeries7 = chart7.addLineSeries({
+    // LineType.Circle = 3
+    lineType: 3,
+    color: '#26a69a',
+    lineWidth: 4,
+});
+lineSeries7.setData(data.slice(0, 50));
+                </pre>
+        </div>
+        <div class="chart-container" id="chart-container7"></div>
+    </div>
+
+    <!-- Cross Style -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Cross Style</h3>
+            <pre>
+const chart8 = LightweightCharts.createChart(document.getElementById('chart-container8'), {
+    width: 600,
+    height: 300,
+});
+const lineSeries8 = chart8.addLineSeries({
+    // LineType.Cross = 4
+    lineType: 4,
+    color: '#ef5350',
+    lineWidth: 3,
+});
+lineSeries8.setData(data.slice(0, 50));
+                </pre>
+        </div>
+        <div class="chart-container" id="chart-container8"></div>
+    </div>
+
+    <!-- Area Opacity Example -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Area (Opacity 0.2)</h3>
+            <pre>
+const chart9 = LightweightCharts.createChart(document.getElementById('chart-container9'), {
+    width: 600,
+    height: 300,
+});
+const lineSeries9 = chart9.addLineSeries({
+    lineType: 5, // Area
+    color: '#2962FF',
+    pointColorAreaAlpha: 0.2, // 20% opacity
+});
+// Syncs with Chart 10
+            </pre>
+        </div>
+        <div class="chart-container" id="chart-container9"></div>
+    </div>
+
+    <!-- Stepped Area Opacity Example -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Stepped Area (Opacity 0.2)</h3>
+            <pre>
+const chart10 = LightweightCharts.createChart(document.getElementById('chart-container10'), {
+    width: 600,
+    height: 300,
+});
+const lineSeries10 = chart10.addLineSeries({
+    lineType: 6, // SteppedArea
+    pointColorAreaAlpha: 0.2,
+});
+// Using per-point coloring
+            </pre>
+        </div>
+        <div class="chart-container" id="chart-container10"></div>
+    </div>
+
+    <nav>
+        <a href="histogram-series.html">Prev</a>
+        <a href="time-scale.html">Next</a>
+    </nav>
     </main>
     <script src="../app-data.js"></script>
     <script>
@@ -111,6 +286,66 @@ lineSeries4.setData(data.map(d => ({ time: d.time, value: d.value })).slice(rand
             const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
             return { start, end };
         }
+
+        // --- Playbook Chart ---
+        const chart0 = LightweightCharts.createChart(document.getElementById('chart-container0'), {
+            width: 800, // Increased width for better playground
+            height: 400,
+        });
+        const lineSeries0 = chart0.addLineSeries({
+            lineType: 0, // Simple
+            lineStyle: 0, // Solid
+            color: '#2962FF',
+            lineWidth: 3,
+        });
+
+        const randomSlice0 = getRandomSlice();
+        const baseData0 = data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice0.start, randomSlice0.end);
+        lineSeries0.setData(baseData0);
+
+        const lineTypeSelect = document.getElementById('lineTypeSelect');
+        const lineStyleSelect = document.getElementById('lineStyleSelect');
+        const perPointColorCheckbox = document.getElementById('perPointColorCheckbox');
+        const opacityInput = document.getElementById('opacityRange');
+        const opacityValue = document.getElementById('opacityValue');
+        const lineWidthInput = document.getElementById('lineWidthInput');
+
+        function updatePlaybook() {
+            const lineType = parseInt(lineTypeSelect.value);
+            const lineStyle = parseInt(lineStyleSelect.value);
+            const usePerPointColor = perPointColorCheckbox.checked;
+            const opacity = parseFloat(opacityInput.value);
+            const lineWidth = parseInt(lineWidthInput.value);
+
+            opacityValue.textContent = opacity.toFixed(1);
+
+            lineSeries0.applyOptions({
+                lineType: lineType,
+                lineStyle: lineStyle,
+                pointColorAreaAlpha: opacity,
+                lineWidth: lineWidth,
+            });
+
+            if (usePerPointColor) {
+                // Using simple synthesized color for demo:
+                const demoColored = baseData0.map(d => ({
+                    ...d,
+                    color: d.value > baseData0[0].value ? '#26a69a' : '#ef5350',
+                }));
+                lineSeries0.setData(demoColored);
+            } else {
+                // Reset to base data (clears per-point color if we just pass time/value)
+                lineSeries0.setData(baseData0);
+            }
+        }
+
+        lineTypeSelect.addEventListener('change', updatePlaybook);
+        lineStyleSelect.addEventListener('change', updatePlaybook);
+        perPointColorCheckbox.addEventListener('change', updatePlaybook);
+        opacityInput.addEventListener('input', updatePlaybook);
+        lineWidthInput.addEventListener('change', updatePlaybook);
+
+        // --- End Playbook ---
 
         // Simple Line
         const chart1 = LightweightCharts.createChart(document.getElementById('chart-container1'), {
@@ -164,6 +399,162 @@ lineSeries4.setData(data.map(d => ({ time: d.time, value: d.value })).slice(rand
         });
         const randomSlice4 = getRandomSlice();
         lineSeries4.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice4.start, randomSlice4.end));
+
+        // Per-Point Coloring
+        const chart5 = LightweightCharts.createChart(document.getElementById('chart-container5'), {
+            width: 600,
+            height: 300,
+        });
+        const lineSeries5 = chart5.addLineSeries();
+        const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+        const randomSlice5 = getRandomSlice();
+        const coloredData = data.map(d => ({
+            time: d.time,
+            value: d.value,
+            color: sqzColors[d.SQZ_HistC] || 'gray',
+        })).slice(randomSlice5.start, randomSlice5.end);
+        lineSeries5.setData(coloredData);
+
+        // Stepped Per-Point Coloring
+        const chart6 = LightweightCharts.createChart(document.getElementById('chart-container6'), {
+            width: 600,
+            height: 300,
+        });
+        const lineSeries6 = chart6.addLineSeries({
+            lineType: LightweightCharts.LineType.WithSteps,
+        });
+        // using same data range for comparison
+        const steppedColoredData = data.map(d => ({
+            time: d.time,
+            value: d.value,
+            color: sqzColors[d.SQZ_HistC] || 'gray',
+        })).slice(randomSlice5.start, randomSlice5.end);
+        lineSeries6.setData(steppedColoredData);
+
+        // --- Synchronization for Chart 1 and Chart 2 ---
+
+        // Sync Crosshair
+        let isSyncingChart1 = false;
+        let isSyncingChart2 = false;
+
+        chart1.subscribeCrosshairMove(param => {
+            if (isSyncingChart2) return;
+            isSyncingChart1 = true;
+            if (param.point) {
+                chart2.moveCrosshair(param.point);
+            } else {
+                chart2.moveCrosshair(null);
+            }
+            isSyncingChart1 = false;
+        });
+
+        chart2.subscribeCrosshairMove(param => {
+            if (isSyncingChart1) return;
+            isSyncingChart2 = true;
+            if (param.point) {
+                chart1.moveCrosshair(param.point);
+            } else {
+                chart1.moveCrosshair(null);
+            }
+            isSyncingChart2 = false;
+        });
+
+        // Sync Time Scale
+        chart1.timeScale().subscribeVisibleLogicalRangeChange(range => {
+            if (range) chart2.timeScale().setVisibleLogicalRange(range);
+        });
+        chart2.timeScale().subscribeVisibleLogicalRangeChange(range => {
+            if (range) chart1.timeScale().setVisibleLogicalRange(range);
+        });
+
+        // Circle Style
+        const chart7 = LightweightCharts.createChart(document.getElementById('chart-container7'), {
+            width: 600,
+            height: 300,
+        });
+        const lineSeries7 = chart7.addLineSeries({
+            // LineType.Circle = 3 (assuming enum order: Simple, WithSteps, WithGaps, Circle, Cross)
+            lineType: 3,
+            lineStyle: LightweightCharts.LineStyle.Solid,
+            color: '#26a69a',
+            lineWidth: 3,
+        });
+        // Use a smaller slice for better visibility of points
+        lineSeries7.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.start + 50));
+
+        // Cross Style
+        const chart8 = LightweightCharts.createChart(document.getElementById('chart-container8'), {
+            width: 600,
+            height: 300,
+        });
+        const lineSeries8 = chart8.addLineSeries({
+            // LineType.Cross = 4
+            lineType: 4,
+            color: '#ef5350',
+            lineWidth: 3,
+        });
+        lineSeries8.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.start + 50));
+
+        // --- Area Opacity Example (Chart 9) ---
+        const chart9 = LightweightCharts.createChart(document.getElementById('chart-container9'), {
+            width: 600,
+            height: 300,
+        });
+        const lineSeries9 = chart9.addLineSeries({
+            lineType: 5, // Area
+            color: '#2962FF',
+            pointColorAreaAlpha: 0.2,
+        });
+        // Use same slice as chart 10 for sync
+        const sharedSlice = getRandomSlice();
+        const sharedData = data.map(d => ({
+            time: d.time,
+            value: d.value,
+            color: sqzColors[d.SQZ_HistC] || '#2962FF',
+        })).slice(sharedSlice.start, sharedSlice.end);
+
+        lineSeries9.setData(sharedData);
+
+        // --- Stepped Area Opacity Example (Chart 10) ---
+        const chart10 = LightweightCharts.createChart(document.getElementById('chart-container10'), {
+            width: 600,
+            height: 300,
+        });
+        const lineSeries10 = chart10.addLineSeries({
+            lineType: 6, // SteppedArea
+            pointColorAreaAlpha: 0.2,
+            lineStyle: LightweightCharts.LineStyle.Solid,
+        });
+        lineSeries10.setData(sharedData);
+
+        // --- Sync Charts 9 & 10 ---
+        const chartsToSync = [chart9, chart10];
+
+        // Sync Crosshair
+        chartsToSync.forEach((chart, index) => {
+            const otherChart = chartsToSync[index === 0 ? 1 : 0];
+            let isSyncing = false;
+            chart.subscribeCrosshairMove(param => {
+                if (isSyncing || param.sourceEvent === undefined) return;
+                isSyncing = true;
+                if (param.point) {
+                    otherChart.moveCrosshair(param.point);
+                } else {
+                    otherChart.moveCrosshair(null);
+                }
+                isSyncing = false;
+            });
+        });
+
+        // Sync Time Scale
+        chartsToSync.forEach((chart, index) => {
+            const otherChart = chartsToSync[index === 0 ? 1 : 0];
+            chart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+                if (range) otherChart.timeScale().setVisibleLogicalRange(range);
+            });
+        });
+
     </script>
 </body>
+
 </html>

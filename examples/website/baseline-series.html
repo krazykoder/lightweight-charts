@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baseline Series Examples</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Baseline Series Examples</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="code-container">
+                <h3>Baseline with Fixed Price Base</h3>
+                <p>This chart sets a fixed base value at price 40. Values above 40 are green (top), and values below are
+                    red (bottom).</p>
+                <pre>
+const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), { width: 600, height: 300 });
+const baselineSeries = chart.addBaselineSeries({
+    baseValue: { type: 'price', price: 40 },
+    topLineColor: 'rgba(38, 166, 154, 1)',
+    topFillColor1: 'rgba(38, 166, 154, 0.28)',
+    topFillColor2: 'rgba(38, 166, 154, 0.05)',
+    bottomLineColor: 'rgba(239, 83, 80, 1)',
+    bottomFillColor1: 'rgba(239, 83, 80, 0.05)',
+    bottomFillColor2: 'rgba(239, 83, 80, 0.28)',
+});
+baselineSeries.setData(data);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container1"></div>
+        </div>
+
+        <div class="container">
+            <div class="code-container">
+                <h3>Baseline with Custom Style</h3>
+                <p>This chart uses a different base value and custom colors for a distinct look.</p>
+                <pre>
+const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), { width: 600, height: 300 });
+const baselineSeries2 = chart2.addBaselineSeries({
+    baseValue: { type: 'price', price: 0 },
+    topLineColor: '#2962FF',
+    topFillColor1: 'rgba(41, 98, 255, 0.28)',
+    topFillColor2: 'rgba(41, 98, 255, 0.05)',
+    bottomLineColor: '#FF6D00',
+    bottomFillColor1: 'rgba(255, 109, 0, 0.05)',
+    bottomFillColor2: 'rgba(255, 109, 0, 0.28)',
+    lineWidth: 4,
+});
+baselineSeries2.setData(data);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container2"></div>
+        </div>
+
+        <nav>
+            <a href="area-series.html">Prev</a>
+            <a href="bar-series.html">Next</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        // Chart 1: Fixed Price Base
+        const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+            width: 600,
+            height: 300,
+            layout: {
+                backgroundColor: '#ffffff',
+                textColor: '#333',
+            },
+            grid: {
+                vertLines: { color: '#f0f3fa' },
+                horzLines: { color: '#f0f3fa' },
+            },
+        });
+
+        const baselineSeries = chart.addBaselineSeries({
+            baseValue: { type: 'price', price: 40 },
+            topLineColor: 'rgba(38, 166, 154, 1)',
+            topFillColor1: 'rgba(38, 166, 154, 0.28)',
+            topFillColor2: 'rgba(38, 166, 154, 0.05)',
+            bottomLineColor: 'rgba(239, 83, 80, 1)',
+            bottomFillColor1: 'rgba(239, 83, 80, 0.05)',
+            bottomFillColor2: 'rgba(239, 83, 80, 0.28)',
+        });
+
+        // Use 'value' field from data
+        const seriesData = data.map(d => ({ time: d.time, value: d.value }));
+        baselineSeries.setData(seriesData);
+        chart.timeScale().fitContent();
+
+
+        // Chart 2: Custom Style
+        const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+            width: 600,
+            height: 300,
+            layout: {
+                backgroundColor: '#ffffff',
+                textColor: '#333',
+            },
+        });
+
+        const baselineSeries2 = chart2.addBaselineSeries({
+            baseValue: { type: 'price', price: 0 },
+            topLineColor: '#2962FF',
+            topFillColor1: 'rgba(41, 98, 255, 0.28)',
+            topFillColor2: 'rgba(41, 98, 255, 0.05)',
+            bottomLineColor: '#FF6D00',
+            bottomFillColor1: 'rgba(255, 109, 0, 0.05)',
+            bottomFillColor2: 'rgba(255, 109, 0, 0.28)',
+            lineWidth: 4,
+        });
+
+        baselineSeries2.setData(seriesData);
+        chart2.timeScale().fitContent();
+
+    </script>
+</body>
+
+</html>

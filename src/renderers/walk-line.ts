@@ -26,8 +26,13 @@ export function walkLine(
 	if (lineType === LineType.WithSteps) {
 		for (; i < visibleRange.to; i++) {
 			const currItem = points[i];
-			const prevY = points[i - 1].y;
-			ctx.lineTo(currItem.x, prevY);
+			const prevItem = points[i - 1]; // We need prevItem for x coordinate
+			const prevY = prevItem.y;
+
+			const midX = (prevItem.x + currItem.x) / 2;
+
+			ctx.lineTo(midX, prevY);
+			ctx.lineTo(midX, currItem.y);
 			ctx.lineTo(currItem.x, currItem.y);
 		}
 	} else if (lineType === LineType.WithGaps) {
