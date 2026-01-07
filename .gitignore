@@ -38,3 +38,5 @@ debug.html
 .AppleDouble
 .LSOverride
 
+examples/website/dist/*.js
+

@@ -22,6 +22,7 @@ export const enum LineType {
 	Cross,
 	Square,
 	Diamond,
+	ConnectedCircles,
 	Area,
 	SteppedArea,
 }

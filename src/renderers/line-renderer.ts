@@ -340,6 +340,63 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 				ctx.rect(item.x - halfSize, item.y - halfSize, size, size);
 			}
 			ctx.fill();
+		} else if (lineType === LineType.ConnectedCircles) {
+			const circleLineWidth = ctx.lineWidth;
+			const halfLineWidth = Math.max(1, Math.floor(circleLineWidth / 2));
+
+			// 1. Draw connecting lines
+			ctx.beginPath();
+			ctx.lineWidth = halfLineWidth;
+
+			let iLine = visibleRange.from;
+			let prevLineStrokeStyle = items[iLine].color ?? lineColor;
+			ctx.strokeStyle = prevLineStrokeStyle;
+			ctx.moveTo(items[iLine].x, items[iLine].y);
+
+			for (iLine = visibleRange.from + 1; iLine < visibleRange.to; iLine++) {
+				const currItem = items[iLine];
+				const currentStrokeStyle = currItem.color ?? lineColor;
+
+				ctx.lineTo(currItem.x, currItem.y);
+
+				if (currentStrokeStyle !== prevLineStrokeStyle) {
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = currentStrokeStyle;
+					prevLineStrokeStyle = currentStrokeStyle;
+					ctx.moveTo(items[iLine - 1].x, items[iLine - 1].y);
+					ctx.lineTo(currItem.x, currItem.y);
+				}
+			}
+			ctx.stroke();
+
+			// 2. Draw circles
+			ctx.lineWidth = circleLineWidth;
+
+			let i = visibleRange.from;
+			let prevStrokeStyle = items[i].color ?? lineColor;
+			ctx.strokeStyle = prevStrokeStyle;
+			ctx.fillStyle = prevStrokeStyle; // Not used for stroke, but good practice if mixed
+
+			ctx.beginPath();
+			for (; i < visibleRange.to; i++) {
+				const item = items[i];
+				const itemColor = item.color ?? lineColor;
+
+				if (itemColor !== prevStrokeStyle) {
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = itemColor;
+					prevStrokeStyle = itemColor;
+				}
+
+				ctx.moveTo(item.x + ctx.lineWidth / 2, item.y);
+				ctx.arc(item.x, item.y, ctx.lineWidth / 2, 0, 2 * Math.PI);
+			}
+			ctx.stroke();
+
+
+
 		} else if (lineType === LineType.Diamond) {
 			ctx.fillStyle = prevStrokeStyle;
 			for (; i < visibleRange.to; i++) {

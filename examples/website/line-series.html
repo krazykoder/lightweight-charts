@@ -29,8 +29,9 @@
                         <option value="4">Cross</option>
                         <option value="5">Square</option>
                         <option value="6">Diamond</option>
-                        <option value="7">Area</option>
-                        <option value="8">SteppedArea</option>
+                        <option value="7">ConnectedCircles</option>
+                        <option value="8">Area</option>
+                        <option value="9">SteppedArea</option>
                     </select>
                 </label>
                 <label>
@@ -277,6 +278,27 @@ lineSeriesDiamond.setData(data.slice(0, 50));
             </pre>
         </div>
         <div class="chart-container" id="chart-container-diamond"></div>
+    </div>
+
+    <!-- Connected Circles Style -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Connected Circles</h3>
+            <pre>
+const chartConnected = LightweightCharts.createChart(document.getElementById('chart-container-connected'), {
+    width: 600,
+    height: 300,
+});
+const lineSeriesConnected = chartConnected.addLineSeries({
+    // LineType.ConnectedCircles = 7
+    lineType: 7,
+    color: '#ab47bc',
+    lineWidth: 4,
+});
+lineSeriesConnected.setData(data.slice(0, 50));
+            </pre>
+        </div>
+        <div class="chart-container" id="chart-container-connected"></div>
     </div>
 
     <!-- Area Opacity Example -->
@@ -565,13 +587,26 @@ const lineSeries10 = chart10.addLineSeries({
         });
         lineSeriesDiamond.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.start + 50));
 
+        // Connected Circles Style
+        const chartConnected = LightweightCharts.createChart(document.getElementById('chart-container-connected'), {
+            width: 600,
+            height: 300,
+        });
+        const lineSeriesConnected = chartConnected.addLineSeries({
+            // LineType.ConnectedCircles = 7
+            lineType: 7,
+            color: '#ab47bc',
+            lineWidth: 4,
+        });
+        lineSeriesConnected.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.start + 50));
+
         // --- Area Opacity Example (Chart 9) ---
         const chart9 = LightweightCharts.createChart(document.getElementById('chart-container9'), {
             width: 600,
             height: 300,
         });
         const lineSeries9 = chart9.addLineSeries({
-            lineType: 7, // Area
+            lineType: 8, // Area
             color: '#2962FF',
             pointColorAreaAlpha: 0.2,
         });
@@ -591,7 +626,7 @@ const lineSeries10 = chart10.addLineSeries({
             height: 300,
         });
         const lineSeries10 = chart10.addLineSeries({
-            lineType: 8, // SteppedArea
+            lineType: 9, // SteppedArea
             pointColorAreaAlpha: 0.2,
             lineStyle: LightweightCharts.LineStyle.Solid,
         });

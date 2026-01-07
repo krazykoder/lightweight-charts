@@ -740,8 +740,9 @@ export declare enum LineType {
 	Cross = 4,
 	Square = 5,
 	Diamond = 6,
-	Area = 7,
-	SteppedArea = 8
+	ConnectedCircles = 7,
+	Area = 8,
+	SteppedArea = 9
 }
 /**
  * Represents the source of data to be used for the horizontal price line.
