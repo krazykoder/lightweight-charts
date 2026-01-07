@@ -21,12 +21,16 @@ import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 import { IPriceScaleApiProvider } from './chart-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, Time } from './data-consumer';
 import { convertTime } from './data-layer';
-import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from './data-validators';
+import { VerticalLineOptions } from '../model/vertical-line-options';
+import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType, checkVerticalLineOptions } from './data-validators';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
 import { BarsInfo, ISeriesApi } from './iseries-api';
+import { IVerticalLine } from './ivertical-line';
 import { priceLineOptionsDefaults } from './options/price-line-options-defaults';
+import { verticalLineOptionsDefaults } from './options/vertical-line-options-defaults';
 import { PriceLine } from './price-line-api';
+import { VerticalLineApi } from './vertical-line-api';
 
 export function migrateOptions<TSeriesType extends SeriesType>(options: SeriesPartialOptionsMap[TSeriesType]): SeriesPartialOptionsInternal<TSeriesType> {
 	// eslint-disable-next-line deprecation/deprecation
@@ -168,6 +172,18 @@ export class SeriesApi<TSeriesType extends SeriesType> implements ISeriesApi<TSe
 
 	public removePriceLine(line: IPriceLine): void {
 		this._series.removePriceLine((line as PriceLine).priceLine());
+	}
+
+	public createVerticalLine(options: VerticalLineOptions): IVerticalLine {
+		checkVerticalLineOptions(options);
+
+		const strictOptions = merge(clone(verticalLineOptionsDefaults), options) as VerticalLineOptions;
+		const verticalLine = this._series.createVerticalLine(strictOptions);
+		return new VerticalLineApi(verticalLine);
+	}
+
+	public removeVerticalLine(line: IVerticalLine): void {
+		this._series.removeVerticalLine((line as VerticalLineApi).line());
 	}
 
 	public seriesType(): TSeriesType {

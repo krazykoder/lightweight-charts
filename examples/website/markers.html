@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +8,66 @@
     <link rel="stylesheet" href="style.css">
     <script src="dist/lightweight-charts.standalone.production.js"></script>
 </head>
+
 <body>
     <header>
         <a href="index.html">Home</a>
         <h1>Series Markers Examples</h1>
     </header>
     <main>
+        <!-- Playbook: Interactive Markers -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Playbook: Interactive Markers</h3>
+                <div class="controls">
+                    <label>
+                        Series Type:
+                        <select id="seriesTypeSelect">
+                            <option value="Candlestick">Candlestick</option>
+                            <option value="Bar">Bar</option>
+                            <option value="Line">Line</option>
+                            <option value="Histogram">Histogram</option>
+                        </select>
+                    </label>
+                    <label>
+                        Position:
+                        <select id="markerPositionSelect">
+                            <option value="aboveBar">aboveBar</option>
+                            <option value="belowBar">belowBar</option>
+                            <option value="inBar">inBar</option>
+                        </select>
+                    </label>
+                    <label>
+                        Shape:
+                        <select id="markerShapeSelect">
+                            <option value="arrowUp">arrowUp</option>
+                            <option value="arrowDown">arrowDown</option>
+                            <option value="circle">circle</option>
+                            <option value="square">square</option>
+                            <option value="triangleUp">triangleUp</option>
+                            <option value="triangleDown">triangleDown</option>
+                        </select>
+                    </label>
+                    <label>
+                        Color:
+                        <input type="color" id="markerColorInput" value="#2196F3">
+                    </label>
+                    <label>
+                        Shape Size:
+                        <input type="number" id="markerSizeInput" value="1" min="0" max="10" step="1">
+                    </label>
+                    <label>
+                        Text:
+                        <input type="text" id="markerTextInput" value="Marker">
+                    </label>
+                    <button id="regenerateMarkersBtn">Regenerate Markers</button>
+                </div>
+                <div class="chart-container" id="chart-container-playbook"></div>
+            </div>
+        </div>
+
+        <hr>
+
         <!-- Markers on Line Series -->
         <div class="container">
             <div class="code-container">
@@ -79,6 +134,127 @@ candlestickSeries3.setMarkers([
     </main>
     <script src="../app-data.js"></script>
     <script>
+        // Playbook Logic
+        (function () {
+            const chartContainer = document.getElementById('chart-container-playbook');
+            const chart = LightweightCharts.createChart(chartContainer, { width: 600, height: 300 });
+
+            let series;
+            let currentSeriesType = 'Candlestick';
+            let currentData = [];
+            // Stabilize data: pick one slice on load
+            const fixedSlice = getRandomSlice();
+            // Stabilize markers: store indices
+            let markerIndices = [];
+
+            // UI Elements
+            const seriesTypeSelect = document.getElementById('seriesTypeSelect');
+            const positionSelect = document.getElementById('markerPositionSelect');
+            const shapeSelect = document.getElementById('markerShapeSelect');
+            const colorInput = document.getElementById('markerColorInput');
+            const sizeInput = document.getElementById('markerSizeInput');
+            const textInput = document.getElementById('markerTextInput');
+            const regenerateBtn = document.getElementById('regenerateMarkersBtn');
+
+            function randomizeMarkerIndices(dataLength) {
+                markerIndices = [];
+                const count = 5;
+                for (let i = 0; i < count && i < dataLength; i++) {
+                    markerIndices.push(Math.floor(Math.random() * dataLength));
+                }
+            }
+
+            function refreshSeriesAndMarkers() {
+                if (series) {
+                    chart.removeSeries(series);
+                }
+
+                switch (currentSeriesType) {
+                    case 'Line':
+                        series = chart.addLineSeries();
+                        break;
+                    case 'Bar':
+                        series = chart.addBarSeries();
+                        break;
+                    case 'Candlestick':
+                        series = chart.addCandlestickSeries();
+                        break;
+                    case 'Histogram':
+                        series = chart.addHistogramSeries();
+                        break;
+                }
+
+                // Use the fixed slice so data doesn't change on series switch
+                if (currentSeriesType === 'Line' || currentSeriesType === 'Histogram') {
+                    currentData = data.map(d => ({ time: d.time, value: d.value })).slice(fixedSlice.start, fixedSlice.end);
+                } else {
+                    currentData = data.slice(fixedSlice.start, fixedSlice.end);
+                }
+                series.setData(currentData);
+
+                // Initialize markers if needed
+                if (markerIndices.length === 0) {
+                    randomizeMarkerIndices(currentData.length);
+                }
+
+                generateMarkers(currentData);
+            }
+
+            function generateMarkers(seriesData) {
+                if (!seriesData || seriesData.length === 0) return;
+
+                const markers = [];
+                const position = positionSelect.value;
+                const shape = shapeSelect.value;
+                const color = colorInput.value;
+                const size = parseInt(sizeInput.value, 10);
+                const text = textInput.value;
+
+                markerIndices.forEach((randomIndex, i) => {
+                    if (randomIndex < seriesData.length) {
+                        const item = seriesData[randomIndex];
+                        markers.push({
+                            time: item.time,
+                            position: position,
+                            shape: shape,
+                            color: color,
+                            size: size,
+                            text: text + ' ' + (i + 1),
+                        });
+                    }
+                });
+
+                markers.sort((a, b) => (a.time > b.time ? 1 : -1));
+                series.setMarkers(markers);
+            }
+
+            function refreshMarkersOnly() {
+                generateMarkers(currentData);
+            }
+
+            function regenerateMarkers() {
+                randomizeMarkerIndices(currentData.length);
+                refreshMarkersOnly();
+            }
+
+            // Event Listeners
+            seriesTypeSelect.addEventListener('change', (e) => {
+                currentSeriesType = e.target.value;
+                refreshSeriesAndMarkers();
+            });
+
+            regenerateBtn.addEventListener('click', regenerateMarkers);
+
+            [positionSelect, shapeSelect, colorInput, sizeInput, textInput].forEach(input => {
+                input.addEventListener('change', refreshMarkersOnly);
+                input.addEventListener('input', refreshMarkersOnly);
+            });
+
+            // Initialize
+            refreshSeriesAndMarkers();
+
+        })();
+
         function getRandomSlice(maxDataLength = 500, minLength = 50, maxLength = 200) {
             const start = Math.floor(Math.random() * (maxDataLength - minLength + 1));
             const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
@@ -121,4 +297,5 @@ candlestickSeries3.setMarkers([
         ]);
     </script>
 </body>
+
 </html>

@@ -16,6 +16,7 @@ import { CustomPriceLine } from './custom-price-line';
 import { DefaultPriceScaleId, isDefaultPriceScale } from './default-price-scale';
 import { GridOptions } from './grid';
 import { InvalidateMask, InvalidationLevel } from './invalidate-mask';
+import { IDataSource } from './idata-source';
 import { IPriceDataSource } from './iprice-data-source';
 import { ColorType, LayoutOptions, LayoutOptionsInternal } from './layout-options';
 import { LocalizationOptions } from './localization-options';
@@ -637,6 +638,14 @@ export class ChartModel implements IDestroyable {
 
 	public serieses(): readonly Series[] {
 		return this._serieses;
+	}
+
+	public dataSources(): readonly IDataSource[] {
+		return [
+			...this._serieses,
+			this._crosshair,
+			this._watermark,
+		];
 	}
 
 	public setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, pane: Pane): void {

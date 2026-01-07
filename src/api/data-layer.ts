@@ -7,7 +7,7 @@ import { isString } from '../helpers/strict-type-checks';
 import { Series, SeriesUpdateInfo } from '../model/series';
 import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
-import { BusinessDay, TimePoint, TimePointIndex, TimeScalePoint, UTCTimestamp } from '../model/time-data';
+import { TimePoint, TimePointIndex, TimeScalePoint, UTCTimestamp } from '../model/time-data';
 
 import {
 	isBusinessDay,
@@ -65,6 +65,9 @@ export function convertTime(time: Time): TimePoint {
 	return businessDayConverter(time);
 }
 
+import { stringToBusinessDay } from '../model/time-data';
+
+/*
 const validDateRegex = /^\d\d\d\d-\d\d-\d\d$/;
 
 export function stringToBusinessDay(value: string): BusinessDay {
@@ -91,6 +94,7 @@ export function stringToBusinessDay(value: string): BusinessDay {
 		year: d.getUTCFullYear(),
 	};
 }
+*/
 
 function convertStringToBusinessDay(value: TimedData): void {
 	if (isString(value.time)) {

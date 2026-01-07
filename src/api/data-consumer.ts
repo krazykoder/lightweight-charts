@@ -1,42 +1,8 @@
-import { isNumber, isString } from '../helpers/strict-type-checks';
-
 import { Series } from '../model/series';
 import { SeriesType } from '../model/series-options';
-import { BusinessDay, UTCTimestamp } from '../model/time-data';
+import { BusinessDay, isBusinessDay, isUTCTimestamp, Time, UTCTimestamp } from '../model/time-data';
 
-/**
- * The Time type is used to represent the time of data items.
- *
- * Values can be a {@link UTCTimestamp}, a {@link BusinessDay}, or a business day string in ISO format.
- *
- * @example
- * ```js
- * const timestamp = 1529899200; // Literal timestamp representing 2018-06-25T04:00:00.000Z
- * const businessDay = { year: 2019, month: 6, day: 1 }; // June 1, 2019
- * const businessDayString = '2021-02-03'; // Business day string literal
- * ```
- */
-export type Time = UTCTimestamp | BusinessDay | string;
-
-/**
- * Check if a time value is a business day object.
- *
- * @param time - The time to check.
- * @returns `true` if `time` is a {@link BusinessDay} object, false otherwise.
- */
-export function isBusinessDay(time: Time): time is BusinessDay {
-	return !isNumber(time) && !isString(time);
-}
-
-/**
- * Check if a time value is a UTC timestamp number.
- *
- * @param time - The time to check.
- * @returns `true` if `time` is a {@link UTCTimestamp} number, false otherwise.
- */
-export function isUTCTimestamp(time: Time): time is UTCTimestamp {
-	return isNumber(time);
-}
+export { BusinessDay, isBusinessDay, isUTCTimestamp, Time, UTCTimestamp };
 
 /**
  * Represents a whitespace data item, which is a data point without a value.

@@ -210,12 +210,13 @@ export interface LineStyleOptions {
 	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
-/**
- * Transparency of the area fill (0-1), used when lineType is Area or SteppedArea.
- *
- * @defaultValue `0.5`
- */
-pointColorAreaAlpha: number;}
+	/**
+	 * Transparency of the area fill (0-1), used when lineType is Area or SteppedArea.
+	 *
+	 * @defaultValue `0.5`
+	 */
+	pointColorAreaAlpha: number;
+}
 
 /**
  * Represents style options for an area series.
@@ -294,12 +295,13 @@ export interface AreaStyleOptions {
 	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
-/**
- * Transparency of the area fill (0-1), used when lineType is Area or SteppedArea.
- *
- * @defaultValue `0.5`
- */
-pointColorAreaAlpha: number;}
+	/**
+	 * Transparency of the area fill (0-1), used when lineType is Area or SteppedArea.
+	 *
+	 * @defaultValue `0.5`
+	 */
+	pointColorAreaAlpha: number;
+}
 
 /**
  * Represents a type of priced base value of baseline series type.
@@ -414,12 +416,13 @@ export interface BaselineStyleOptions {
 	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
-/**
- * Transparency of the area fill (0-1), used when lineType is Area or SteppedArea.
- *
- * @defaultValue `0.5`
- */
-pointColorAreaAlpha: number;}
+	/**
+	 * Transparency of the area fill (0-1), used when lineType is Area or SteppedArea.
+	 *
+	 * @defaultValue `0.5`
+	 */
+	pointColorAreaAlpha: number;
+}
 
 
 /**

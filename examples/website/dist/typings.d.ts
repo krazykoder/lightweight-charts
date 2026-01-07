@@ -410,6 +410,7 @@ declare class Series<T extends SeriesType = SeriesType> extends PriceDataSource 
 	private _formatter;
 	private readonly _priceLineView;
 	private readonly _customPriceLines;
+	private readonly _customVerticalLines;
 	private readonly _baseHorizontalLineView;
 	private _paneView;
 	private readonly _lastPriceAnimationPaneView;
@@ -432,6 +433,9 @@ declare class Series<T extends SeriesType = SeriesType> extends PriceDataSource 
 	createPriceLine(options: PriceLineOptions): CustomPriceLine;
 	removePriceLine(line: CustomPriceLine): void;
 	customPriceLines(): CustomPriceLine[];
+	createVerticalLine(options: VerticalLineOptions): VerticalLine;
+	removeVerticalLine(line: VerticalLine): void;
+	verticalLines(): VerticalLine[];
 	seriesType(): T;
 	firstValue(): FirstValue | null;
 	firstBar(): SeriesPlotRow<T> | null;
@@ -440,6 +444,7 @@ declare class Series<T extends SeriesType = SeriesType> extends PriceDataSource 
 	topPaneViews(pane: Pane): readonly IPaneView[];
 	paneViews(): readonly IPaneView[];
 	priceAxisViews(pane: Pane, priceScale: PriceScale): readonly IPriceAxisView[];
+	timeAxisViews(): readonly ITimeAxisView[];
 	autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null;
 	minMove(): number;
 	formatter(): IPriceFormatter;
@@ -579,6 +584,19 @@ declare class TimeScale {
 	private _updateDateTimeFormatter;
 	private _doFixLeftEdge;
 	private _doFixRightEdge;
+}
+declare class VerticalLine {
+	private readonly _series;
+	private readonly _lineView;
+	private readonly _axisView;
+	private readonly _options;
+	constructor(series: Series, options: VerticalLineOptions);
+	applyOptions(options: Partial<VerticalLineOptions>): void;
+	options(): VerticalLineOptions;
+	paneViews(): readonly IPaneView[];
+	timeAxisView(): ITimeAxisView;
+	update(): void;
+	xCoord(): Coordinate | null;
 }
 declare class Watermark extends DataSource {
 	private readonly _paneView;
@@ -2045,6 +2063,18 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 */
 	removePriceLine(line: IPriceLine): void;
 	/**
+	 * Creates a new vertical line
+	 *
+	 * @param options - Any subset of options.
+	 */
+	createVerticalLine(options: VerticalLineOptions): IVerticalLine;
+	/**
+	 * Removes the vertical line that was created before.
+	 *
+	 * @param line - A line to remove.
+	 */
+	removeVerticalLine(line: IVerticalLine): void;
+	/**
 	 * Return current series type.
 	 *
 	 * @returns Type of the series.
@@ -2261,6 +2291,21 @@ export interface ITimeScaleApi {
 }
 export interface IUpdatablePaneView extends IPaneView {
 	update(updateType?: UpdateType): void;
+}
+/**
+ * Represents the interface for interacting with vertical lines.
+ */
+export interface IVerticalLine {
+	/**
+	 * Apply options to the vertical line.
+	 *
+	 * @param options - Any subset of options.
+	 */
+	applyOptions(options: Partial<VerticalLineOptions>): void;
+	/**
+	 * Get the currently applied options.
+	 */
+	options(): Readonly<VerticalLineOptions>;
 }
 export interface InternalSeriesMarker<TimeType> extends SeriesMarker<TimeType> {
 	internalId: number;
@@ -3284,6 +3329,63 @@ export interface VerticalGradientColor {
 	 */
 	bottomColor: string;
 }
+/**
+ * Represents vertical line options.
+ */
+export interface VerticalLineOptions {
+	/**
+	 * Vertical line's time value.
+	 */
+	time: Time;
+	/**
+	 * Vertical line's color.
+	 *
+	 * @defaultValue `''`
+	 */
+	color: string;
+	/**
+	 * Vertical line's width in pixels.
+	 *
+	 * @defaultValue `1`
+	 */
+	lineWidth: LineWidth;
+	/**
+	 * Vertical line's style.
+	 *
+	 * @defaultValue {@link LineStyle.Solid}
+	 */
+	lineStyle: LineStyle;
+	/**
+	 * Display line.
+	 *
+	 * @defaultValue `true`
+	 */
+	lineVisible: boolean;
+	/**
+	 * Display the current vertical line's text label on the time axis scale.
+	 *
+	 * @defaultValue `true`
+	 */
+	axisLabelVisible: boolean;
+	/**
+	 * Vertical line's text label.
+	 *
+	 * @defaultValue `''`
+	 */
+	title: string;
+	/**
+	 * Label background color.
+	 *
+	 * @defaultValue `''`
+	 */
+	labelBackgroundColor: string;
+	/**
+	 * Label text color.
+	 *
+	 * @defaultValue `''`
+	 */
+	labelTextColor: string;
+}
 /** Watermark options. */
 export interface WatermarkOptions {
 	/**
@@ -3579,7 +3681,7 @@ export type TickMarkFormatter = (time: UTCTimestamp | BusinessDay, tickMarkType:
  *
  * @example
  * ```js
- * const timestamp = 1529899200; // Literal timestamp representing 2018-06-25T04:00:00.000Z
+ * const timestamp = 1529899200 as UTCTimestamp; // Literal timestamp representing 2018-06-25T04:00:00.000Z
  * const businessDay = { year: 2019, month: 6, day: 1 }; // June 1, 2019
  * const businessDayString = '2021-02-03'; // Business day string literal
  * ```
@@ -3600,21 +3702,6 @@ export type TimeRange = Range<Time>;
  */
 export type TimeRangeChangeEventHandler = (timeRange: TimeRange | null) => void;
 export type TimeScaleInvalidation = TimeScaleApplyRangeInvalidation | TimeScaleFitContentInvalidation | TimeScaleApplyRightOffsetInvalidation | TimeScaleApplyBarSpacingInvalidation | TimeScaleResetInvalidation;
-/**
- * Represents a time a a UNIX timestamp.
- *
- * If your chart displays an intraday interval you should use a UNIX Timestamp.
- *
- * Note that JavaScript Date APIs like `Date.now` return a number of milliseconds but UTCTimestamp expects a number of seconds.
- *
- * Note that to prevent errors, you should cast the numeric type of the time to `UTCTimestamp` type from the package (`value as UTCTimestamp`) in TypeScript code.
- *
- * @example
- * ```ts
- * const timestamp = 1529899200 as UTCTimestamp; // Literal timestamp representing 2018-06-25T04:00:00.000Z
- * const timestamp2 = (Date.now() / 1000) as UTCTimestamp;
- * ```
- */
 export type UTCTimestamp = Nominal<number, "UTCTimestamp">;
 export type UpdateType = "data" | "other" | "options";
 /**

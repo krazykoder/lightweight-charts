@@ -1,25 +1,72 @@
 import { lowerbound, upperbound } from '../helpers/algorithms';
 import { Nominal } from '../helpers/nominal';
+import { isNumber, isString } from '../helpers/strict-type-checks';
 
 import { Coordinate } from './coordinate';
 import { RangeImpl } from './range-impl';
 
+export type UTCTimestamp = Nominal<number, 'UTCTimestamp'>;
+
 /**
- * Represents a time a a UNIX timestamp.
+ * The Time type is used to represent the time of data items.
  *
- * If your chart displays an intraday interval you should use a UNIX Timestamp.
- *
- * Note that JavaScript Date APIs like `Date.now` return a number of milliseconds but UTCTimestamp expects a number of seconds.
- *
- * Note that to prevent errors, you should cast the numeric type of the time to `UTCTimestamp` type from the package (`value as UTCTimestamp`) in TypeScript code.
+ * Values can be a {@link UTCTimestamp}, a {@link BusinessDay}, or a business day string in ISO format.
  *
  * @example
- * ```ts
+ * ```js
  * const timestamp = 1529899200 as UTCTimestamp; // Literal timestamp representing 2018-06-25T04:00:00.000Z
- * const timestamp2 = (Date.now() / 1000) as UTCTimestamp;
+ * const businessDay = { year: 2019, month: 6, day: 1 }; // June 1, 2019
+ * const businessDayString = '2021-02-03'; // Business day string literal
  * ```
  */
-export type UTCTimestamp = Nominal<number, 'UTCTimestamp'>;
+export type Time = UTCTimestamp | BusinessDay | string;
+
+/**
+ * Check if a time value is a business day object.
+ *
+ * @param time - The time to check.
+ * @returns `true` if `time` is a {@link BusinessDay} object, false otherwise.
+ */
+export function isBusinessDay(time: Time): time is BusinessDay {
+	return !isNumber(time) && !isString(time);
+}
+
+/**
+ * Check if a time value is a UTC timestamp number.
+ *
+ * @param time - The time to check.
+ * @returns `true` if `time` is a {@link UTCTimestamp} number, false otherwise.
+ */
+export function isUTCTimestamp(time: Time): time is UTCTimestamp {
+	return isNumber(time);
+}
+
+const validDateRegex = /^\d\d\d\d-\d\d-\d\d$/;
+
+export function stringToBusinessDay(value: string): BusinessDay {
+	if (process.env.NODE_ENV === 'development') {
+		// in some browsers (I look at your Chrome) the Date constructor may accept invalid date string
+		// but parses them in "implementation specific" way
+		// for example 2019-1-1 isn't the same as 2019-01-01 (for Chrome both are "valid" date strings)
+		// see https://bugs.chromium.org/p/chromium/issues/detail?id=968939
+		// so, we need to be sure that date has valid format to avoid strange behavior and hours of debugging
+		// but let's do this in development build only because of perf
+		if (!validDateRegex.test(value)) {
+			throw new Error(`Invalid date string=${value}, expected format=yyyy-mm-dd`);
+		}
+	}
+
+	const d = new Date(value);
+	if (isNaN(d.getTime())) {
+		throw new Error(`Invalid date string=${value}, expected format=yyyy-mm-dd`);
+	}
+
+	return {
+		day: d.getUTCDate(),
+		month: d.getUTCMonth() + 1,
+		year: d.getUTCFullYear(),
+	};
+}
 
 /**
  * Represents a time as a day/month/year.

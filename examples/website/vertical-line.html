@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertical Line Examples</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="./dist/lightweight-charts.standalone.development.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Vertical Line Examples</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="code-container">
+                <h3>Line Series with Vertical Lines</h3>
+                <p>Demonstrates sticky vs. non-sticky axis labels.</p>
+                <pre>
+const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+    width: 600,
+    height: 300,
+});
+const series = chart.addLineSeries({
+    lineType: LightweightCharts.LineType.WithSteps,
+});
+series.setData(data);
+
+// Non-sticky label (default)
+const vLine1 = series.createVerticalLine({
+    time: data[50].time,
+    color: '#EF5350',
+    title: 'Event A',
+    // axisLabelVisibleAtEdge: false, // default
+});
+
+// Sticky label
+series.createVerticalLine({
+    time: data[100].time,
+    color: '#26a69a',
+    title: 'Start',
+    axisLabelVisibleAtEdge: true,
+});
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container1"></div>
+        </div>
+
+        <div class="container">
+            <div class="code-container">
+                <h3>Vertical Lines on Histogram (Area Style)</h3>
+                <p>Vertical lines can be added to any series type, including Histograms.</p>
+                <pre>
+const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+    width: 600,
+    height: 300,
+});
+const histogramSeries = chart2.addHistogramSeries({
+    histogramStyle: 1, // Area
+});
+histogramSeries.setData(histogramData);
+
+histogramSeries.createVerticalLine({
+    time: histogramData[10].time,
+    color: '#fff',
+    title: 'Hist Event 1',
+    axisLabelVisibleAtEdge: true,
+});
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container2"></div>
+        </div>
+
+        <nav>
+            <a href="index.html">Back to Index</a>
+        </nav>
+    </main>
+
+    <script src="../app-data.js"></script>
+    <script>
+        const { createChart, LineStyle } = LightweightCharts;
+
+        // --- Chart 1: Line Series ---
+        const chart = createChart(document.getElementById('chart-container1'), {
+            width: 600,
+            height: 300,
+            layout: {
+                textColor: '#d1d4dc',
+                backgroundColor: '#111',
+            },
+            grid: {
+                vertLines: { color: '#333' },
+                horzLines: { color: '#333' },
+            },
+        });
+
+        const series = chart.addLineSeries({
+            color: '#2962FF',
+            lineType: LightweightCharts.LineType.WithSteps,
+        });
+
+        const chartData = data.map(d => ({ time: d.time, value: d.value }));
+        series.setData(chartData);
+
+        const verticalLine = series.createVerticalLine({
+            time: chartData[50].time,
+            color: '#EF5350',
+            lineWidth: 2,
+            lineStyle: LineStyle.Dotted,
+            title: 'Event A',
+            // axisLabelVisibleAtEdge: false, // Default
+        });
+
+        series.createVerticalLine({
+            time: chartData[100].time,
+            color: '#26a69a',
+            lineWidth: 1,
+            lineStyle: LineStyle.Solid,
+            title: 'Start',
+            axisLabelVisibleAtEdge: true,
+        });
+
+        setTimeout(() => {
+            verticalLine.applyOptions({
+                color: '#FFD740',
+                lineWidth: 4,
+                title: 'Updated Event',
+            });
+        }, 5000);
+
+        chart.timeScale().fitContent();
+
+        // --- Chart 2: Histogram Series ---
+        const chart2 = createChart(document.getElementById('chart-container2'), {
+            width: 600,
+            height: 300,
+            layout: {
+                textColor: '#d1d4dc',
+                backgroundColor: '#111',
+            },
+            grid: {
+                vertLines: { color: '#333' },
+                horzLines: { color: '#333' },
+            },
+        });
+
+        const histogramSeries = chart2.addHistogramSeries({
+            histogramStyle: 1, // Area style
+        });
+
+        const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+        function getRandomSlice(maxDataLength = 500, minLength = 50, maxLength = 200) {
+            const start = Math.floor(Math.random() * (maxDataLength - minLength + 1));
+            const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
+            return { start, end };
+        }
+
+        const randomSlice1 = getRandomSlice();
+        const histogramData = data.map(d => ({
+            time: d.time,
+            value: d.SQZ_Hist,
+            color: sqzColors[d.SQZ_HistC] || 'gray',
+        })).slice(randomSlice1.start, randomSlice1.end);
+
+        histogramSeries.setData(histogramData);
+
+        if (histogramData.length > 20) {
+            const v1 = histogramSeries.createVerticalLine({
+                time: histogramData[10].time,
+                color: '#fff',
+                title: 'Hist Event 1',
+                axisLabelVisibleAtEdge: true,
+            });
+
+            const v2 = histogramSeries.createVerticalLine({
+                time: histogramData[histogramData.length - 10].time,
+                color: '#00bcd4',
+                title: 'Hist Event 2',
+            });
+        }
+
+        chart2.timeScale().fitContent();
+    </script>
+</body>
+
+</html>
