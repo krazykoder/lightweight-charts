@@ -99,6 +99,8 @@ export const shapeSeriesStyleDefaults: ShapeSeriesStyleOptions = {
 	position: 'top',
 	fixedValue: 0,
 	margin: 10,
+	level: 0,
+	levelSpacing: 5,
 };
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {

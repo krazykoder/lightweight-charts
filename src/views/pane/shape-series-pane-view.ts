@@ -137,11 +137,17 @@ export class SeriesShapePaneView implements IUpdatablePaneView {
     }
 
     private _calculateY(item: ShapeSeriesRendererDataItem, options: ShapeSeriesOptions, priceScale: PriceScale, firstValue: number): Coordinate {
+        const size = item.size || options.size;
+        // Padding between levels. 
+        // Use the series-level options.size for the step to ensure consistent spacing for the whole series.
+        const step = options.size + options.levelSpacing;
+        const levelOffset = options.level * step;
+
         switch (options.position) {
             case 'top':
-                return options.margin + options.size / 2 as Coordinate;
+                return options.margin + levelOffset + size / 2 as Coordinate;
             case 'bottom':
-                return this._paneHeight - options.margin - options.size / 2 as Coordinate;
+                return this._paneHeight - options.margin - levelOffset - size / 2 as Coordinate;
             case 'value':
                 return priceScale.priceToCoordinate(options.fixedValue, firstValue);
         }

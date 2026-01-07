@@ -476,6 +476,20 @@ export interface ShapeSeriesStyleOptions {
 	 * @defaultValue `10`
 	 */
 	margin: number;
+
+	/**
+	 * The level of the series. Used to offset the series when multiple series are present.
+	 *
+	 * @defaultValue `0`
+	 */
+	level: number;
+
+	/**
+	 * The spacing between levels.
+	 *
+	 * @defaultValue `5`
+	 */
+	levelSpacing: number;
 }
 
 /**

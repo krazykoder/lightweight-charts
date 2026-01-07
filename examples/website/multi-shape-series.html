@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi Shape Series Playbook</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Multi Shape Series Playbook</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="code-container">
+                <h3>Stacked Shape Series</h3>
+                <p>This example demonstrates using the `level` property to stack multiple shape series without
+                    overlapping.
+                    It shows series at Top (levels 0,1,2), Bottom (levels 0,1), and On Value positions simultaneously.
+                </p>
+                <div class="controls">
+                    <label>
+                        Level Spacing:
+                        <input type="number" id="levelSpacingInput" value="5" min="0" step="1" />
+                    </label>
+                    <label>
+                        Shape Size:
+                        <input type="number" id="shapeSizeInput" value="8" min="2" step="1" />
+                    </label>
+                </div>
+                <div class="chart-container" id="chart-container-playbook"></div>
+            </div>
+        </div>
+
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        (function () {
+            const chartContainer = document.getElementById('chart-container-playbook');
+            const chart = LightweightCharts.createChart(chartContainer, {
+                width: 800,
+                height: 400,
+                layout: {
+                    background: { type: 'solid', color: '#ffffff' },
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: { color: '#f0f3fa' },
+                    horzLines: { color: '#f0f3fa' },
+                },
+            });
+
+            // Add a line series for context
+            const lineSeries = chart.addLineSeries({
+                color: 'rgba(0, 0, 0, 0.2)',
+                lineWidth: 1,
+            });
+            const lineData = data.map(d => ({ time: d.time, value: d.value }));
+            lineSeries.setData(lineData);
+
+            let allSeries = [];
+
+            const levelSpacingInput = document.getElementById('levelSpacingInput');
+            const shapeSizeInput = document.getElementById('shapeSizeInput');
+
+            function createAllSeries() {
+                // Remove existing
+                allSeries.forEach(s => chart.removeSeries(s));
+                allSeries = [];
+
+                const spacing = parseInt(levelSpacingInput.value, 10);
+                const size = parseInt(shapeSizeInput.value, 10);
+
+                // --- TOP Series (Levels 0, 1, 2) ---
+                const topShapes = ['square', 'circle', 'diamond'];
+                const topColors = ['#E91E63', '#2196F3', '#00E676']; // Pink, Blue, Green
+
+                for (let i = 0; i < 3; i++) {
+                    const series = chart.addShapeSeries({
+                        position: 'top',
+                        level: i,
+                        shape: topShapes[i],
+                        color: topColors[i],
+                        size: size,
+                        levelSpacing: spacing,
+                    });
+
+                    const seriesData = lineData.map((d) => ({
+                        time: d.time,
+                        value: d.value,
+                    })).filter((_, index) => index % 2 === 0); // Every 2nd point
+
+                    series.setData(seriesData);
+                    allSeries.push(series);
+                }
+
+                // --- BOTTOM Series (Levels 0, 1) ---
+                const bottomShapes = ['triangleUp', 'triangleDown'];
+                const bottomColors = ['#FF9800', '#9C27B0']; // Orange, Purple
+
+                for (let i = 0; i < 2; i++) {
+                    const series = chart.addShapeSeries({
+                        position: 'bottom',
+                        level: i,
+                        shape: bottomShapes[i],
+                        color: bottomColors[i],
+                        size: size,
+                        levelSpacing: spacing,
+                    });
+
+                    const seriesData = lineData.map((d) => ({
+                        time: d.time,
+                        value: d.value,
+                    })).filter((_, index) => index % 3 === 0); // Every 3rd point
+
+                    series.setData(seriesData);
+                    allSeries.push(series);
+                }
+
+                // --- VALUE Series (On Price Line) ---
+                const valueSeries = chart.addShapeSeries({
+                    position: 'value',
+                    shape: 'arrowUp',
+                    color: '#000000',
+                    size: size,
+                    // Level and spacing don't affect 'value' position, but good to verify it handles them safely
+                });
+
+                const valueData = lineData.map((d) => ({
+                    time: d.time,
+                    value: d.value,
+                    fixedValue: d.value + 20, // Offset from line
+                })).filter((_, index) => index % 10 === 0);
+
+                // For 'value' position with fixedValue potentially varying per point? 
+                // Wait, ShapeSeriesOptions has `fixedValue`. 
+                // Does ShapeSeries support per-point value positioning? 
+                // The renderer uses `options.fixedValue`. 
+                // If we want per-point vertical position, we need to extend ShapeSeries to read value from item?
+                // Currently `ShapeSeriesPaneView` for `value` uses `options.fixedValue`.
+                // It does NOT read `item.value` or `item.fixedValue`.
+                // So all points in a 'value' positioned series share the same Y coordinate (horizontal line of shapes).
+                // Unless... we update ShapeSeriesPaneView to support `item.value` override?
+                // The user request was "value examples". 
+                // Let's stick to standard behavior: a horizontal strip of shapes at a specific price.
+
+                // Let's create two 'value' series at different fixed prices
+                valueSeries.applyOptions({ fixedValue: 10 }); // Arbitrary price
+                valueSeries.setData(valueData.map(d => ({ ...d, value: 10 }))); // Data value doesn't matter for position but needed for validity
+                allSeries.push(valueSeries);
+            }
+
+            function updateOptions() {
+                const spacing = parseInt(levelSpacingInput.value, 10);
+                const size = parseInt(shapeSizeInput.value, 10);
+                allSeries.forEach(s => s.applyOptions({
+                    levelSpacing: spacing,
+                    size: size
+                }));
+            }
+
+            levelSpacingInput.addEventListener('input', updateOptions);
+            shapeSizeInput.addEventListener('input', updateOptions);
+
+            // Initialize
+            createAllSeries();
+        })();
+    </script>
+</body>
+
+</html>
