@@ -497,6 +497,27 @@ export interface ShapeSeriesStyleOptions {
 	 * @defaultValue `2`
 	 */
 	labelOffset: number;
+
+	/**
+	 * Visibility of the background line.
+	 *
+	 * @defaultValue `false`
+	 */
+	backgroundLineVisible: boolean;
+
+	/**
+	 * Color of the background line.
+	 *
+	 * @defaultValue `'#26a69a'`
+	 */
+	backgroundLineColor: string;
+
+	/**
+	 * Width of the background line.
+	 *
+	 * @defaultValue `1`
+	 */
+	backgroundLineWidth: number;
 }
 
 /**

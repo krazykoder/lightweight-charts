@@ -98,3 +98,21 @@
 
 ### Documentation
 - [x] Create `examples/FEATURES.md` documenting new capabilities
+
+## 2026-01-07 - Shape Series Final Polish
+### Randomization & Null Handling
+- [x] **Improved Randomization**
+    - [x] Implement "contiguous gaps" (streaks of undefined shapes) in examples.
+    - [x] Ensure `undefined` (no shape) is a first-class citizen in randomization.
+
+### Playbook Refactoring
+- [x] **Format Standardization**
+    - [x] Refactor `shape-series.html` and `multi-shape-series.html` to mimic `line-series.html`.
+    - [x] Add Interactive "Playbook" section with "Randomize" toggle.
+    - [x] Add standalone "Hardcoded Examples" for clear usage demonstration.
+- [x] **Visibility Fixes**
+    - [x] Convert invalid `aboveBar`/`belowBar` positions to `top`/`bottom`.
+    - [x] Ensure `value` property is present in all Shape Series data points (required by model even if unused by position).
+- [x] **Example Accuracy**
+    - [x] Sync "Shapes on Price Levels" snippet with implementation.
+    - [x] Add text labels to price level examples.

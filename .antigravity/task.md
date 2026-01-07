@@ -1,3 +1,5 @@
 # Current Tasks
 
-- [ ] (No active tasks)
+- [ ] Regression Check
+    - [ ] Run `npm run build:prod`
+    - [ ] Verify `examples/website/` for regressions

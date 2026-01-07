@@ -102,6 +102,9 @@ export const shapeSeriesStyleDefaults: ShapeSeriesStyleOptions = {
 	level: 0,
 	levelSpacing: 5,
 	labelOffset: 2,
+	backgroundLineVisible: false,
+	backgroundLineColor: '#26a69a',
+	backgroundLineWidth: 1,
 };
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {

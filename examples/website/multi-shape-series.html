@@ -15,33 +15,207 @@
         <h1>Multi Shape Series Playbook</h1>
     </header>
     <main>
-        <!-- Playbook Section -->
+        <style>
+            :root {
+                --primary-color: #2962FF;
+                --bg-color: #f8f9fa;
+                --surface-color: #ffffff;
+                --text-color: #333333;
+                --border-radius: 8px;
+                --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+            body {
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .playbook-grid {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                gap: 24px;
+                align-items: start;
+            }
+
+            .controls-panel {
+                background: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .chart-wrapper {
+                background: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                height: 500px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chart-container {
+                flex: 1;
+                width: 100%;
+                height: 100%;
+            }
+
+            h3 {
+                margin-top: 0;
+                margin-bottom: 16px;
+                font-size: 1.25rem;
+                color: #111;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .control-group:last-child {
+                border-bottom: none;
+            }
+
+            .control-group-title {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #666;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            label {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.9rem;
+            }
+
+            input[type="number"],
+            select {
+                padding: 6px 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 0.9rem;
+                width: 120px;
+            }
+
+            input[type="color"] {
+                border: none;
+                width: 40px;
+                height: 30px;
+                padding: 0;
+                background: none;
+                cursor: pointer;
+            }
+
+            button {
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 10px 16px;
+                border-radius: 6px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s;
+                width: 100%;
+            }
+
+            button:hover {
+                background-color: #1e4bd1;
+            }
+
+            .checkbox-row {
+                justify-content: flex-start;
+                gap: 10px;
+                cursor: pointer;
+            }
+
+            #chart-container-playbook {
+                border: 1px solid #f0f0f0;
+                border-radius: 4px;
+            }
+
+            @media (max-width: 900px) {
+                .playbook-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .chart-wrapper {
+                    height: 400px;
+                }
+            }
+        </style>
+
         <div class="container">
-            <div class="code-container">
-                <h3>Playbook: Interactive Demo</h3>
-                <p>Experiment with multiple stacking series and anti-overlap algorithms.</p>
-                <div class="controls">
-                    <label>
-                        Level Spacing:
-                        <input type="number" id="levelSpacingInput" value="5" min="0" step="1" />
-                    </label>
-                    <label>
-                        Shape Size:
-                        <input type="number" id="shapeSizeInput" value="8" min="2" step="1" />
-                    </label>
-                    <label>
-                        Label Offset:
-                        <input type="number" id="labelOffsetInput" value="2" min="0" step="1" />
-                    </label>
-                    <label>
-                        <input type="checkbox" id="showTextInput" checked /> Show Text
-                    </label>
-                    <label>
-                        <input type="checkbox" id="randomizeInput" checked /> Randomize Data
-                    </label>
-                    <button id="regenerateBtn">Regenerate Data</button>
+            <h3>Interactive Multi-Series Playbook</h3>
+            <div class="playbook-grid">
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <div class="control-group-title">Configuration</div>
+                        <label>
+                            Level Spacing
+                            <input type="number" id="levelSpacingInput" value="5" min="0" step="1" />
+                        </label>
+                        <label>
+                            Shape Size
+                            <input type="number" id="shapeSizeInput" value="8" min="2" step="1" />
+                        </label>
+                        <label>
+                            Label Offset
+                            <input type="number" id="labelOffsetInput" value="2" min="0" step="1" />
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Background Line</div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="bgLineVisibleInput" />
+                            <span>Enable Lines</span>
+                        </label>
+                        <label>
+                            Line Color
+                            <input type="color" id="bgLineColorInput" value="#CCCCCC" />
+                        </label>
+                        <label>
+                            Line Width
+                            <input type="number" id="bgLineWidthInput" value="1" min="1" max="10" />
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Data</div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="showTextInput" checked />
+                            <span>Show Labels</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="randomizeInput" checked />
+                            <span>Randomize Data</span>
+                        </label>
+                        <button id="regenerateBtn">Regenerate Data</button>
+                    </div>
                 </div>
-                <div class="chart-container" id="chart-container-playbook"></div>
+
+                <div class="chart-wrapper">
+                    <h3>Preview</h3>
+                    <div id="chart-container-playbook" class="chart-container"></div>
+                </div>
             </div>
         </div>
 
@@ -119,6 +293,9 @@ s2.setData([
             const levelSpacingInput = document.getElementById('levelSpacingInput');
             const shapeSizeInput = document.getElementById('shapeSizeInput');
             const labelOffsetInput = document.getElementById('labelOffsetInput');
+            const bgLineVisibleInput = document.getElementById('bgLineVisibleInput');
+            const bgLineColorInput = document.getElementById('bgLineColorInput');
+            const bgLineWidthInput = document.getElementById('bgLineWidthInput');
             const showTextInput = document.getElementById('showTextInput');
             const randomizeInput = document.getElementById('randomizeInput');
             const regenerateBtn = document.getElementById('regenerateBtn');
@@ -130,6 +307,9 @@ s2.setData([
                 const spacing = parseInt(levelSpacingInput.value, 10);
                 const size = parseInt(shapeSizeInput.value, 10);
                 const offset = parseInt(labelOffsetInput.value, 10);
+                const bgVisible = bgLineVisibleInput.checked;
+                const bgColor = bgLineColorInput.value;
+                const bgWidth = parseInt(bgLineWidthInput.value, 10);
                 const showText = showTextInput.checked;
                 const isRandom = randomizeInput.checked;
 
@@ -145,6 +325,7 @@ s2.setData([
                             shape: possibleShapes[Math.floor(Math.random() * possibleShapes.length)],
                             color: possibleColors[Math.floor(Math.random() * possibleColors.length)],
                             size: size, levelSpacing: spacing, labelOffset: offset,
+                            backgroundLineVisible: bgVisible, backgroundLineColor: bgColor, backgroundLineWidth: bgWidth
                         });
 
                         let gapRemaining = 0;
@@ -169,6 +350,7 @@ s2.setData([
                             shape: possibleShapes[Math.floor(Math.random() * possibleShapes.length)],
                             color: possibleColors[Math.floor(Math.random() * possibleColors.length)],
                             size: size, levelSpacing: spacing, labelOffset: offset,
+                            backgroundLineVisible: bgVisible, backgroundLineColor: bgColor, backgroundLineWidth: bgWidth
                         });
                         const seriesData = lineData.filter((_, idx) => idx % 3 === 0).map(d => ({ time: d.time, value: d.value }));
                         series.setData(seriesData); // Simplified for bottom
@@ -184,12 +366,12 @@ s2.setData([
                 } else {
                     // --- Deterministic Logic ---
                     // Level 0 Top
-                    const s1 = chart.addShapeSeries({ position: 'top', level: 0, shape: 'circle', color: 'blue', size: size, levelSpacing: spacing, labelOffset: offset });
+                    const s1 = chart.addShapeSeries({ position: 'top', level: 0, shape: 'circle', color: 'blue', size: size, levelSpacing: spacing, labelOffset: offset, backgroundLineVisible: bgVisible, backgroundLineColor: bgColor, backgroundLineWidth: bgWidth });
                     s1.setData(lineData.filter((_, i) => i % 2 === 0).map(d => ({ time: d.time, value: 0, text: showText ? 'L0' : undefined })));
                     allSeries.push(s1);
 
                     // Level 1 Top
-                    const s2 = chart.addShapeSeries({ position: 'top', level: 1, shape: 'square', color: 'green', size: size, levelSpacing: spacing, labelOffset: offset });
+                    const s2 = chart.addShapeSeries({ position: 'top', level: 1, shape: 'square', color: 'green', size: size, levelSpacing: spacing, labelOffset: offset, backgroundLineVisible: bgVisible, backgroundLineColor: bgColor, backgroundLineWidth: bgWidth });
                     s2.setData(lineData.filter((_, i) => i % 3 === 0).map(d => ({ time: d.time, value: 0, text: showText ? 'L1' : undefined })));
                     allSeries.push(s2);
 
@@ -206,12 +388,25 @@ s2.setData([
                 const spacing = parseInt(levelSpacingInput.value, 10);
                 const size = parseInt(shapeSizeInput.value, 10);
                 const offset = parseInt(labelOffsetInput.value, 10);
-                allSeries.forEach(s => s.applyOptions({ levelSpacing: spacing, size: size, labelOffset: offset }));
+                const bgVisible = bgLineVisibleInput.checked;
+                const bgColor = bgLineColorInput.value;
+                const bgWidth = parseInt(bgLineWidthInput.value, 10);
+                allSeries.forEach(s => s.applyOptions({
+                    levelSpacing: spacing,
+                    size: size,
+                    labelOffset: offset,
+                    backgroundLineVisible: bgVisible,
+                    backgroundLineColor: bgColor,
+                    backgroundLineWidth: bgWidth
+                }));
             }
 
             levelSpacingInput.addEventListener('input', updateOptions);
             shapeSizeInput.addEventListener('input', updateOptions);
             labelOffsetInput.addEventListener('input', updateOptions);
+            bgLineVisibleInput.addEventListener('change', updateOptions);
+            bgLineColorInput.addEventListener('input', updateOptions);
+            bgLineWidthInput.addEventListener('input', updateOptions);
             showTextInput.addEventListener('change', createAllSeries);
             randomizeInput.addEventListener('change', createAllSeries);
             regenerateBtn.addEventListener('click', createAllSeries);

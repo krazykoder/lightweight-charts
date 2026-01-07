@@ -41,7 +41,12 @@ export interface ShapeSeriesRendererData {
         color: string;
         size: number;
         labelOffset: number;
+        backgroundLineVisible: boolean;
+        backgroundLineColor: string;
+        backgroundLineWidth: number;
+        backgroundLineY: Coordinate;
     };
+    width: number;
 }
 
 export class ShapeSeriesRenderer extends ScaledRenderer {
@@ -97,6 +102,32 @@ export class ShapeSeriesRenderer extends ScaledRenderer {
 
         ctx.textBaseline = 'middle';
         ctx.font = this._font;
+
+        if (this._data.options.backgroundLineVisible) {
+            ctx.beginPath();
+            const y = this._data.options.backgroundLineY;
+
+            // Determine start and end X for the line
+            let startX = 0;
+            // If there are no items before the visible range, start at the first visible item
+            if (this._data.visibleRange.from === 0 && this._data.items.length > 0) {
+                startX = this._data.items[0].x;
+            }
+
+            let endX = this._data.width;
+            // If there are no items after the visible range, end at the last visible item
+            if (this._data.visibleRange.to === this._data.items.length && this._data.items.length > 0) {
+                endX = this._data.items[this._data.items.length - 1].x;
+            }
+
+            ctx.lineWidth = this._data.options.backgroundLineWidth;
+            ctx.strokeStyle = this._data.options.backgroundLineColor;
+
+            ctx.beginPath();
+            ctx.moveTo(startX, y);
+            ctx.lineTo(endX, y);
+            ctx.stroke();
+        }
 
         for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
             const item = this._data.items[i];

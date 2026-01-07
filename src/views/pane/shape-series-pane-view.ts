@@ -39,7 +39,12 @@ export class SeriesShapePaneView implements IUpdatablePaneView {
                 color: options.color,
                 size: options.size,
                 labelOffset: options.labelOffset,
+                backgroundLineVisible: options.backgroundLineVisible,
+                backgroundLineColor: options.backgroundLineColor,
+                backgroundLineWidth: options.backgroundLineWidth,
+                backgroundLineY: 0 as Coordinate,
             },
+            width: 0,
         };
     }
 
@@ -69,6 +74,24 @@ export class SeriesShapePaneView implements IUpdatablePaneView {
         this._data.options.color = options.color;
         this._data.options.size = options.size;
         this._data.options.labelOffset = options.labelOffset;
+        this._data.options.backgroundLineVisible = options.backgroundLineVisible;
+        this._data.options.backgroundLineColor = options.backgroundLineColor;
+        this._data.options.backgroundLineWidth = options.backgroundLineWidth;
+
+        // Calculate background line Y
+        const priceScale = this._series.priceScale();
+        const firstValue = this._series.firstValue();
+        if (firstValue !== null) {
+            const dummyItem: ShapeSeriesRendererDataItem = {
+                time: 0 as unknown as any,
+                x: 0 as Coordinate,
+                y: 0 as Coordinate,
+                internalId: 0,
+            };
+            this._data.options.backgroundLineY = this._calculateY(dummyItem, options, priceScale, firstValue.value);
+        }
+
+        this._data.width = width;
 
         this._renderer.setData(this._data);
         this._renderer.setParams(this._model.options().layout.fontSize, this._model.options().layout.fontFamily);

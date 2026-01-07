@@ -15,58 +15,237 @@
         <h1>Shape Series Playbook</h1>
     </header>
     <main>
-        <!-- Playbook Section -->
+        <style>
+            :root {
+                --primary-color: #2962FF;
+                --bg-color: #f8f9fa;
+                --surface-color: #ffffff;
+                --text-color: #333333;
+                --border-radius: 8px;
+                --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+            body {
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .playbook-grid {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                gap: 24px;
+                align-items: start;
+            }
+
+            .controls-panel {
+                background: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .chart-wrapper {
+                background: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                height: 500px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chart-container {
+                flex: 1;
+                width: 100%;
+                height: 100%;
+            }
+
+            h3 {
+                margin-top: 0;
+                margin-bottom: 16px;
+                font-size: 1.25rem;
+                color: #111;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .control-group:last-child {
+                border-bottom: none;
+            }
+
+            .control-group-title {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #666;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            label {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.9rem;
+            }
+
+            input[type="number"],
+            select {
+                padding: 6px 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 0.9rem;
+                width: 120px;
+            }
+
+            input[type="color"] {
+                border: none;
+                width: 40px;
+                height: 30px;
+                padding: 0;
+                background: none;
+                cursor: pointer;
+            }
+
+            button {
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 10px 16px;
+                border-radius: 6px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s;
+                width: 100%;
+            }
+
+            button:hover {
+                background-color: #1e4bd1;
+            }
+
+            .checkbox-row {
+                justify-content: flex-start;
+                gap: 10px;
+                cursor: pointer;
+            }
+
+            /* Specific adjustments for playbook controls */
+            #chart-container-playbook {
+                border: 1px solid #f0f0f0;
+                border-radius: 4px;
+            }
+
+            @media (max-width: 900px) {
+                .playbook-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .chart-wrapper {
+                    height: 400px;
+                }
+            }
+        </style>
+
         <div class="container">
-            <div class="code-container">
-                <h3>Playbook: Interactive Demo</h3>
-                <p>Use the controls below to experiment with Shape Series options.</p>
-                <div class="controls">
-                    <label>
-                        Position:
-                        <select id="positionSelect">
-                            <option value="top">Top</option>
-                            <option value="bottom">Bottom</option>
-                            <option value="value">Value</option>
-                        </select>
-                    </label>
-                    <label>
-                        Shape:
-                        <select id="shapeSelect">
-                            <option value="square">Square</option>
-                            <option value="circle">Circle</option>
-                            <option value="diamond">Diamond</option>
-                            <option value="arrowUp">Arrow Up</option>
-                            <option value="arrowDown">Arrow Down</option>
-                            <option value="triangleUp">Triangle Up</option>
-                            <option value="triangleDown">Triangle Down</option>
-                            <option value="none">None</option>
-                        </select>
-                    </label>
-                    <label>
-                        Color:
-                        <input type="color" id="colorInput" value="#2196F3" />
-                    </label>
-                    <label>
-                        Size:
-                        <input type="number" id="sizeInput" value="12" min="0" step="1" />
-                    </label>
-                    <label>
-                        Label Offset:
-                        <input type="number" id="labelOffsetInput" value="2" min="0" step="1" />
-                    </label>
-                    <label>
-                        Fixed Value:
-                        <input type="number" id="fixedValueInput" value="0" step="1" />
-                    </label>
-                    <label>
-                        <input type="checkbox" id="showTextInput" checked /> Show Text
-                    </label>
-                    <label>
-                        <input type="checkbox" id="randomizeInput" checked /> Randomize Data
-                    </label>
-                    <button id="regenerateBtn">Regenerate Data</button>
+            <h3>Interactive Playbook</h3>
+            <div class="playbook-grid">
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <div class="control-group-title">Configuration</div>
+                        <label>
+                            Position
+                            <select id="positionSelect">
+                                <option value="top">Top</option>
+                                <option value="bottom">Bottom</option>
+                                <option value="value">Value</option>
+                            </select>
+                        </label>
+                        <label>
+                            Shape
+                            <select id="shapeSelect">
+                                <option value="square">Square</option>
+                                <option value="circle">Circle</option>
+                                <option value="diamond">Diamond</option>
+                                <option value="arrowUp">Arrow Up</option>
+                                <option value="arrowDown">Arrow Down</option>
+                                <option value="triangleUp">Triangle Up</option>
+                                <option value="triangleDown">Triangle Down</option>
+                                <option value="none">None</option>
+                            </select>
+                        </label>
+                        <label>
+                            Fixed Value
+                            <input type="number" id="fixedValueInput" value="0" step="1" />
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Style</div>
+                        <label>
+                            Color
+                            <input type="color" id="colorInput" value="#2196F3" />
+                        </label>
+                        <label>
+                            Size (px)
+                            <input type="number" id="sizeInput" value="12" min="0" step="1" />
+                        </label>
+                        <label>
+                            Label Offset
+                            <input type="number" id="labelOffsetInput" value="2" min="0" step="1" />
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="showTextInput" checked />
+                            <span>Show Labels</span>
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Background Line</div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="bgLineVisibleInput" />
+                            <span>Enable Line</span>
+                        </label>
+                        <label>
+                            Line Color
+                            <input type="color" id="bgLineColorInput" value="#FF0000" />
+                        </label>
+                        <label>
+                            Line Width
+                            <input type="number" id="bgLineWidthInput" value="2" min="1" max="10" />
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Data</div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="randomizeInput" checked />
+                            <span>Randomize Properties</span>
+                        </label>
+                        <button id="regenerateBtn">Regenerate Data</button>
+                    </div>
                 </div>
-                <div class="chart-container" id="chart-container-playbook"></div>
+
+                <div class="chart-wrapper">
+                    <h3>Preview</h3>
+                    <div id="chart-container-playbook" class="chart-container"></div>
+                </div>
             </div>
         </div>
 
@@ -162,6 +341,9 @@ series.setData([
             const fixedValueInput = document.getElementById('fixedValueInput');
             const labelOffsetInput = document.getElementById('labelOffsetInput');
             const showTextInput = document.getElementById('showTextInput');
+            const bgLineVisibleInput = document.getElementById('bgLineVisibleInput');
+            const bgLineColorInput = document.getElementById('bgLineColorInput');
+            const bgLineWidthInput = document.getElementById('bgLineWidthInput');
             const randomizeInput = document.getElementById('randomizeInput');
             const regenerateBtn = document.getElementById('regenerateBtn');
 
@@ -176,6 +358,9 @@ series.setData([
                     size: parseInt(sizeInput.value, 10),
                     fixedValue: parseFloat(fixedValueInput.value),
                     labelOffset: parseInt(labelOffsetInput.value, 10),
+                    backgroundLineVisible: bgLineVisibleInput.checked,
+                    backgroundLineColor: bgLineColorInput.value,
+                    backgroundLineWidth: parseInt(bgLineWidthInput.value, 10),
                 });
                 updateData();
             }
@@ -239,6 +424,9 @@ series.setData([
             sizeInput.addEventListener('input', () => shapeSeries.applyOptions({ size: parseInt(sizeInput.value, 10) }));
             labelOffsetInput.addEventListener('input', () => shapeSeries.applyOptions({ labelOffset: parseInt(labelOffsetInput.value, 10) }));
             fixedValueInput.addEventListener('input', () => shapeSeries.applyOptions({ fixedValue: parseFloat(fixedValueInput.value) }));
+            bgLineVisibleInput.addEventListener('change', () => shapeSeries.applyOptions({ backgroundLineVisible: bgLineVisibleInput.checked }));
+            bgLineColorInput.addEventListener('input', () => shapeSeries.applyOptions({ backgroundLineColor: bgLineColorInput.value }));
+            bgLineWidthInput.addEventListener('input', () => shapeSeries.applyOptions({ backgroundLineWidth: parseInt(bgLineWidthInput.value, 10) }));
             showTextInput.addEventListener('change', updateData);
             randomizeInput.addEventListener('change', updateData);
             regenerateBtn.addEventListener('click', updateData);

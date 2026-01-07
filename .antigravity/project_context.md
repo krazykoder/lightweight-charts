@@ -36,3 +36,18 @@ The library is structured with a core model, renderers, and views.
 
 ## Current Focus
 - ensuring all examples are robust and visually correct.
+
+### Shape Series
+**Implemented: Jan 2026**
+- **Description**: A new flexible series type for rendering shapes (icons) at specific data points. Supports sparse data, stacking (levels), and text labels.
+- **Key Classes**:
+    - `Series<'Shape'>` (Model)
+    - `ShapeSeriesRenderer` (Renderer)
+    - `SeriesShapePaneView` (View)
+- **API**: `chart.addShapeSeries(options)`
+- **Capabilities**:
+    - **Shapes**: Supports standard markers (circle, square, arrowUp, etc.) and new shapes (diamond, cross, plus).
+    - **Positioning**: `top`, `bottom` (margin-based), and `value` (price-based).
+    - **Text Labels**: Auto-positioned text with configurable offsets and truncation.
+    - **Stacking**: `level` and `levelSpacing` options to prevent overlap of multiple series.
+    - **Sparse Data**: Handles `undefined` shapes (draws nothing) for gaps.
