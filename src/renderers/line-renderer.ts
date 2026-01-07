@@ -320,6 +320,51 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 				ctx.lineTo(currItem.x, currItem.y);
 			}
 			ctx.stroke();
+		} else if (lineType === LineType.Square) {
+			ctx.fillStyle = prevStrokeStyle;
+			for (; i < visibleRange.to; i++) {
+				const item = items[i];
+				const itemColor = item.color ?? lineColor;
+
+				if (itemColor !== prevStrokeStyle) {
+					ctx.fill();
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = itemColor;
+					ctx.fillStyle = itemColor;
+					prevStrokeStyle = itemColor;
+				}
+
+				const size = ctx.lineWidth;
+				const halfSize = size / 2;
+				ctx.rect(item.x - halfSize, item.y - halfSize, size, size);
+			}
+			ctx.fill();
+		} else if (lineType === LineType.Diamond) {
+			ctx.fillStyle = prevStrokeStyle;
+			for (; i < visibleRange.to; i++) {
+				const item = items[i];
+				const itemColor = item.color ?? lineColor;
+
+				if (itemColor !== prevStrokeStyle) {
+					ctx.fill();
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = itemColor;
+					ctx.fillStyle = itemColor;
+					prevStrokeStyle = itemColor;
+				}
+
+				const size = ctx.lineWidth * 2; // Diamond looks better slightly larger
+				const halfSize = size / 2;
+
+				ctx.moveTo(item.x, item.y - halfSize);
+				ctx.lineTo(item.x + halfSize, item.y);
+				ctx.lineTo(item.x, item.y + halfSize);
+				ctx.lineTo(item.x - halfSize, item.y);
+				ctx.closePath();
+			}
+			ctx.fill();
 		} else {
 			for (; i < visibleRange.to; i++) {
 				const currItem = items[i];

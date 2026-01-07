@@ -1,6 +1,6 @@
 /*!
  * @license
- * TradingView Lightweight Charts v3.8.0-local-dev+202601052352
+ * TradingView Lightweight Charts v3.8.0-local-dev+202601070001
  * Copyright (c) 2020 TradingView, Inc.
  * Licensed under Apache License 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
@@ -20,6 +20,12 @@ var LineType;
      */
     LineType[LineType["WithSteps"] = 1] = "WithSteps";
     LineType[LineType["WithGaps"] = 2] = "WithGaps";
+    LineType[LineType["Circle"] = 3] = "Circle";
+    LineType[LineType["Cross"] = 4] = "Cross";
+    LineType[LineType["Square"] = 5] = "Square";
+    LineType[LineType["Diamond"] = 6] = "Diamond";
+    LineType[LineType["Area"] = 7] = "Area";
+    LineType[LineType["SteppedArea"] = 8] = "SteppedArea";
 })(LineType || (LineType = {}));
 /**
  * Represents the possible line styles.
@@ -1770,8 +1776,11 @@ function walkLine(ctx, points, lineType, visibleRange) {
     if (lineType === 1 /* LineType.WithSteps */) {
         for (; i < visibleRange.to; i++) {
             var currItem = points[i];
-            var prevY = points[i - 1].y;
-            ctx.lineTo(currItem.x, prevY);
+            var prevItem = points[i - 1]; // We need prevItem for x coordinate
+            var prevY = prevItem.y;
+            var midX = (prevItem.x + currItem.x) / 2;
+            ctx.lineTo(midX, prevY);
+            ctx.lineTo(midX, currItem.y);
             ctx.lineTo(currItem.x, currItem.y);
         }
     }
@@ -1908,7 +1917,7 @@ var PaneRendererLine = /** @class */ (function (_super) {
      * Similar to {@link walkLine}, but supports color changes
      */
     PaneRendererLine.prototype._drawLine = function (ctx, data) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u;
         var items = data.items, visibleRange = data.visibleRange, lineType = data.lineType, lineColor = data.lineColor;
         if (items.length === 0 || visibleRange === null) {
             return;
@@ -1931,11 +1940,13 @@ var PaneRendererLine = /** @class */ (function (_super) {
                 var currItem = items[i];
                 var prevItem = items[i - 1];
                 var currentStrokeStyle = (_b = currItem.color) !== null && _b !== void 0 ? _b : lineColor;
-                ctx.lineTo(currItem.x, prevItem.y);
+                var midX = (prevItem.x + currItem.x) / 2;
+                ctx.lineTo(midX, prevItem.y);
                 if (currentStrokeStyle !== prevStrokeStyle) {
                     changeColor(currentStrokeStyle);
-                    ctx.moveTo(currItem.x, prevItem.y);
+                    ctx.moveTo(midX, prevItem.y);
                 }
+                ctx.lineTo(midX, currItem.y);
                 ctx.lineTo(currItem.x, currItem.y);
             }
         }
@@ -1961,10 +1972,205 @@ var PaneRendererLine = /** @class */ (function (_super) {
                 ctx.lineTo(currItem.x, currItem.y);
             }
         }
+        else if (lineType === 3 /* LineType.Circle */) {
+            for (; i < visibleRange.to; i++) {
+                var item = items[i];
+                var itemColor = (_d = item.color) !== null && _d !== void 0 ? _d : lineColor;
+                if (itemColor !== prevStrokeStyle) {
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.strokeStyle = itemColor;
+                    ctx.fillStyle = itemColor;
+                    prevStrokeStyle = itemColor;
+                }
+                ctx.moveTo(item.x + ctx.lineWidth / 2, item.y);
+                ctx.arc(item.x, item.y, ctx.lineWidth / 2, 0, 2 * Math.PI);
+            }
+        }
+        else if (lineType === 4 /* LineType.Cross */) {
+            for (; i < visibleRange.to; i++) {
+                var item = items[i];
+                var itemColor = (_e = item.color) !== null && _e !== void 0 ? _e : lineColor;
+                if (itemColor !== prevStrokeStyle) {
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.strokeStyle = itemColor;
+                    prevStrokeStyle = itemColor;
+                }
+                var size = ctx.lineWidth * 2; // Making cross slightly bigger for visibility
+                var halfSize = size / 2;
+                ctx.moveTo(item.x - halfSize, item.y - halfSize);
+                ctx.lineTo(item.x + halfSize, item.y + halfSize);
+                ctx.moveTo(item.x - halfSize, item.y + halfSize);
+                ctx.lineTo(item.x + halfSize, item.y - halfSize);
+            }
+        }
+        else if (lineType === 7 /* LineType.Area */) {
+            var baseLevel = (_f = data.baseLevelCoordinate) !== null && _f !== void 0 ? _f : ctx.canvas.height;
+            var alpha = (_g = data.pointColorAreaAlpha) !== null && _g !== void 0 ? _g : 0.5;
+            // Fill First
+            for (; i < visibleRange.to; i++) {
+                var currItem = items[i];
+                var prevItem = items[i - 1];
+                var currentStrokeStyle = (_h = currItem.color) !== null && _h !== void 0 ? _h : lineColor;
+                ctx.beginPath();
+                ctx.fillStyle = applyAlpha(currentStrokeStyle, alpha);
+                ctx.moveTo(prevItem.x, prevItem.y);
+                ctx.lineTo(currItem.x, currItem.y);
+                ctx.lineTo(currItem.x, baseLevel);
+                ctx.lineTo(prevItem.x, baseLevel);
+                ctx.closePath();
+                ctx.fill();
+            }
+            // Stroke Second
+            i = visibleRange.from + 1;
+            var prevStrokeStyle_1 = (_j = items[visibleRange.from].color) !== null && _j !== void 0 ? _j : lineColor;
+            ctx.beginPath();
+            ctx.strokeStyle = prevStrokeStyle_1;
+            ctx.moveTo(items[visibleRange.from].x, items[visibleRange.from].y);
+            for (; i < visibleRange.to; i++) {
+                var currItem = items[i];
+                var currentStrokeStyle = (_k = currItem.color) !== null && _k !== void 0 ? _k : lineColor;
+                if (currentStrokeStyle !== prevStrokeStyle_1) {
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.strokeStyle = currentStrokeStyle;
+                    prevStrokeStyle_1 = currentStrokeStyle;
+                    ctx.moveTo(items[i - 1].x, items[i - 1].y);
+                }
+                ctx.lineTo(currItem.x, currItem.y);
+            }
+            ctx.stroke();
+        }
+        else if (lineType === 8 /* LineType.SteppedArea */) {
+            var baseLevel = (_l = data.baseLevelCoordinate) !== null && _l !== void 0 ? _l : ctx.canvas.height;
+            var alpha = (_m = data.pointColorAreaAlpha) !== null && _m !== void 0 ? _m : 0.5;
+            // Fill First
+            for (; i < visibleRange.to; i++) {
+                var currItem = items[i];
+                var prevItem = items[i - 1];
+                var prevColor = (_o = prevItem.color) !== null && _o !== void 0 ? _o : lineColor;
+                var currColor = (_p = currItem.color) !== null && _p !== void 0 ? _p : lineColor;
+                var midX = (prevItem.x + currItem.x) / 2;
+                // Left half fill (prevColor)
+                ctx.beginPath();
+                ctx.fillStyle = applyAlpha(prevColor, alpha);
+                ctx.moveTo(prevItem.x, prevItem.y);
+                ctx.lineTo(midX, prevItem.y);
+                ctx.lineTo(midX, baseLevel);
+                ctx.lineTo(prevItem.x, baseLevel);
+                ctx.closePath();
+                ctx.fill();
+                // Right half fill (currColor)
+                ctx.beginPath();
+                ctx.fillStyle = applyAlpha(currColor, alpha);
+                // Standard stepped logic: vertical line at midX connects prevY to currY
+                // So right half is from midX to currX at currY level
+                // Wait, the vertical drop happens at midX.
+                // The area under the vertical line is technically infinitesimal?
+                // The polygon shape for right half:
+                // Start at (midX, prevY) ? No, the line goes: (prevX, prevY) -> (midX, prevY) -> (midX, currY) -> (currX, currY)
+                // So the area is the polygon enclosed by that line and the baseline.
+                // Left polygon: (prevX, prevY) -> (midX, prevY) -> (midX, base) -> (prevX, base)
+                // Right polygon: (midX, prevY) -> (midX, currY) -> (currX, currY) -> (currX, base) -> (midX, base)
+                // Actually, (midX, prevY) is part of the "cliff".
+                // The area under the vertical segment (midX, prevY) to (midX, currY) is just a line.
+                // So constructing the right polygon: 
+                // Top-Left: (midX, currY) ?
+                // If we strictly follow the line path:
+                // (midX, prevY) -> (midX, currY) -> (currX, currY)
+                // If we close this to base:
+                // (midX, base) -> (midX, prevY) ...
+                // Let's look at the stroke logic again:
+                // ctx.lineTo(midX, prevItem.y);
+                // ctx.lineTo(midX, currItem.y);
+                // ctx.lineTo(currItem.x, currItem.y);
+                // So the right polygon should cover from midX to currX.
+                // The height at midX changes from prevY to currY.
+                // If we treat the color switch happening AT midX (vertical line), then:
+                // Left of midX is prevColor. Right of midX is currColor.
+                // The vertical line itself is at midX.
+                // If we want the vertical line to be part of the right block (currColor), 
+                // then the Right polygon starts at (midX, prevY).
+                ctx.moveTo(midX, prevItem.y);
+                ctx.lineTo(midX, currItem.y);
+                ctx.lineTo(currItem.x, currItem.y);
+                ctx.lineTo(currItem.x, baseLevel);
+                ctx.lineTo(midX, baseLevel);
+                ctx.closePath();
+                ctx.fill();
+            }
+            // Stroke Second
+            i = visibleRange.from + 1;
+            var prevStrokeStyle_2 = (_q = items[visibleRange.from].color) !== null && _q !== void 0 ? _q : lineColor;
+            ctx.beginPath();
+            ctx.strokeStyle = prevStrokeStyle_2;
+            ctx.moveTo(items[visibleRange.from].x, items[visibleRange.from].y);
+            for (; i < visibleRange.to; i++) {
+                var currItem = items[i];
+                var prevItem = items[i - 1];
+                var currentStrokeStyle = (_r = currItem.color) !== null && _r !== void 0 ? _r : lineColor;
+                var midX = (prevItem.x + currItem.x) / 2;
+                if (currentStrokeStyle !== prevStrokeStyle_2) {
+                    ctx.lineTo(midX, prevItem.y);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.strokeStyle = currentStrokeStyle;
+                    prevStrokeStyle_2 = currentStrokeStyle;
+                    ctx.moveTo(midX, prevItem.y);
+                }
+                ctx.lineTo(midX, prevItem.y);
+                ctx.lineTo(midX, currItem.y);
+                ctx.lineTo(currItem.x, currItem.y);
+            }
+            ctx.stroke();
+        }
+        else if (lineType === 5 /* LineType.Square */) {
+            ctx.fillStyle = prevStrokeStyle;
+            for (; i < visibleRange.to; i++) {
+                var item = items[i];
+                var itemColor = (_s = item.color) !== null && _s !== void 0 ? _s : lineColor;
+                if (itemColor !== prevStrokeStyle) {
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.strokeStyle = itemColor;
+                    ctx.fillStyle = itemColor;
+                    prevStrokeStyle = itemColor;
+                }
+                var size = ctx.lineWidth;
+                var halfSize = size / 2;
+                ctx.rect(item.x - halfSize, item.y - halfSize, size, size);
+            }
+            ctx.fill();
+        }
+        else if (lineType === 6 /* LineType.Diamond */) {
+            ctx.fillStyle = prevStrokeStyle;
+            for (; i < visibleRange.to; i++) {
+                var item = items[i];
+                var itemColor = (_t = item.color) !== null && _t !== void 0 ? _t : lineColor;
+                if (itemColor !== prevStrokeStyle) {
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.strokeStyle = itemColor;
+                    ctx.fillStyle = itemColor;
+                    prevStrokeStyle = itemColor;
+                }
+                var size = ctx.lineWidth * 2; // Diamond looks better slightly larger
+                var halfSize = size / 2;
+                ctx.moveTo(item.x, item.y - halfSize);
+                ctx.lineTo(item.x + halfSize, item.y);
+                ctx.lineTo(item.x, item.y + halfSize);
+                ctx.lineTo(item.x - halfSize, item.y);
+                ctx.closePath();
+            }
+            ctx.fill();
+        }
         else {
             for (; i < visibleRange.to; i++) {
                 var currItem = items[i];
-                var currentStrokeStyle = (_d = currItem.color) !== null && _d !== void 0 ? _d : lineColor;
+                var currentStrokeStyle = (_u = currItem.color) !== null && _u !== void 0 ? _u : lineColor;
                 ctx.lineTo(currItem.x, currItem.y);
                 if (currentStrokeStyle !== prevStrokeStyle) {
                     changeColor(currentStrokeStyle);
@@ -2763,6 +2969,7 @@ var PaneRendererHistogram = /** @class */ (function () {
                 var nextCache = this._precalculatedCache[i - this._data.visibleRange.from + 1];
                 var nextItem = this._data.items[i + 1];
                 var nextY = Math.round(nextItem.y * pixelRatio);
+                ctx.fillStyle = nextItem.color;
                 ctx.moveTo(current.roundedCenter, y);
                 ctx.lineTo(nextCache.roundedCenter, nextY);
                 ctx.lineTo(nextCache.roundedCenter, histogramBase);
@@ -2940,9 +3147,11 @@ var SeriesLinePaneView = /** @class */ (function (_super) {
     function SeriesLinePaneView(series, model) {
         var _this = _super.call(this, series, model) || this;
         _this._lineRenderer = new PaneRendererLine();
+        _this._baseLevelCoordinate = null;
         return _this;
     }
     SeriesLinePaneView.prototype.renderer = function (height, width) {
+        var _a;
         if (!this._series.visible()) {
             return null;
         }
@@ -2956,9 +3165,16 @@ var SeriesLinePaneView = /** @class */ (function (_super) {
             lineWidth: lineStyleProps.lineWidth,
             visibleRange: this._itemsVisibleRange,
             barWidth: this._model.timeScale().barSpacing(),
+            baseLevelCoordinate: (_a = this._baseLevelCoordinate) !== null && _a !== void 0 ? _a : undefined,
+            pointColorAreaAlpha: lineStyleProps.pointColorAreaAlpha,
         };
         this._lineRenderer.setData(data);
         return this._lineRenderer;
+    };
+    SeriesLinePaneView.prototype._convertToCoordinates = function (priceScale, timeScale, firstValue) {
+        _super.prototype._convertToCoordinates.call(this, priceScale, timeScale, firstValue);
+        // Assuming 0 as the base level for Area line type
+        this._baseLevelCoordinate = priceScale.priceToCoordinate(0, firstValue);
     };
     SeriesLinePaneView.prototype._updateOptions = function () {
         var _this = this;
@@ -12080,6 +12296,7 @@ var lineStyleDefaults = {
     crosshairMarkerBorderColor: '',
     crosshairMarkerBackgroundColor: '',
     lastPriceAnimation: 0 /* LastPriceAnimationMode.Disabled */,
+    pointColorAreaAlpha: 0.5,
 };
 var areaStyleDefaults = {
     topColor: 'rgba( 46, 220, 135, 0.4)',
@@ -12093,6 +12310,7 @@ var areaStyleDefaults = {
     crosshairMarkerBorderColor: '',
     crosshairMarkerBackgroundColor: '',
     lastPriceAnimation: 0 /* LastPriceAnimationMode.Disabled */,
+    pointColorAreaAlpha: 0.5,
 };
 var baselineStyleDefaults = {
     baseValue: {
@@ -12112,6 +12330,7 @@ var baselineStyleDefaults = {
     crosshairMarkerBorderColor: '',
     crosshairMarkerBackgroundColor: '',
     lastPriceAnimation: 0 /* LastPriceAnimationMode.Disabled */,
+    pointColorAreaAlpha: 0.5,
 };
 var histogramStyleDefaults = {
     color: '#26a69a',
@@ -12548,9 +12767,15 @@ var ChartApi = /** @class */ (function () {
         this._clickedDelegate.unsubscribe(handler);
     };
     ChartApi.prototype.moveCrosshair = function (point) {
-        if (!point)
-            return;
         var paneWidgets = this._chartWidget.paneWidgets();
+        if (!point) {
+            for (var _i = 0, paneWidgets_1 = paneWidgets; _i < paneWidgets_1.length; _i++) {
+                var paneWidget = paneWidgets_1[_i];
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                paneWidget.mouseLeaveEvent({});
+            }
+            return;
+        }
         var event = {
             localX: point.x,
             localY: point.y,
@@ -12646,7 +12871,7 @@ function createChart(container, options) {
  * Returns the current version as a string. For example `'3.3.0'`.
  */
 function version() {
-    return "3.8.0-local-dev+202601052352";
+    return "3.8.0-local-dev+202601070001";
 }
 
 export { ColorType, CrosshairMode, LastPriceAnimationMode as LasPriceAnimationMode, LastPriceAnimationMode, LineStyle, LineType, PriceFormatter, PriceLineSource, PriceScaleMode, TickMarkType, TrackingModeExitMode, createChart, isBusinessDay, isUTCTimestamp, version };

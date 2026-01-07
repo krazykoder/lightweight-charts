@@ -20,6 +20,8 @@ export const enum LineType {
 	WithGaps,
 	Circle,
 	Cross,
+	Square,
+	Diamond,
 	Area,
 	SteppedArea,
 }

@@ -735,7 +735,13 @@ export declare enum LineType {
 	 * A stepped line.
 	 */
 	WithSteps = 1,
-	WithGaps = 2
+	WithGaps = 2,
+	Circle = 3,
+	Cross = 4,
+	Square = 5,
+	Diamond = 6,
+	Area = 7,
+	SteppedArea = 8
 }
 /**
  * Represents the source of data to be used for the horizontal price line.
@@ -909,6 +915,12 @@ export interface AreaStyleOptions {
 	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
+	/**
+	 * Transparency of the area fill (0-1), used when lineType is Area or SteppedArea.
+	 *
+	 * @defaultValue `0.5`
+	 */
+	pointColorAreaAlpha: number;
 }
 /**
  * Represents the margin used when updating a price scale.
@@ -1143,6 +1155,12 @@ export interface BaselineStyleOptions {
 	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
+	/**
+	 * Transparency of the area fill (0-1), used when lineType is Area or SteppedArea.
+	 *
+	 * @defaultValue `0.5`
+	 */
+	pointColorAreaAlpha: number;
 }
 /**
  * Represents a time as a day/month/year.
@@ -2377,6 +2395,12 @@ export interface LineStyleOptions {
 	 * @defaultValue {@link LastPriceAnimationMode.Disabled}
 	 */
 	lastPriceAnimation: LastPriceAnimationMode;
+	/**
+	 * Transparency of the area fill (0-1), used when lineType is Area or SteppedArea.
+	 *
+	 * @defaultValue `0.5`
+	 */
+	pointColorAreaAlpha: number;
 }
 /**
  * Represents options for formatting dates, times, and prices according to a locale.

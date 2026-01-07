@@ -27,8 +27,10 @@
                         <option value="2">WithGaps</option>
                         <option value="3">Circle</option>
                         <option value="4">Cross</option>
-                        <option value="5">Area</option>
-                        <option value="6">SteppedArea</option>
+                        <option value="5">Square</option>
+                        <option value="6">Diamond</option>
+                        <option value="7">Area</option>
+                        <option value="8">SteppedArea</option>
                     </select>
                 </label>
                 <label>
@@ -233,6 +235,48 @@ lineSeries8.setData(data.slice(0, 50));
                 </pre>
         </div>
         <div class="chart-container" id="chart-container8"></div>
+    </div>
+
+    <!-- Square Style -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Square Style</h3>
+            <pre>
+const chartSquare = LightweightCharts.createChart(document.getElementById('chart-container-square'), {
+    width: 600,
+    height: 300,
+});
+const lineSeriesSquare = chartSquare.addLineSeries({
+    // LineType.Square = 7
+    lineType: 7,
+    color: '#ab47bc',
+    lineWidth: 4,
+});
+lineSeriesSquare.setData(data.slice(0, 50));
+            </pre>
+        </div>
+        <div class="chart-container" id="chart-container-square"></div>
+    </div>
+
+    <!-- Diamond Style -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Diamond Style</h3>
+            <pre>
+const chartDiamond = LightweightCharts.createChart(document.getElementById('chart-container-diamond'), {
+    width: 600,
+    height: 300,
+});
+const lineSeriesDiamond = chartDiamond.addLineSeries({
+    // LineType.Diamond = 8
+    lineType: 8,
+    color: '#ff9800',
+    lineWidth: 4,
+});
+lineSeriesDiamond.setData(data.slice(0, 50));
+            </pre>
+        </div>
+        <div class="chart-container" id="chart-container-diamond"></div>
     </div>
 
     <!-- Area Opacity Example -->
@@ -495,13 +539,39 @@ const lineSeries10 = chart10.addLineSeries({
         });
         lineSeries8.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.start + 50));
 
+        // Square Style
+        const chartSquare = LightweightCharts.createChart(document.getElementById('chart-container-square'), {
+            width: 600,
+            height: 300,
+        });
+        const lineSeriesSquare = chartSquare.addLineSeries({
+            // LineType.Square = 5
+            lineType: 5,
+            color: '#ab47bc',
+            lineWidth: 4,
+        });
+        lineSeriesSquare.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.start + 50));
+
+        // Diamond Style
+        const chartDiamond = LightweightCharts.createChart(document.getElementById('chart-container-diamond'), {
+            width: 600,
+            height: 300,
+        });
+        const lineSeriesDiamond = chartDiamond.addLineSeries({
+            // LineType.Diamond = 6
+            lineType: 6,
+            color: '#ff9800',
+            lineWidth: 4,
+        });
+        lineSeriesDiamond.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.start + 50));
+
         // --- Area Opacity Example (Chart 9) ---
         const chart9 = LightweightCharts.createChart(document.getElementById('chart-container9'), {
             width: 600,
             height: 300,
         });
         const lineSeries9 = chart9.addLineSeries({
-            lineType: 5, // Area
+            lineType: 7, // Area
             color: '#2962FF',
             pointColorAreaAlpha: 0.2,
         });
@@ -521,7 +591,7 @@ const lineSeries10 = chart10.addLineSeries({
             height: 300,
         });
         const lineSeries10 = chart10.addLineSeries({
-            lineType: 6, // SteppedArea
+            lineType: 8, // SteppedArea
             pointColorAreaAlpha: 0.2,
             lineStyle: LightweightCharts.LineStyle.Solid,
         });
