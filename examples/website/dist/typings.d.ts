@@ -761,9 +761,10 @@ export declare enum LineType {
 	Cross = 4,
 	Square = 5,
 	Diamond = 6,
-	ConnectedCircles = 7,
-	Area = 8,
-	SteppedArea = 9
+	Plus = 7,
+	ConnectedCircles = 8,
+	Area = 9,
+	SteppedArea = 10
 }
 /**
  * Represents the source of data to be used for the horizontal price line.
@@ -3163,10 +3164,15 @@ export interface ShapeSeriesData extends SingleValueData {
 	 * Optional shape value for certain data item. If missed, shape from options is used
 	 */
 	shape?: SeriesMarkerShape;
+	/**
+	 * Optional size value for certain data item. If missed, size from options is used
+	 */
+	size?: number;
 }
 export interface ShapeSeriesPlotRow extends PlotRow {
 	readonly color?: string;
 	readonly shape?: SeriesMarkerShape;
+	readonly size?: number;
 }
 /**
  * Represents style options for a shape series.
@@ -3181,9 +3187,9 @@ export interface ShapeSeriesStyleOptions {
 	/**
 	 * The shape of the markers.
 	 *
-	 * @defaultValue `'circle'`
+	 * @defaultValue `undefined`
 	 */
-	shape: SeriesMarkerShape;
+	shape?: SeriesMarkerShape;
 	/**
 	 * The size of the shapes in pixels.
 	 *
@@ -3724,7 +3730,7 @@ export type SeriesMarkerPosition = "aboveBar" | "belowBar" | "inBar" | number;
 /**
  * Represents the shape of a series marker.
  */
-export type SeriesMarkerShape = "circle" | "square" | "arrowUp" | "arrowDown" | "triangleUp" | "triangleDown";
+export type SeriesMarkerShape = "circle" | "square" | "arrowUp" | "arrowDown" | "triangleUp" | "triangleDown" | "diamond" | "cross" | "plus";
 /**
  * Represents the intersection of a series type `T`'s options and common series options.
  *

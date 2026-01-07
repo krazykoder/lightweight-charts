@@ -95,7 +95,6 @@ export const histogramStyleDefaults: HistogramStyleOptions = {
 
 export const shapeSeriesStyleDefaults: ShapeSeriesStyleOptions = {
 	color: '#26a69a',
-	shape: 'circle',
 	size: 4,
 	position: 'top',
 	fixedValue: 0,

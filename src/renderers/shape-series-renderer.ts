@@ -27,7 +27,7 @@ export interface ShapeSeriesRendererData {
     items: ShapeSeriesRendererDataItem[];
     visibleRange: SeriesItemsIndexesRange | null;
     options: {
-        shape: SeriesMarkerShape;
+        shape?: SeriesMarkerShape;
         color: string;
         size: number;
     };
@@ -75,11 +75,11 @@ function drawShape(item: ShapeSeriesRendererDataItem, options: ShapeSeriesRender
     const size = item.size || options.size;
     const shape = item.shape || options.shape;
 
-    ctx.fillStyle = color;
-
-    if (size === 0) {
+    if (!shape || size === 0) {
         return;
     }
+
+    ctx.fillStyle = color;
 
     switch (shape) {
         case 'arrowDown':
@@ -118,7 +118,7 @@ function hitTestShape(item: ShapeSeriesRendererDataItem, options: ShapeSeriesRen
     const size = item.size || options.size;
     const shape = item.shape || options.shape;
 
-    if (size === 0) {
+    if (!shape || size === 0) {
         return false;
     }
 

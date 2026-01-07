@@ -99,14 +99,22 @@
             const fixedValueInput = document.getElementById('fixedValueInput');
             const regenerateBtn = document.getElementById('regenerateDataBtn');
 
+            // Add "None" option to shape select
+            const noneOption = document.createElement('option');
+            noneOption.value = 'none';
+            noneOption.text = 'None';
+            shapeSelect.appendChild(noneOption);
+
             function createShapeSeries() {
                 if (shapeSeries) {
                     chart.removeSeries(shapeSeries);
                 }
 
+                const shapeValue = shapeSelect.value === 'none' ? undefined : shapeSelect.value;
+
                 shapeSeries = chart.addShapeSeries({
                     position: positionSelect.value,
-                    shape: shapeSelect.value,
+                    shape: shapeValue,
                     color: colorInput.value,
                     size: parseInt(sizeInput.value, 10),
                     fixedValue: parseFloat(fixedValueInput.value),
@@ -121,17 +129,33 @@
                 // Randomly assign shapes to some points, or use defaults
                 // For 'value' position, we need a value. We can use the close price or random.
                 const newData = lineData.map((d, i) => {
-                    const isSpecial = i % 5 === 0;
                     const item = {
                         time: d.time,
                         value: d.value + (Math.random() * 10 - 5), // Value used if position is 'value'
                     };
 
-                    if (isSpecial) {
-                        item.color = '#ff0000';
-                        item.shape = 'square'; // Test overriding shape
-                        item.size = 6;
+                    // Scenario 1: Explicit Shape & Color (every 10th point)
+                    if (i % 10 === 0) {
+                        item.color = '#E91E63'; // Pink
+                        item.shape = 'diamond';
+                        item.size = 8;
+                        return item;
                     }
+
+                    // Scenario 2: Explicit Shape, Default Color (every 7th point)
+                    if (i % 7 === 0) {
+                        item.shape = 'square';
+                        return item;
+                    }
+
+                    // Scenario 3: Default Shape, Explicit Color (every 5th point)
+                    if (i % 5 === 0) {
+                        item.color = '#00E676'; // Green
+                        return item;
+                    }
+
+                    // Scenario 4: Default Shape & Color (Remainder)
+                    // If default shape is 'none', these will not draw.
                     return item;
                 });
 
@@ -144,7 +168,7 @@
             });
 
             shapeSelect.addEventListener('change', () => {
-                shapeSeries.applyOptions({ shape: shapeSelect.value });
+                createShapeSeries();
             });
 
             colorInput.addEventListener('change', () => {

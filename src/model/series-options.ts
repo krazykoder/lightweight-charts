@@ -445,9 +445,9 @@ export interface ShapeSeriesStyleOptions {
 	/**
 	 * The shape of the markers.
 	 *
-	 * @defaultValue `'circle'`
+	 * @defaultValue `undefined`
 	 */
-	shape: SeriesMarkerShape;
+	shape?: SeriesMarkerShape;
 
 	/**
 	 * The size of the shapes in pixels.
