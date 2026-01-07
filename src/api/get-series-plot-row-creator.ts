@@ -3,7 +3,7 @@ import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
-import { BarData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap } from './data-consumer';
+import { BarData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap, ShapeSeriesData } from './data-consumer';
 
 function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData): Mutable<SeriesPlotRow<'Area' | 'Baseline'>> {
 	const val = item.value;
@@ -60,7 +60,31 @@ function getCandlestickSeriesPlotRow(time: TimePoint, index: TimePointIndex, ite
 	return res;
 }
 
+function getShapeSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: ShapeSeriesData): Mutable<SeriesPlotRow<'Shape'>> {
+	const val = item.value;
+	const res: Mutable<SeriesPlotRow<'Shape'>> = { index, time, value: [val, val, val, val] };
+
+	// 'color' here is public property (from API) so we can use `in` here safely
+	// eslint-disable-next-line no-restricted-syntax
+	if ('color' in item && item.color !== undefined) {
+		res.color = item.color;
+	}
+
+	if ('shape' in item && item.shape !== undefined) {
+		res.shape = item.shape;
+	}
+
+	// 'size' here is public property (from API) so we can use `in` here safely
+	// eslint-disable-next-line no-restricted-syntax
+	if ('size' in item && item.size !== undefined) {
+		res.size = item.size;
+	}
+
+	return res;
+}
+
 export type WhitespacePlotRow = Omit<PlotRow, 'value'>;
+
 
 export function isSeriesPlotRow(row: SeriesPlotRow | WhitespacePlotRow): row is SeriesPlotRow {
 	return (row as Partial<SeriesPlotRow>).value !== undefined;
@@ -76,7 +100,7 @@ type SeriesItemValueFnMap = {
 
 export type TimedSeriesItemValueFn = (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[SeriesType]) => Mutable<SeriesPlotRow | WhitespacePlotRow>;
 
-function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow)): TimedSeriesItemValueFn {
+function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow) | (typeof getShapeSeriesPlotRow)): TimedSeriesItemValueFn {
 	return (time: TimePoint, index: TimePointIndex, bar: SeriesDataItemTypeMap[SeriesType]) => {
 		if (isWhitespaceData(bar)) {
 			return { time, index };
@@ -93,7 +117,10 @@ const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Baseline: wrapWhitespaceData(getLineBasedSeriesPlotRow),
 	Histogram: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 	Line: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
+	Shape: wrapWhitespaceData(getShapeSeriesPlotRow),
 };
+
+
 
 export function getSeriesPlotRowCreator(seriesType: SeriesType): TimedSeriesItemValueFn {
 	return seriesPlotRowFnMap[seriesType] as TimedSeriesItemValueFn;

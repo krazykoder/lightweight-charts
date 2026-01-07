@@ -10,6 +10,7 @@ import {
 	CandlestickStyleOptions,
 	HistogramStyleOptions,
 	LineStyleOptions,
+	ShapeSeriesOptions,
 } from './series-options';
 import { TimePointIndex } from './time-data';
 
@@ -61,6 +62,9 @@ export class SeriesBarColorer {
 
 			case 'Histogram':
 				return this._histogramStyle(seriesOptions as HistogramStyleOptions, barIndex, precomputedBars);
+
+			case 'Shape':
+				return this._shapeStyle(seriesOptions as ShapeSeriesOptions, barIndex, precomputedBars);
 		}
 
 		throw new Error('Unknown chart style');
@@ -133,6 +137,13 @@ export class SeriesBarColorer {
 			...emptyResult,
 			barColor: currentBar.color ?? lineStyle.color,
 		};
+	}
+
+	private _shapeStyle(shapeStyle: ShapeSeriesOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {
+		const result: BarColorerStyle = { ...emptyResult };
+		const currentBar = ensureNotNull(this._findBar(barIndex, precomputedBars)) as SeriesPlotRow<'Shape'>;
+		result.barColor = currentBar.color !== undefined ? currentBar.color : shapeStyle.color;
+		return result;
 	}
 
 	private _histogramStyle(histogramStyle: HistogramStyleOptions, barIndex: TimePointIndex, precomputedBars?: PrecomputedBars): BarColorerStyle {

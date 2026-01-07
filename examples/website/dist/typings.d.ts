@@ -93,6 +93,7 @@ declare class ChartModel implements IDestroyable {
 	scrollTimeTo(x: Coordinate): boolean;
 	endScrollTime(): void;
 	serieses(): readonly Series[];
+	dataSources(): readonly IDataSource[];
 	setAndSaveCurrentPosition(x: Coordinate, y: Coordinate, pane: Pane): void;
 	clearCurrentPosition(): void;
 	updateCrosshair(): void;
@@ -471,6 +472,7 @@ declare class SeriesBarColorer {
 	private _areaStyle;
 	private _baselineStyle;
 	private _lineStyle;
+	private _shapeStyle;
 	private _histogramStyle;
 	private _findBar;
 }
@@ -597,6 +599,7 @@ declare class VerticalLine {
 	timeAxisView(): ITimeAxisView;
 	update(): void;
 	xCoord(): Coordinate | null;
+	model(): ChartModel;
 }
 declare class Watermark extends DataSource {
 	private readonly _paneView;
@@ -1651,6 +1654,17 @@ export interface IChartApi {
 	 * ```
 	 */
 	addLineSeries(lineOptions?: LineSeriesPartialOptions): ISeriesApi<"Line">;
+	/**
+	 * Creates a shape series with specified parameters.
+	 *
+	 * @param shapeOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addShapeSeries();
+	 * ```
+	 */
+	addShapeSeries(shapeOptions?: ShapeSeriesPartialOptions): ISeriesApi<"Shape">;
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.
 	 *
@@ -2841,6 +2855,7 @@ export interface SeriesDataAtTypeMap {
 	Baseline: BarPrice;
 	Line: BarPrice;
 	Histogram: BarPrice;
+	Shape: BarPrice;
 }
 /**
  * Represents the type of data that a series contains.
@@ -2872,6 +2887,10 @@ export interface SeriesDataItemTypeMap {
 	 * The types of histogram series data.
 	 */
 	Histogram: HistogramData | WhitespaceData;
+	/**
+	 * The types of structure series data.
+	 */
+	Shape: ShapeSeriesData | WhitespaceData;
 }
 /**
  * Represents a series marker.
@@ -3083,6 +3102,7 @@ export interface SeriesOptionsMap {
 	 * The type of histogram series options.
 	 */
 	Histogram: HistogramSeriesOptions;
+	Shape: ShapeSeriesOptions;
 }
 /**
  * Represents the type of partial options for each series type.
@@ -3114,6 +3134,10 @@ export interface SeriesPartialOptionsMap {
 	 * The type of histogram series partial options.
 	 */
 	Histogram: HistogramSeriesPartialOptions;
+	/**
+	 * The type of shape series partial options.
+	 */
+	Shape: ShapeSeriesPartialOptions;
 }
 export interface SeriesPlotRowTypeAtTypeMap {
 	Bar: BarPlotRow;
@@ -3122,9 +3146,68 @@ export interface SeriesPlotRowTypeAtTypeMap {
 	Baseline: PlotRow;
 	Line: LinePlotRow;
 	Histogram: HistogramPlotRow;
+	Shape: ShapeSeriesPlotRow;
 }
 export interface SeriesUpdateInfo {
 	lastBarUpdatedOrNewBarsAddedToTheRight: boolean;
+}
+/**
+ * Structure describing a single item of data for shape series
+ */
+export interface ShapeSeriesData extends SingleValueData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+	/**
+	 * Optional shape value for certain data item. If missed, shape from options is used
+	 */
+	shape?: SeriesMarkerShape;
+}
+export interface ShapeSeriesPlotRow extends PlotRow {
+	readonly color?: string;
+	readonly shape?: SeriesMarkerShape;
+}
+/**
+ * Represents style options for a shape series.
+ */
+export interface ShapeSeriesStyleOptions {
+	/**
+	 * Color of the shapes.
+	 *
+	 * @defaultValue `'#26a69a'`
+	 */
+	color: string;
+	/**
+	 * The shape of the markers.
+	 *
+	 * @defaultValue `'circle'`
+	 */
+	shape: SeriesMarkerShape;
+	/**
+	 * The size of the shapes in pixels.
+	 *
+	 * @defaultValue `4`
+	 */
+	size: number;
+	/**
+	 * The position of the series.
+	 *
+	 * @defaultValue `'top'`
+	 */
+	position: ShapeSeriesPosition;
+	/**
+	 * The fixed value if position is 'value'.
+	 *
+	 * @defaultValue `0`
+	 */
+	fixedValue: number;
+	/**
+	 * The margin (in pixels) from the top or bottom if position is 'top' or 'bottom'.
+	 *
+	 * @defaultValue `10`
+	 */
+	margin: number;
 }
 /**
  * A base interface for a data point of single-value series.
@@ -3159,6 +3242,8 @@ export interface TimeAxisViewRendererData {
 	color: string;
 	background: string;
 	visible: boolean;
+	tickVisible?: boolean;
+	visibleAtEdge?: boolean;
 }
 export interface TimeAxisViewRendererOptions {
 	baselineOffset: number;
@@ -3385,6 +3470,12 @@ export interface VerticalLineOptions {
 	 * @defaultValue `''`
 	 */
 	labelTextColor: string;
+	/**
+	 * If true, the axis label will be visible even if the line is outside the viewport (sticking to the edge).
+	 *
+	 * @defaultValue `false`
+	 */
+	axisLabelVisibleAtEdge: boolean;
 }
 /** Watermark options. */
 export interface WatermarkOptions {
@@ -3654,6 +3745,18 @@ export type SeriesPlotRow<T extends SeriesType = SeriesType> = SeriesPlotRowType
  * @see {@link SeriesOptionsMap}
  */
 export type SeriesType = keyof SeriesOptionsMap;
+/**
+ * Structure describing shape series options.
+ */
+export type ShapeSeriesOptions = SeriesOptions<ShapeSeriesStyleOptions>;
+/**
+ * Represents shape series options where all properties are options.
+ */
+export type ShapeSeriesPartialOptions = SeriesPartialOptions<ShapeSeriesStyleOptions>;
+/**
+ * Represents the possible shape series position.
+ */
+export type ShapeSeriesPosition = "top" | "bottom" | "value";
 /**
  * A custom function used to handle changes to the time scale's size.
  */

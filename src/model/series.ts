@@ -19,6 +19,7 @@ import { PanePriceAxisView } from '../views/pane/pane-price-axis-view';
 import { SeriesHorizontalBaseLinePaneView } from '../views/pane/series-horizontal-base-line-pane-view';
 import { SeriesLastPriceAnimationPaneView } from '../views/pane/series-last-price-animation-pane-view';
 import { SeriesMarkersPaneView } from '../views/pane/series-markers-pane-view';
+import { SeriesShapePaneView } from '../views/pane/shape-series-pane-view';
 import { SeriesPriceLinePaneView } from '../views/pane/series-price-line-pane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view';
@@ -86,6 +87,7 @@ export interface SeriesDataAtTypeMap {
 	Baseline: BarPrice;
 	Line: BarPrice;
 	Histogram: BarPrice;
+	Shape: BarPrice;
 }
 
 export interface SeriesUpdateInfo {
@@ -671,6 +673,11 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 			case 'Histogram': {
 				this._paneView = new SeriesHistogramPaneView(this as Series<'Histogram'>, this.model());
+				break;
+			}
+
+			case 'Shape': {
+				this._paneView = new SeriesShapePaneView(this as Series<'Shape'>, this.model());
 				break;
 			}
 

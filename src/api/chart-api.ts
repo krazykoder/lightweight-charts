@@ -28,7 +28,10 @@ import {
 	PriceFormat,
 	PriceFormatBuiltIn,
 	SeriesType,
+	ShapeSeriesOptions,
+	ShapeSeriesPartialOptions,
 } from '../model/series-options';
+
 
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
@@ -46,7 +49,9 @@ import {
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
+	shapeSeriesStyleDefaults,
 } from './options/series-options-defaults';
+
 import { PriceScaleApi } from './price-scale-api';
 import { migrateOptions, SeriesApi } from './series-api';
 import { TimeScaleApi } from './time-scale-api';
@@ -301,6 +306,20 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const series = this._chartWidget.model().createSeries('Line', strictOptions);
 
 		const res = new SeriesApi<'Line'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
+	}
+
+	public addShapeSeries(options: ShapeSeriesPartialOptions = {}): ISeriesApi<'Shape'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), { lastValueVisible: false }, shapeSeriesStyleDefaults, options) as ShapeSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Shape', strictOptions);
+
+		const res = new SeriesApi<'Shape'>(series, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 

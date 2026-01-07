@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Series Playbook</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Shape Series Playbook</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="code-container">
+                <h3>Interactive Shape Series</h3>
+                <div class="controls">
+                    <label>
+                        Position:
+                        <select id="seriesPositionSelect">
+                            <option value="top">Top</option>
+                            <option value="bottom">Bottom</option>
+                            <option value="value">Value</option>
+                        </select>
+                    </label>
+                    <label>
+                        Default Shape:
+                        <select id="defaultShapeSelect">
+                            <option value="circle">Circle</option>
+                            <option value="square">Square</option>
+                            <option value="triangleUp">Triangle Up</option>
+                            <option value="triangleDown">Triangle Down</option>
+                            <option value="arrowUp">Arrow Up</option>
+                            <option value="arrowDown">Arrow Down</option>
+                            <option value="diamond">Diamond</option>
+                            <option value="cross">Cross</option>
+                            <option value="plus">Plus</option>
+                        </select>
+                    </label>
+                    <label>
+                        Default Color:
+                        <input type="color" id="defaultColorInput" value="#2196F3">
+                    </label>
+                    <label>
+                        Default Size:
+                        <input type="number" id="defaultSizeInput" value="3" min="1" max="100" step="1">
+                    </label>
+                    <label>
+                        Fixed Value:
+                        <input type="number" id="fixedValueInput" value="50" step="1">
+                    </label>
+                    <button id="regenerateDataBtn">Regenerate Data</button>
+                </div>
+                <div class="chart-container" id="chart-container-playbook"></div>
+            </div>
+        </div>
+
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        (function () {
+            const chartContainer = document.getElementById('chart-container-playbook');
+            const chart = LightweightCharts.createChart(chartContainer, {
+                width: 600,
+                height: 300,
+                layout: {
+                    background: { type: 'solid', color: '#ffffff' },
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: { color: '#f0f3fa' },
+                    horzLines: { color: '#f0f3fa' },
+                },
+            });
+
+            // Add a line series for context
+            const lineSeries = chart.addLineSeries({
+                color: 'rgba(0, 0, 0, 0.2)',
+                lineWidth: 1,
+            });
+            const lineData = data.map(d => ({ time: d.time, value: d.value }));
+            lineSeries.setData(lineData);
+
+            let shapeSeries;
+            let currentData = [];
+
+            // UI Elements
+            const positionSelect = document.getElementById('seriesPositionSelect');
+            const shapeSelect = document.getElementById('defaultShapeSelect');
+            const colorInput = document.getElementById('defaultColorInput');
+            const sizeInput = document.getElementById('defaultSizeInput');
+            const fixedValueInput = document.getElementById('fixedValueInput');
+            const regenerateBtn = document.getElementById('regenerateDataBtn');
+
+            function createShapeSeries() {
+                if (shapeSeries) {
+                    chart.removeSeries(shapeSeries);
+                }
+
+                shapeSeries = chart.addShapeSeries({
+                    position: positionSelect.value,
+                    shape: shapeSelect.value,
+                    color: colorInput.value,
+                    size: parseInt(sizeInput.value, 10),
+                    fixedValue: parseFloat(fixedValueInput.value),
+                });
+
+                updateData();
+            }
+
+            function updateData() {
+                if (!shapeSeries) return;
+
+                // Randomly assign shapes to some points, or use defaults
+                // For 'value' position, we need a value. We can use the close price or random.
+                const newData = lineData.map((d, i) => {
+                    const isSpecial = i % 5 === 0;
+                    const item = {
+                        time: d.time,
+                        value: d.value + (Math.random() * 10 - 5), // Value used if position is 'value'
+                    };
+
+                    if (isSpecial) {
+                        item.color = '#ff0000';
+                        item.shape = 'square'; // Test overriding shape
+                        item.size = 6;
+                    }
+                    return item;
+                });
+
+                shapeSeries.setData(newData);
+            }
+
+            // Listeners
+            positionSelect.addEventListener('change', () => {
+                shapeSeries.applyOptions({ position: positionSelect.value });
+            });
+
+            shapeSelect.addEventListener('change', () => {
+                shapeSeries.applyOptions({ shape: shapeSelect.value });
+            });
+
+            colorInput.addEventListener('change', () => {
+                shapeSeries.applyOptions({ color: colorInput.value });
+            });
+
+            sizeInput.addEventListener('input', () => {
+                shapeSeries.applyOptions({ size: parseInt(sizeInput.value, 10) });
+            });
+
+            fixedValueInput.addEventListener('input', () => {
+                shapeSeries.applyOptions({ fixedValue: parseFloat(fixedValueInput.value) });
+            });
+
+            regenerateBtn.addEventListener('click', updateData);
+
+            // Initialize
+            createShapeSeries();
+        })();
+    </script>
+</body>
+
+</html>

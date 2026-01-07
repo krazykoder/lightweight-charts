@@ -9,6 +9,7 @@ import {
 	LineStyleOptions,
 	PriceLineSource,
 	SeriesOptionsCommon,
+	ShapeSeriesStyleOptions,
 } from '../../model/series-options';
 import { LineStyle, LineType } from '../../renderers/draw-line';
 
@@ -42,7 +43,8 @@ export const lineStyleDefaults: LineStyleOptions = {
 	crosshairMarkerBorderColor: '',
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
-pointColorAreaAlpha: 0.5,};
+	pointColorAreaAlpha: 0.5,
+};
 
 export const areaStyleDefaults: AreaStyleOptions = {
 	topColor: 'rgba( 46, 220, 135, 0.4)',
@@ -56,7 +58,8 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	crosshairMarkerBorderColor: '',
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
-pointColorAreaAlpha: 0.5,};
+	pointColorAreaAlpha: 0.5,
+};
 
 export const baselineStyleDefaults: BaselineStyleOptions = {
 	baseValue: {
@@ -81,12 +84,22 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	crosshairMarkerBackgroundColor: '',
 
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
-pointColorAreaAlpha: 0.5,};
+	pointColorAreaAlpha: 0.5,
+};
 
 export const histogramStyleDefaults: HistogramStyleOptions = {
 	color: '#26a69a',
 	base: 0,
 	histogramStyle: HistogramStyle.Columns,
+};
+
+export const shapeSeriesStyleDefaults: ShapeSeriesStyleOptions = {
+	color: '#26a69a',
+	shape: 'circle',
+	size: 4,
+	position: 'top',
+	fixedValue: 0,
+	margin: 10,
 };
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {

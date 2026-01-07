@@ -11,6 +11,9 @@ import { ScaledRenderer } from './scaled-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
 import { drawCircle, hitTestCircle } from './series-markers-circle';
 import { drawSquare, hitTestSquare } from './series-markers-square';
+import { drawDiamond, hitTestDiamond } from './series-markers-diamond';
+import { drawCross, hitTestCross } from './series-markers-cross';
+import { drawPlus, hitTestPlus } from './series-markers-plus';
 import { drawText, hitTestText } from './series-markers-text';
 import { drawTriangle, hitTestTriangle } from './series-markers-triangle';
 
@@ -129,6 +132,15 @@ function drawShape(item: SeriesMarkerRendererDataItem, ctx: CanvasRenderingConte
 		case 'square':
 			drawSquare(ctx, item.x, item.y, item.size, item.borderSize, item.borderColor);
 			return;
+		case 'diamond':
+			drawDiamond(ctx, item.x, item.y, item.size);
+			return;
+		case 'cross':
+			drawCross(ctx, item.x, item.y, item.size);
+			return;
+		case 'plus':
+			drawPlus(ctx, item.x, item.y, item.size);
+			return;
 	}
 
 	ensureNever(item.shape);
@@ -160,5 +172,11 @@ function hitTestShape(item: SeriesMarkerRendererDataItem, x: Coordinate, y: Coor
 			return hitTestCircle(item.x, item.y, item.size, x, y);
 		case 'square':
 			return hitTestSquare(item.x, item.y, item.size, x, y);
+		case 'diamond':
+			return hitTestDiamond(item.x, item.y, item.size, x, y);
+		case 'cross':
+			return hitTestCross(item.x, item.y, item.size, x, y);
+		case 'plus':
+			return hitTestPlus(item.x, item.y, item.size, x, y);
 	}
 }

@@ -5,6 +5,7 @@ import { applyAlpha } from '../helpers/color';
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
 import { ScaledRenderer } from './scaled-renderer';
 import { walkLine } from './walk-line';
+import { drawPlus } from './series-markers-plus';
 
 export type LineItem = TimedValue & PricedValue & LinePoint & { color?: string };
 
@@ -422,6 +423,47 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 				ctx.closePath();
 			}
 			ctx.fill();
+		} else if (lineType === LineType.Plus) {
+			const size = ctx.lineWidth * 2;
+			ctx.fillStyle = prevStrokeStyle;
+
+			for (; i < visibleRange.to; i++) {
+				const item = items[i];
+				const itemColor = item.color ?? lineColor;
+
+				if (itemColor !== prevStrokeStyle) {
+					// drawPlus uses its own stroking logic, so we don't need to stroke pending paths here
+					// but it relies on current context state which might be dirty?
+					// no, drawPlus sets strokeStyle from fillStyle, lineWidth, etc.
+					// we just need to update fillStyle
+					prevStrokeStyle = itemColor;
+					ctx.fillStyle = itemColor;
+				}
+
+				drawPlus(ctx, item.x, item.y, size);
+			}
+			// restore context state if needed? 
+			// drawPlus changes lineWidth, strokeStyle, lineCap.
+			// The caller of _drawLine expects to stroke at the end: ctx.stroke() is called in _drawImpl (Wait, _drawImpl calls _drawLine then ctx.stroke()?)
+			// _drawImpl: 
+			// if (items.length === 1) ...
+			// else this._drawLine(ctx, this._data);
+			// 
+			// PaneRendererLine._drawLine overrides the base and DOES NOT return to base to stroke. 
+			// PaneRendererLine._drawLine finishes with ctx.stroke().
+
+			// So after the loop, we might need to be careful if we left any path open? 
+			// drawPlus calls ctx.stroke() internally.
+			// So we are good. 
+
+			// Note: drawPlus changes ctx.lineWidth. We should restore it?
+			// The next frame/series will set it again.
+			// But within the same series ... no, we are done with this series.
+			// However, checking _drawImpl:
+			// ctx.strokeStyle = ...
+			// line-renderer.ts L62 calls _drawLine.
+			// _drawImpl doesn't do anything after _drawLine.
+
 		} else {
 			for (; i < visibleRange.to; i++) {
 				const currItem = items[i];

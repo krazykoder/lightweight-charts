@@ -2,6 +2,7 @@ import { DeepPartial } from '../helpers/strict-type-checks';
 
 import { LineStyle, LineType, LineWidth } from '../renderers/draw-line';
 
+import { SeriesMarkerShape } from './series-markers';
 import { AutoScaleMargins } from './autoscale-info-impl';
 import { PriceFormatterFn } from './price-formatter-fn';
 import { PriceScaleMargins } from './price-scale';
@@ -426,6 +427,58 @@ export interface BaselineStyleOptions {
 
 
 /**
+ * Represents the possible shape series position.
+ */
+export type ShapeSeriesPosition = 'top' | 'bottom' | 'value';
+
+/**
+ * Represents style options for a shape series.
+ */
+export interface ShapeSeriesStyleOptions {
+	/**
+	 * Color of the shapes.
+	 *
+	 * @defaultValue `'#26a69a'`
+	 */
+	color: string;
+
+	/**
+	 * The shape of the markers.
+	 *
+	 * @defaultValue `'circle'`
+	 */
+	shape: SeriesMarkerShape;
+
+	/**
+	 * The size of the shapes in pixels.
+	 *
+	 * @defaultValue `4`
+	 */
+	size: number;
+
+	/**
+	 * The position of the series.
+	 *
+	 * @defaultValue `'top'`
+	 */
+	position: ShapeSeriesPosition;
+
+	/**
+	 * The fixed value if position is 'value'.
+	 *
+	 * @defaultValue `0`
+	 */
+	fixedValue: number;
+
+	/**
+	 * The margin (in pixels) from the top or bottom if position is 'top' or 'bottom'.
+	 *
+	 * @defaultValue `10`
+	 */
+	margin: number;
+}
+
+/**
  * Represents the possible histogram styles.
  */
 export const enum HistogramStyle {
@@ -800,6 +853,16 @@ export type BaselineSeriesOptions = SeriesOptions<BaselineStyleOptions>;
 export type BaselineSeriesPartialOptions = SeriesPartialOptions<BaselineStyleOptions>;
 
 /**
+ * Structure describing shape series options.
+ */
+export type ShapeSeriesOptions = SeriesOptions<ShapeSeriesStyleOptions>;
+/**
+ * Represents shape series options where all properties are options.
+ */
+export type ShapeSeriesPartialOptions = SeriesPartialOptions<ShapeSeriesStyleOptions>;
+
+
+/**
  * Represents bar series options.
  */
 export type BarSeriesOptions = SeriesOptions<BarStyleOptions>;
@@ -865,7 +928,9 @@ export interface SeriesOptionsMap {
 	 * The type of histogram series options.
 	 */
 	Histogram: HistogramSeriesOptions;
+	Shape: ShapeSeriesOptions;
 }
+
 
 /**
  * Represents the type of partial options for each series type.
@@ -897,6 +962,10 @@ export interface SeriesPartialOptionsMap {
 	 * The type of histogram series partial options.
 	 */
 	Histogram: HistogramSeriesPartialOptions;
+	/**
+	 * The type of shape series partial options.
+	 */
+	Shape: ShapeSeriesPartialOptions;
 }
 
 /**

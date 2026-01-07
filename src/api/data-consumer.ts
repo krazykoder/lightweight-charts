@@ -1,6 +1,7 @@
 import { Series } from '../model/series';
 import { SeriesType } from '../model/series-options';
 import { BusinessDay, isBusinessDay, isUTCTimestamp, Time, UTCTimestamp } from '../model/time-data';
+import { SeriesMarkerShape } from '../model/series-markers';
 
 export { BusinessDay, isBusinessDay, isUTCTimestamp, Time, UTCTimestamp };
 
@@ -117,6 +118,26 @@ export interface CandlestickData extends OhlcData {
 	wickColor?: string;
 }
 
+/**
+ * Structure describing a single item of data for shape series
+ */
+export interface ShapeSeriesData extends SingleValueData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+
+	/**
+	 * Optional shape value for certain data item. If missed, shape from options is used
+	 */
+	shape?: SeriesMarkerShape;
+
+	/**
+	 * Optional size value for certain data item. If missed, size from options is used
+	 */
+	size?: number;
+}
+
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
 	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
 }
@@ -155,7 +176,12 @@ export interface SeriesDataItemTypeMap {
 	 * The types of histogram series data.
 	 */
 	Histogram: HistogramData | WhitespaceData;
+	/**
+	 * The types of structure series data.
+	 */
+	Shape: ShapeSeriesData | WhitespaceData;
 }
+
 
 export interface DataUpdatesConsumer<TSeriesType extends SeriesType> {
 	applyNewData(series: Series<TSeriesType>, data: SeriesDataItemTypeMap[TSeriesType][]): void;

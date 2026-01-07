@@ -25,6 +25,11 @@ export function shapeSize(shape: SeriesMarkerShape, originalSize: number): numbe
 		case 'triangleDown':
 		case 'triangleUp':
 			return size(originalSize, 0.7);
+		case 'diamond':
+			return size(originalSize, 1); // Diamond often looks smaller if scaled down too much
+		case 'cross':
+		case 'plus':
+			return size(originalSize, 0.8);
 	}
 }
 

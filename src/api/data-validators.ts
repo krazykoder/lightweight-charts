@@ -63,6 +63,9 @@ function getChecker(type: SeriesType): Checker {
 		case 'Line':
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
+
+		case 'Shape':
+			return checkShapeItem;
 	}
 }
 
@@ -101,4 +104,23 @@ function checkLineItem(type: 'Area' | 'Baseline' | 'Line' | 'Histogram', lineIte
 	assert(
 		typeof lineData.value === 'number' || lineData.value === null,
 		`${type} series item data value must be a number, got=${typeof lineData.value}, value=${lineData.value}`);
+}
+
+function checkShapeItem(shapeItem: SeriesDataItemTypeMap['Shape']): void {
+	if (!isFulfilledData(shapeItem)) {
+		return;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+	const shapeData = shapeItem as any;
+	assert(
+		typeof shapeData.value === 'number' || shapeData.value === null,
+		`Shape series item data value must be a number, got=${typeof shapeData.value}, value=${shapeData.value}`
+	);
+	if (shapeData.size !== undefined) {
+		assert(
+			typeof shapeData.size === 'number',
+			`Shape series item data size must be a number, got=${typeof shapeData.size}, value=${shapeData.size}`
+		);
+	}
 }

@@ -29,9 +29,10 @@
                         <option value="4">Cross</option>
                         <option value="5">Square</option>
                         <option value="6">Diamond</option>
-                        <option value="7">ConnectedCircles</option>
-                        <option value="8">Area</option>
-                        <option value="9">SteppedArea</option>
+                        <option value="7">Plus</option>
+                        <option value="8">ConnectedCircles</option>
+                        <option value="9">Area</option>
+                        <option value="10">SteppedArea</option>
                     </select>
                 </label>
                 <label>
@@ -280,6 +281,27 @@ lineSeriesDiamond.setData(data.slice(0, 50));
         <div class="chart-container" id="chart-container-diamond"></div>
     </div>
 
+    <!-- Plus Style -->
+    <div class="container">
+        <div class="code-container">
+            <h3>Plus Style</h3>
+            <pre>
+const chartPlus = LightweightCharts.createChart(document.getElementById('chart-container-plus'), {
+    width: 600,
+    height: 300,
+});
+const lineSeriesPlus = chartPlus.addLineSeries({
+    // LineType.Plus = 7
+    lineType: 7,
+    color: '#00bcd4',
+    lineWidth: 3,
+});
+lineSeriesPlus.setData(data.slice(0, 50));
+            </pre>
+        </div>
+        <div class="chart-container" id="chart-container-plus"></div>
+    </div>
+
     <!-- Connected Circles Style -->
     <div class="container">
         <div class="code-container">
@@ -290,8 +312,8 @@ const chartConnected = LightweightCharts.createChart(document.getElementById('ch
     height: 300,
 });
 const lineSeriesConnected = chartConnected.addLineSeries({
-    // LineType.ConnectedCircles = 7
-    lineType: 7,
+    // LineType.ConnectedCircles = 8
+    lineType: 8,
     color: '#ab47bc',
     lineWidth: 4,
 });
@@ -311,7 +333,7 @@ const chart9 = LightweightCharts.createChart(document.getElementById('chart-cont
     height: 300,
 });
 const lineSeries9 = chart9.addLineSeries({
-    lineType: 5, // Area
+    lineType: 9, // Area
     color: '#2962FF',
     pointColorAreaAlpha: 0.2, // 20% opacity
 });
@@ -331,7 +353,7 @@ const chart10 = LightweightCharts.createChart(document.getElementById('chart-con
     height: 300,
 });
 const lineSeries10 = chart10.addLineSeries({
-    lineType: 6, // SteppedArea
+    lineType: 10, // SteppedArea
     pointColorAreaAlpha: 0.2,
 });
 // Using per-point coloring
@@ -587,14 +609,27 @@ const lineSeries10 = chart10.addLineSeries({
         });
         lineSeriesDiamond.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.start + 50));
 
+        // Plus Style
+        const chartPlus = LightweightCharts.createChart(document.getElementById('chart-container-plus'), {
+            width: 600,
+            height: 300,
+        });
+        const lineSeriesPlus = chartPlus.addLineSeries({
+            // LineType.Plus = 7
+            lineType: 7,
+            color: '#00bcd4',
+            lineWidth: 3,
+        });
+        lineSeriesPlus.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.start + 50));
+
         // Connected Circles Style
         const chartConnected = LightweightCharts.createChart(document.getElementById('chart-container-connected'), {
             width: 600,
             height: 300,
         });
         const lineSeriesConnected = chartConnected.addLineSeries({
-            // LineType.ConnectedCircles = 7
-            lineType: 7,
+            // LineType.ConnectedCircles = 8
+            lineType: 8,
             color: '#ab47bc',
             lineWidth: 4,
         });
@@ -606,7 +641,7 @@ const lineSeries10 = chart10.addLineSeries({
             height: 300,
         });
         const lineSeries9 = chart9.addLineSeries({
-            lineType: 8, // Area
+            lineType: 9, // Area
             color: '#2962FF',
             pointColorAreaAlpha: 0.2,
         });
@@ -626,7 +661,7 @@ const lineSeries10 = chart10.addLineSeries({
             height: 300,
         });
         const lineSeries10 = chart10.addLineSeries({
-            lineType: 9, // SteppedArea
+            lineType: 10, // SteppedArea
             pointColorAreaAlpha: 0.2,
             lineStyle: LightweightCharts.LineStyle.Solid,
         });
