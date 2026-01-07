@@ -15,13 +15,11 @@
         <h1>Multi Shape Series Playbook</h1>
     </header>
     <main>
+        <!-- Playbook Section -->
         <div class="container">
             <div class="code-container">
-                <h3>Stacked Shape Series</h3>
-                <p>This example demonstrates using the `level` property to stack multiple shape series without
-                    overlapping.
-                    It shows series at Top (levels 0,1,2), Bottom (levels 0,1), and On Value positions simultaneously.
-                </p>
+                <h3>Playbook: Interactive Demo</h3>
+                <p>Experiment with multiple stacking series and anti-overlap algorithms.</p>
                 <div class="controls">
                     <label>
                         Level Spacing:
@@ -35,9 +33,65 @@
                         Label Offset:
                         <input type="number" id="labelOffsetInput" value="2" min="0" step="1" />
                     </label>
+                    <label>
+                        <input type="checkbox" id="showTextInput" checked /> Show Text
+                    </label>
+                    <label>
+                        <input type="checkbox" id="randomizeInput" checked /> Randomize Data
+                    </label>
+                    <button id="regenerateBtn">Regenerate Data</button>
                 </div>
                 <div class="chart-container" id="chart-container-playbook"></div>
             </div>
+        </div>
+
+        <hr>
+
+        <!-- Hardcoded Example 1: Simple Stacking -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Simple Stacking</h3>
+                <p>Two stacked series at different levels (Top & Bottom).</p>
+                <pre>
+chart.addShapeSeries({ position: 'top', level: 0, shape: 'circle' });
+chart.addShapeSeries({ position: 'top', level: 1, shape: 'square' });
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-stack"></div>
+        </div>
+
+        <!-- Hardcoded Example 2: Value Position Lines -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Shapes on Price Levels</h3>
+                <p>Using 'value' position with fixedValue to place shapes at specific prices.</p>
+                <pre>
+// Series at value 20
+const s1 = chart.addShapeSeries({ 
+    position: 'value', 
+    fixedValue: 20, 
+    shape: 'arrowUp', 
+    color: 'red' 
+});
+s1.setData([
+    { time: '2018-12-19', value: 0, text: '20' },
+    ...
+]);
+
+// Series at value 15
+const s2 = chart.addShapeSeries({ 
+    position: 'value', 
+    fixedValue: 15, 
+    shape: 'arrowDown', 
+    color: 'blue' 
+});
+s2.setData([
+    { time: '2018-12-19', value: 0, text: '15' },
+    ...
+]);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-value"></div>
         </div>
 
         <nav>
@@ -47,25 +101,16 @@
     <script src="../app-data.js"></script>
     <script>
         (function () {
+            // --- Playbook Chart ---
             const chartContainer = document.getElementById('chart-container-playbook');
             const chart = LightweightCharts.createChart(chartContainer, {
                 width: 800,
                 height: 400,
-                layout: {
-                    background: { type: 'solid', color: '#ffffff' },
-                    textColor: '#333',
-                },
-                grid: {
-                    vertLines: { color: '#f0f3fa' },
-                    horzLines: { color: '#f0f3fa' },
-                },
+                layout: { background: { type: 'solid', color: '#ffffff' }, textColor: '#333' },
+                grid: { vertLines: { color: '#f0f3fa' }, horzLines: { color: '#f0f3fa' } },
             });
 
-            // Add a line series for context
-            const lineSeries = chart.addLineSeries({
-                color: 'rgba(0, 0, 0, 0.2)',
-                lineWidth: 1,
-            });
+            const lineSeries = chart.addLineSeries({ color: 'rgba(0, 0, 0, 0.2)', lineWidth: 1 });
             const lineData = data.map(d => ({ time: d.time, value: d.value }));
             lineSeries.setData(lineData);
 
@@ -74,115 +119,129 @@
             const levelSpacingInput = document.getElementById('levelSpacingInput');
             const shapeSizeInput = document.getElementById('shapeSizeInput');
             const labelOffsetInput = document.getElementById('labelOffsetInput');
+            const showTextInput = document.getElementById('showTextInput');
+            const randomizeInput = document.getElementById('randomizeInput');
+            const regenerateBtn = document.getElementById('regenerateBtn');
 
             function createAllSeries() {
-                // Remove existing
                 allSeries.forEach(s => chart.removeSeries(s));
                 allSeries = [];
 
                 const spacing = parseInt(levelSpacingInput.value, 10);
                 const size = parseInt(shapeSizeInput.value, 10);
                 const offset = parseInt(labelOffsetInput.value, 10);
+                const showText = showTextInput.checked;
+                const isRandom = randomizeInput.checked;
 
-                // --- TOP Series (Levels 0, 1, 2) ---
-                const topShapes = ['square', 'circle', 'diamond'];
-                const topColors = ['#E91E63', '#2196F3', '#00E676']; // Pink, Blue, Green
+                if (isRandom) {
+                    // --- Randomized Logic ---
+                    const possibleShapes = ['square', 'circle', 'diamond', 'triangleUp', 'triangleDown', 'arrowUp', 'arrowDown', undefined];
+                    const possibleColors = ['#E91E63', '#2196F3', '#00E676', '#FF9800', '#9C27B0'];
 
-                for (let i = 0; i < 3; i++) {
-                    const series = chart.addShapeSeries({
-                        position: 'top',
-                        level: i,
-                        shape: topShapes[i],
-                        color: topColors[i],
-                        size: size,
-                        levelSpacing: spacing,
-                        labelOffset: offset,
-                    });
+                    // Top Series (3 Levels)
+                    for (let i = 0; i < 3; i++) {
+                        const series = chart.addShapeSeries({
+                            position: 'top', level: i,
+                            shape: possibleShapes[Math.floor(Math.random() * possibleShapes.length)],
+                            color: possibleColors[Math.floor(Math.random() * possibleColors.length)],
+                            size: size, levelSpacing: spacing, labelOffset: offset,
+                        });
 
-                    const seriesData = lineData.map((d, itemIndex) => ({
-                        time: d.time,
-                        value: d.value,
-                        text: itemIndex % 5 === 0 ? "L" + i + " #" + itemIndex : undefined,
-                    })).filter((_, index) => index % 2 === 0); // Every 2nd point
+                        let gapRemaining = 0;
+                        const seriesData = lineData.map((d, itemIndex) => {
+                            const item = { time: d.time, value: d.value };
+                            if (gapRemaining > 0) { gapRemaining--; return item; }
+                            if (Math.random() > 0.9) { gapRemaining = Math.floor(Math.random() * 10) + 5; return item; }
 
-                    series.setData(seriesData);
-                    allSeries.push(series);
+                            if (Math.random() > 0.7) item.shape = possibleShapes[Math.floor(Math.random() * possibleShapes.length)];
+                            if (Math.random() > 0.7) item.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+                            if (showText && Math.random() > 0.6) item.text = "L" + i + " #" + itemIndex;
+                            return item;
+                        }).filter((_, index) => index % 2 === 0);
+                        series.setData(seriesData);
+                        allSeries.push(series);
+                    }
+
+                    // Bottom Series (2 Levels)
+                    for (let i = 0; i < 2; i++) {
+                        const series = chart.addShapeSeries({
+                            position: 'bottom', level: i,
+                            shape: possibleShapes[Math.floor(Math.random() * possibleShapes.length)],
+                            color: possibleColors[Math.floor(Math.random() * possibleColors.length)],
+                            size: size, levelSpacing: spacing, labelOffset: offset,
+                        });
+                        const seriesData = lineData.filter((_, idx) => idx % 3 === 0).map(d => ({ time: d.time, value: d.value }));
+                        series.setData(seriesData); // Simplified for bottom
+                        allSeries.push(series);
+                    }
+
+                    // Value Series
+                    const valueSeries = chart.addShapeSeries({ position: 'value', shape: 'arrowUp', color: '#000', size: size, labelOffset: offset });
+                    valueSeries.applyOptions({ fixedValue: 20 + Math.random() * 50 });
+                    valueSeries.setData(lineData.filter((_, i) => i % 10 === 0).map(d => ({ time: d.time })));
+                    allSeries.push(valueSeries);
+
+                } else {
+                    // --- Deterministic Logic ---
+                    // Level 0 Top
+                    const s1 = chart.addShapeSeries({ position: 'top', level: 0, shape: 'circle', color: 'blue', size: size, levelSpacing: spacing, labelOffset: offset });
+                    s1.setData(lineData.filter((_, i) => i % 2 === 0).map(d => ({ time: d.time, value: 0, text: showText ? 'L0' : undefined })));
+                    allSeries.push(s1);
+
+                    // Level 1 Top
+                    const s2 = chart.addShapeSeries({ position: 'top', level: 1, shape: 'square', color: 'green', size: size, levelSpacing: spacing, labelOffset: offset });
+                    s2.setData(lineData.filter((_, i) => i % 3 === 0).map(d => ({ time: d.time, value: 0, text: showText ? 'L1' : undefined })));
+                    allSeries.push(s2);
+
+                    // Value
+                    const sv = chart.addShapeSeries({ position: 'value', shape: 'arrowRight', color: 'red', size: size, labelOffset: offset, fixedValue: 50 });
+                    // For Value position, using 0 is fine if fixedValue is used, but ideally it should match the price if we wanted variable psoition.
+                    // But here 'fixedValue' is 50.
+                    sv.setData(lineData.filter((_, i) => i % 5 === 0).map(d => ({ time: d.time, value: 0, text: showText ? 'Val' : undefined })));
+                    allSeries.push(sv);
                 }
-
-                // --- BOTTOM Series (Levels 0, 1) ---
-                const bottomShapes = ['triangleUp', 'triangleDown'];
-                const bottomColors = ['#FF9800', '#9C27B0']; // Orange, Purple
-
-                for (let i = 0; i < 2; i++) {
-                    const series = chart.addShapeSeries({
-                        position: 'bottom',
-                        level: i,
-                        shape: bottomShapes[i],
-                        color: bottomColors[i],
-                        size: size,
-                        levelSpacing: spacing,
-                    });
-
-                    const seriesData = lineData.map((d, itemIndex) => ({
-                        time: d.time,
-                        value: d.value,
-                        text: itemIndex % 5 === 0 ? "B" + i : undefined,
-                    })).filter((_, index) => index % 3 === 0); // Every 3rd point
-
-                    series.setData(seriesData);
-                    allSeries.push(series);
-                }
-
-                // --- VALUE Series (On Price Line) ---
-                const valueSeries = chart.addShapeSeries({
-                    position: 'value',
-                    shape: 'arrowUp',
-                    color: '#000000',
-                    size: size,
-                    // Level and spacing don't affect 'value' position, but good to verify it handles them safely
-                });
-
-                const valueData = lineData.map((d) => ({
-                    time: d.time,
-                    value: d.value,
-                    fixedValue: d.value + 20, // Offset from line
-                })).filter((_, index) => index % 10 === 0);
-
-                // For 'value' position with fixedValue potentially varying per point? 
-                // Wait, ShapeSeriesOptions has `fixedValue`. 
-                // Does ShapeSeries support per-point value positioning? 
-                // The renderer uses `options.fixedValue`. 
-                // If we want per-point vertical position, we need to extend ShapeSeries to read value from item?
-                // Currently `ShapeSeriesPaneView` for `value` uses `options.fixedValue`.
-                // It does NOT read `item.value` or `item.fixedValue`.
-                // So all points in a 'value' positioned series share the same Y coordinate (horizontal line of shapes).
-                // Unless... we update ShapeSeriesPaneView to support `item.value` override?
-                // The user request was "value examples". 
-                // Let's stick to standard behavior: a horizontal strip of shapes at a specific price.
-
-                // Let's create two 'value' series at different fixed prices
-                valueSeries.applyOptions({ fixedValue: 10 }); // Arbitrary price
-                valueSeries.setData(valueData.map(d => ({ ...d, value: 10 }))); // Data value doesn't matter for position but needed for validity
-                allSeries.push(valueSeries);
             }
 
             function updateOptions() {
                 const spacing = parseInt(levelSpacingInput.value, 10);
                 const size = parseInt(shapeSizeInput.value, 10);
                 const offset = parseInt(labelOffsetInput.value, 10);
-                allSeries.forEach(s => s.applyOptions({
-                    levelSpacing: spacing,
-                    size: size,
-                    labelOffset: offset,
-                }));
+                allSeries.forEach(s => s.applyOptions({ levelSpacing: spacing, size: size, labelOffset: offset }));
             }
 
             levelSpacingInput.addEventListener('input', updateOptions);
             shapeSizeInput.addEventListener('input', updateOptions);
             labelOffsetInput.addEventListener('input', updateOptions);
-
-            // Initialize
+            showTextInput.addEventListener('change', createAllSeries);
+            randomizeInput.addEventListener('change', createAllSeries);
+            regenerateBtn.addEventListener('click', createAllSeries);
             createAllSeries();
+        })();
+
+        // --- Hardcoded Example 1: Simple Stacking ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-stack'), { width: 600, height: 300 });
+            chart.addLineSeries({ color: 'rgba(0,0,0,0.1)' }).setData(data);
+
+            const s0 = chart.addShapeSeries({ position: 'top', level: 0, shape: 'circle', color: '#2196F3' });
+            s0.setData(data.filter((_, i) => i % 2 === 0).map(d => ({ time: d.time, value: 0 })));
+
+            const s1 = chart.addShapeSeries({ position: 'top', level: 1, shape: 'square', color: '#4CAF50' });
+            s1.setData(data.filter((_, i) => i % 2 === 0).map(d => ({ time: d.time, value: 0 })));
+        })();
+
+        // --- Hardcoded Example 2: Value Position ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-value'), { width: 600, height: 300 });
+            chart.addLineSeries({ color: 'rgba(0,0,0,0.1)' }).setData(data);
+
+            // Fixed at 20
+            const s1 = chart.addShapeSeries({ position: 'value', fixedValue: 20, shape: 'arrowUp', color: 'red' });
+            s1.setData(data.filter((_, i) => i % 5 === 0).map(d => ({ time: d.time, value: 0, text: '20' })));
+
+            // Fixed at 15
+            const s2 = chart.addShapeSeries({ position: 'value', fixedValue: 15, shape: 'arrowDown', color: 'blue' });
+            s2.setData(data.filter((_, i) => i % 6 === 0).map(d => ({ time: d.time, value: 0, text: '15' })));
         })();
     </script>
 </body>

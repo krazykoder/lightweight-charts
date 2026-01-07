@@ -15,156 +15,217 @@
         <h1>Shape Series Playbook</h1>
     </header>
     <main>
+        <!-- Playbook Section -->
         <div class="container">
             <div class="code-container">
-                <h3>Interactive Shape Series</h3>
+                <h3>Playbook: Interactive Demo</h3>
+                <p>Use the controls below to experiment with Shape Series options.</p>
                 <div class="controls">
                     <label>
                         Position:
-                        <select id="seriesPositionSelect">
+                        <select id="positionSelect">
                             <option value="top">Top</option>
                             <option value="bottom">Bottom</option>
                             <option value="value">Value</option>
                         </select>
                     </label>
                     <label>
-                        Default Shape:
-                        <select id="defaultShapeSelect">
-                            <option value="circle">Circle</option>
+                        Shape:
+                        <select id="shapeSelect">
                             <option value="square">Square</option>
-                            <option value="triangleUp">Triangle Up</option>
-                            <option value="triangleDown">Triangle Down</option>
+                            <option value="circle">Circle</option>
+                            <option value="diamond">Diamond</option>
                             <option value="arrowUp">Arrow Up</option>
                             <option value="arrowDown">Arrow Down</option>
-                            <option value="diamond">Diamond</option>
-                            <option value="cross">Cross</option>
-                            <option value="plus">Plus</option>
+                            <option value="triangleUp">Triangle Up</option>
+                            <option value="triangleDown">Triangle Down</option>
+                            <option value="none">None</option>
                         </select>
                     </label>
                     <label>
-                        Default Color:
-                        <input type="color" id="defaultColorInput" value="#2196F3">
+                        Color:
+                        <input type="color" id="colorInput" value="#2196F3" />
                     </label>
                     <label>
-                        Default Size:
-                        <input type="number" id="defaultSizeInput" value="3" min="1" max="100" step="1">
-                    </label>
-                    <label>
-                        Fixed Value:
-                        <input type="number" id="fixedValueInput" value="50" step="1">
+                        Size:
+                        <input type="number" id="sizeInput" value="12" min="0" step="1" />
                     </label>
                     <label>
                         Label Offset:
-                        <input type="number" id="labelOffsetInput" value="2" min="0" step="1">
+                        <input type="number" id="labelOffsetInput" value="2" min="0" step="1" />
                     </label>
-                    <button id="regenerateDataBtn">Regenerate Data</button>
+                    <label>
+                        Fixed Value:
+                        <input type="number" id="fixedValueInput" value="0" step="1" />
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showTextInput" checked /> Show Text
+                    </label>
+                    <label>
+                        <input type="checkbox" id="randomizeInput" checked /> Randomize Data
+                    </label>
+                    <button id="regenerateBtn">Regenerate Data</button>
                 </div>
                 <div class="chart-container" id="chart-container-playbook"></div>
             </div>
+        </div>
+
+        <hr>
+
+        <!-- Hardcoded Examples Section -->
+
+        <!-- Example 1: Basic Shapes -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Basic Shapes</h3>
+                <p>Demonstrates creating a Shape Series with standard shapes.</p>
+                <pre>
+const chart = LightweightCharts.createChart(container, { width: 600, height: 300 });
+const series = chart.addShapeSeries({
+    position: 'top',
+    shape: 'arrowDown',
+    color: '#E91E63',
+    size: 15,
+});
+// Data points with default shape
+series.setData(data);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-basic"></div>
+        </div>
+
+        <!-- Example 2: Per-Point Customization -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Per-Point Customization</h3>
+                <p>Override shape, color, and size on individual data points.</p>
+                <pre>
+const series = chart.addShapeSeries({ position: 'top', shape: 'circle' });
+series.setData([
+    { time: '2019-04-11', value: 0, shape: 'square', color: 'red' },
+    { time: '2019-04-12', value: 0, shape: 'diamond', size: 20 },
+    // ...
+]);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-custom"></div>
+        </div>
+
+        <!-- Example 3: Text Labels -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Text Labels</h3>
+                <p>Display text labels alongside shapes.</p>
+                <pre>
+const series = chart.addShapeSeries({ 
+    position: 'bottom', 
+    shape: 'arrowUp',
+    labelOffset: 10 
+});
+series.setData([
+    { time: '2019-04-11', value: 0, text: 'Buy Signal' },
+    // ...
+]);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-text"></div>
         </div>
 
         <nav>
             <a href="index.html">Home</a>
         </nav>
     </main>
+
     <script src="../app-data.js"></script>
     <script>
         (function () {
+            // --- Playbook Chart ---
             const chartContainer = document.getElementById('chart-container-playbook');
             const chart = LightweightCharts.createChart(chartContainer, {
-                width: 600,
-                height: 300,
-                layout: {
-                    background: { type: 'solid', color: '#ffffff' },
-                    textColor: '#333',
-                },
-                grid: {
-                    vertLines: { color: '#f0f3fa' },
-                    horzLines: { color: '#f0f3fa' },
-                },
+                width: 800,
+                height: 400,
+                layout: { background: { type: 'solid', color: '#ffffff' }, textColor: '#333' },
+                grid: { vertLines: { color: '#f0f3fa' }, horzLines: { color: '#f0f3fa' } },
             });
 
-            // Add a line series for context
-            const lineSeries = chart.addLineSeries({
-                color: 'rgba(0, 0, 0, 0.2)',
-                lineWidth: 1,
-            });
+            const lineSeries = chart.addLineSeries({ color: 'rgba(0, 0, 0, 0.2)', lineWidth: 1 });
             const lineData = data.map(d => ({ time: d.time, value: d.value }));
             lineSeries.setData(lineData);
 
-            let shapeSeries;
-            let currentData = [];
+            let shapeSeries = null;
 
-            // UI Elements
-            const positionSelect = document.getElementById('seriesPositionSelect');
-            const shapeSelect = document.getElementById('defaultShapeSelect');
-            const colorInput = document.getElementById('defaultColorInput');
-            const sizeInput = document.getElementById('defaultSizeInput');
+            // Inputs
+            const positionSelect = document.getElementById('positionSelect');
+            const shapeSelect = document.getElementById('shapeSelect');
+            const colorInput = document.getElementById('colorInput');
+            const sizeInput = document.getElementById('sizeInput');
             const fixedValueInput = document.getElementById('fixedValueInput');
-            const regenerateBtn = document.getElementById('regenerateDataBtn');
-
-            // Add "None" option to shape select
-            const noneOption = document.createElement('option');
-            noneOption.value = 'none';
-            noneOption.text = 'None';
-            shapeSelect.appendChild(noneOption);
+            const labelOffsetInput = document.getElementById('labelOffsetInput');
+            const showTextInput = document.getElementById('showTextInput');
+            const randomizeInput = document.getElementById('randomizeInput');
+            const regenerateBtn = document.getElementById('regenerateBtn');
 
             function createShapeSeries() {
-                if (shapeSeries) {
-                    chart.removeSeries(shapeSeries);
-                }
+                if (shapeSeries) chart.removeSeries(shapeSeries);
 
                 const shapeValue = shapeSelect.value === 'none' ? undefined : shapeSelect.value;
-
                 shapeSeries = chart.addShapeSeries({
                     position: positionSelect.value,
                     shape: shapeValue,
                     color: colorInput.value,
                     size: parseInt(sizeInput.value, 10),
                     fixedValue: parseFloat(fixedValueInput.value),
+                    labelOffset: parseInt(labelOffsetInput.value, 10),
                 });
-
                 updateData();
             }
 
             function updateData() {
                 if (!shapeSeries) return;
 
-                // Randomly assign shapes to some points, or use defaults
-                // For 'value' position, we need a value. We can use the close price or random.
+                const isRandom = randomizeInput.checked;
+                const showText = showTextInput.checked;
+                const shapes = ['square', 'circle', 'diamond', 'arrowUp', 'arrowDown', 'triangleUp', 'triangleDown', undefined];
+                const colors = ['#E91E63', '#2196F3', '#00E676', '#FF9800', '#9C27B0', undefined];
+                const texts = ['Buy', 'Sell', 'Hold', 'Exit', '#123', 'A', 'Long Label'];
+
+                let gapRemaining = 0;
+
                 const newData = lineData.map((d, i) => {
-                    const item = {
-                        time: d.time,
-                        value: d.value + (Math.random() * 10 - 5), // Value used if position is 'value'
-                    };
+                    const item = { time: d.time, value: d.value + (Math.random() * 10 - 5) };
 
-                    // Scenario 1: Explicit Shape & Color (every 10th point)
-                    if (i % 10 === 0) {
-                        item.color = '#E91E63'; // Pink
-                        item.shape = 'diamond';
-                        // item.size = 8;
-                        item.text = '#' + i;
-                        item.labelOffset = 50;
-                        item.labelBackgroundColor = '#E91E63';
-                        item.labelTextColor = '#ffffff';
-                        return item;
+                    if (isRandom) {
+                        // Gap Logic
+                        if (gapRemaining > 0) {
+                            gapRemaining--;
+                            return item;
+                        }
+                        if (Math.random() > 0.9) {
+                            gapRemaining = Math.floor(Math.random() * 15) + 5;
+                            return item;
+                        }
+
+                        if (Math.random() > 0.3) {
+                            const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+                            if (randomShape) item.shape = randomShape;
+                        }
+                        if (Math.random() > 0.5) {
+                            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                            if (randomColor) item.color = randomColor;
+                        }
+                        if (showText && Math.random() > 0.6) {
+                            item.text = texts[Math.floor(Math.random() * texts.length)];
+                        }
+                    } else {
+                        // Deterministic Demo Logic
+                        if (i % 5 === 0) {
+                            item.shape = 'circle';
+                            item.color = '#E91E63';
+                            if (showText) item.text = '#' + i;
+                        } else if (i % 3 === 0) {
+                            item.shape = 'square';
+                        }
                     }
-
-                    // Scenario 2: Explicit Shape, Default Color (every 7th point)
-                    if (i % 7 === 0) {
-                        item.shape = 'square';
-                        return item;
-                    }
-
-                    // Scenario 3: Default Shape, Explicit Color (every 5th point)
-                    if (i % 5 === 0) {
-                        item.color = '#00E676'; // Green
-                        item.text = 'Hi';
-                        return item;
-                    }
-
-                    // Scenario 4: Default Shape & Color (Remainder)
-                    // If default shape is 'none', these will not draw.
                     return item;
                 });
 
@@ -172,36 +233,87 @@
             }
 
             // Listeners
-            positionSelect.addEventListener('change', () => {
-                shapeSeries.applyOptions({ position: positionSelect.value });
-            });
-
-            shapeSelect.addEventListener('change', () => {
-                createShapeSeries();
-            });
-
-            colorInput.addEventListener('change', () => {
-                shapeSeries.applyOptions({ color: colorInput.value });
-            });
-
-            sizeInput.addEventListener('input', () => {
-                shapeSeries.applyOptions({ size: parseInt(sizeInput.value, 10) });
-            });
-
-            fixedValueInput.addEventListener('input', () => {
-                shapeSeries.applyOptions({ fixedValue: parseFloat(fixedValueInput.value) });
-            });
-
-            const labelOffsetInput = document.getElementById('labelOffsetInput');
-            labelOffsetInput.addEventListener('input', () => {
-                shapeSeries.applyOptions({ labelOffset: parseInt(labelOffsetInput.value, 10) });
-            });
-
+            positionSelect.addEventListener('change', createShapeSeries);
+            shapeSelect.addEventListener('change', createShapeSeries);
+            colorInput.addEventListener('input', () => shapeSeries.applyOptions({ color: colorInput.value }));
+            sizeInput.addEventListener('input', () => shapeSeries.applyOptions({ size: parseInt(sizeInput.value, 10) }));
+            labelOffsetInput.addEventListener('input', () => shapeSeries.applyOptions({ labelOffset: parseInt(labelOffsetInput.value, 10) }));
+            fixedValueInput.addEventListener('input', () => shapeSeries.applyOptions({ fixedValue: parseFloat(fixedValueInput.value) }));
+            showTextInput.addEventListener('change', updateData);
+            randomizeInput.addEventListener('change', updateData);
             regenerateBtn.addEventListener('click', updateData);
 
-            // Initialize
+            // Init
             createShapeSeries();
         })();
+
+        // --- Hardcoded Example 1: Basic Shapes ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-basic'), {
+                width: 600, height: 300,
+            });
+            const lineSeries = chart.addLineSeries({ color: 'rgba(0,0,0,0.1)' });
+            lineSeries.setData(data);
+
+            const series = chart.addShapeSeries({
+                position: 'top', // Changed from invalid 'aboveBar'
+                shape: 'arrowDown',
+                color: '#E91E63',
+                size: 15,
+            });
+
+            // Just every 10th point, ensuring value provided
+            const seriesData = data.filter((d, i) => i % 10 === 0).map(d => ({ time: d.time, value: 0 }));
+            series.setData(seriesData);
+        })();
+
+        // --- Hardcoded Example 2: Per-Point Customization ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-custom'), {
+                width: 600, height: 300,
+            });
+            const lineSeries = chart.addLineSeries({ color: 'rgba(0,0,0,0.1)' });
+            lineSeries.setData(data);
+
+            const series = chart.addShapeSeries({ position: 'top', shape: 'circle', color: '#2962FF' });
+
+            const shapes = ['square', 'circle', 'diamond', 'triangleUp'];
+            const colors = ['#f44336', '#2196F3', '#4CAF50', '#FFC107'];
+
+            const seriesData = data.filter((d, i) => i % 5 === 0).map((d, i) => ({
+                time: d.time,
+                value: 0,
+                shape: shapes[i % shapes.length],
+                color: colors[i % colors.length],
+                size: 10 + (i % 3) * 5,
+            }));
+            series.setData(seriesData);
+        })();
+
+        // --- Hardcoded Example 3: Text Labels ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-text'), {
+                width: 600, height: 300,
+            });
+            const lineSeries = chart.addLineSeries({ color: 'rgba(0,0,0,0.1)' });
+            lineSeries.setData(data);
+
+            const series = chart.addShapeSeries({
+                position: 'bottom', // Changed from invalid 'belowBar'
+                shape: 'arrowUp',
+                color: '#009688',
+                labelOffset: 15,
+            });
+
+            const txts = ['Buy', 'Strong Buy', 'Entry'];
+            const seriesData = data.filter((d, i) => i % 15 === 0).map((d, i) => ({
+                time: d.time,
+                value: 0,
+                text: txts[i % txts.length],
+            }));
+            series.setData(seriesData);
+        })();
+
     </script>
 </body>
 
