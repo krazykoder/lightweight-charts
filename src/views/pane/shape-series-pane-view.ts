@@ -38,6 +38,7 @@ export class SeriesShapePaneView implements IUpdatablePaneView {
                 shape: options.shape,
                 color: options.color,
                 size: options.size,
+                labelOffset: options.labelOffset,
             },
         };
     }
@@ -67,8 +68,10 @@ export class SeriesShapePaneView implements IUpdatablePaneView {
         this._data.options.shape = options.shape;
         this._data.options.color = options.color;
         this._data.options.size = options.size;
+        this._data.options.labelOffset = options.labelOffset;
 
         this._renderer.setData(this._data);
+        this._renderer.setParams(this._model.options().layout.fontSize, this._model.options().layout.fontFamily);
 
         return this._renderer;
     }
@@ -84,26 +87,31 @@ export class SeriesShapePaneView implements IUpdatablePaneView {
             const bars = this._series.bars();
             bars.rows().forEach((bar: ShapeSeriesPlotRow) => {
                 const time = bar.index;
+
+                // Truncate text to 20 chars
+                let textObj = undefined;
+                if (bar.text) {
+                    textObj = {
+                        content: bar.text.substring(0, 20),
+                        y: 0 as Coordinate,
+                        width: 0,
+                        height: 0,
+                    };
+                }
+
+                const labelPosition = options.position === 'bottom' ? 'above' : 'below';
+
                 this._data.items.push({
                     time: time,
                     x: 0 as Coordinate,
                     y: 0 as Coordinate,
-                    size: undefined, // bar.size? No, ShapeSeriesPlotRow doesn't have size? 
-                    // Let's check ShapeSeriesPlotRow definition. 
-                    // If bar has size, use it. If not, use undefined. 
-                    // But I need access to bar.size.
-                    // Assuming bar has size if it allows overrides.
-                    // Actually, I don't see bar.size accessed in my previous view_file.
-                    // ShapeSeriesData assumes size is part of options?
-                    // Let's check SeriesPlotRow for Shape.
-                    // But for now, let's just use undefined so it picks up default.
-                    // Wait, if I want per-point size, I need to know where it comes from.
-                    // I will look up ShapeSeriesPlotRow in a moment.
-                    // For now, let's fix the duplicate property 'y' and just leave size as undefined to use default.
+                    size: bar.size, // Use bar size if available (though type definition might need check)
                     shape: bar.shape,
                     color: bar.color,
                     internalId: time,
-                    externalId: undefined, // SeriesPlotRow doesn't have custom IDs like markers
+                    externalId: undefined,
+                    text: textObj,
+                    labelPosition: labelPosition,
                 });
             });
             this._dataInvalidated = false;

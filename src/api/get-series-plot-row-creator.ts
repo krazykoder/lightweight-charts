@@ -80,6 +80,10 @@ function getShapeSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: Sha
 		res.size = item.size;
 	}
 
+	if ('text' in item && item.text !== undefined) {
+		res.text = item.text;
+	}
+
 	return res;
 }
 

@@ -31,6 +31,10 @@
                         Shape Size:
                         <input type="number" id="shapeSizeInput" value="8" min="2" step="1" />
                     </label>
+                    <label>
+                        Label Offset:
+                        <input type="number" id="labelOffsetInput" value="2" min="0" step="1" />
+                    </label>
                 </div>
                 <div class="chart-container" id="chart-container-playbook"></div>
             </div>
@@ -69,6 +73,7 @@
 
             const levelSpacingInput = document.getElementById('levelSpacingInput');
             const shapeSizeInput = document.getElementById('shapeSizeInput');
+            const labelOffsetInput = document.getElementById('labelOffsetInput');
 
             function createAllSeries() {
                 // Remove existing
@@ -77,6 +82,7 @@
 
                 const spacing = parseInt(levelSpacingInput.value, 10);
                 const size = parseInt(shapeSizeInput.value, 10);
+                const offset = parseInt(labelOffsetInput.value, 10);
 
                 // --- TOP Series (Levels 0, 1, 2) ---
                 const topShapes = ['square', 'circle', 'diamond'];
@@ -90,11 +96,13 @@
                         color: topColors[i],
                         size: size,
                         levelSpacing: spacing,
+                        labelOffset: offset,
                     });
 
-                    const seriesData = lineData.map((d) => ({
+                    const seriesData = lineData.map((d, itemIndex) => ({
                         time: d.time,
                         value: d.value,
+                        text: itemIndex % 5 === 0 ? "L" + i + " #" + itemIndex : undefined,
                     })).filter((_, index) => index % 2 === 0); // Every 2nd point
 
                     series.setData(seriesData);
@@ -115,9 +123,10 @@
                         levelSpacing: spacing,
                     });
 
-                    const seriesData = lineData.map((d) => ({
+                    const seriesData = lineData.map((d, itemIndex) => ({
                         time: d.time,
                         value: d.value,
+                        text: itemIndex % 5 === 0 ? "B" + i : undefined,
                     })).filter((_, index) => index % 3 === 0); // Every 3rd point
 
                     series.setData(seriesData);
@@ -160,14 +169,17 @@
             function updateOptions() {
                 const spacing = parseInt(levelSpacingInput.value, 10);
                 const size = parseInt(shapeSizeInput.value, 10);
+                const offset = parseInt(labelOffsetInput.value, 10);
                 allSeries.forEach(s => s.applyOptions({
                     levelSpacing: spacing,
-                    size: size
+                    size: size,
+                    labelOffset: offset,
                 }));
             }
 
             levelSpacingInput.addEventListener('input', updateOptions);
             shapeSizeInput.addEventListener('input', updateOptions);
+            labelOffsetInput.addEventListener('input', updateOptions);
 
             // Initialize
             createAllSeries();

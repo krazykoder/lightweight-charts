@@ -53,6 +53,10 @@
                         Fixed Value:
                         <input type="number" id="fixedValueInput" value="50" step="1">
                     </label>
+                    <label>
+                        Label Offset:
+                        <input type="number" id="labelOffsetInput" value="2" min="0" step="1">
+                    </label>
                     <button id="regenerateDataBtn">Regenerate Data</button>
                 </div>
                 <div class="chart-container" id="chart-container-playbook"></div>
@@ -138,7 +142,11 @@
                     if (i % 10 === 0) {
                         item.color = '#E91E63'; // Pink
                         item.shape = 'diamond';
-                        item.size = 8;
+                        // item.size = 8;
+                        item.text = '#' + i;
+                        item.labelOffset = 50;
+                        item.labelBackgroundColor = '#E91E63';
+                        item.labelTextColor = '#ffffff';
                         return item;
                     }
 
@@ -151,6 +159,7 @@
                     // Scenario 3: Default Shape, Explicit Color (every 5th point)
                     if (i % 5 === 0) {
                         item.color = '#00E676'; // Green
+                        item.text = 'Hi';
                         return item;
                     }
 
@@ -181,6 +190,11 @@
 
             fixedValueInput.addEventListener('input', () => {
                 shapeSeries.applyOptions({ fixedValue: parseFloat(fixedValueInput.value) });
+            });
+
+            const labelOffsetInput = document.getElementById('labelOffsetInput');
+            labelOffsetInput.addEventListener('input', () => {
+                shapeSeries.applyOptions({ labelOffset: parseInt(labelOffsetInput.value, 10) });
             });
 
             regenerateBtn.addEventListener('click', updateData);

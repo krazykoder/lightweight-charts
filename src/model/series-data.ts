@@ -25,6 +25,7 @@ export interface ShapeSeriesPlotRow extends PlotRow {
 	readonly color?: string;
 	readonly shape?: SeriesMarkerShape;
 	readonly size?: number;
+	readonly text?: string;
 }
 
 export interface SeriesPlotRowTypeAtTypeMap {

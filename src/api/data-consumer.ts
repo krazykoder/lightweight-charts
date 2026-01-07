@@ -136,6 +136,11 @@ export interface ShapeSeriesData extends SingleValueData {
 	 * Optional size value for certain data item. If missed, size from options is used
 	 */
 	size?: number;
+
+	/**
+	 * Optional text value for certain data item.
+	 */
+	text?: string;
 }
 
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {

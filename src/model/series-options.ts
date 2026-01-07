@@ -490,6 +490,13 @@ export interface ShapeSeriesStyleOptions {
 	 * @defaultValue `5`
 	 */
 	levelSpacing: number;
+
+	/**
+	 * Spacing between the shape and the text label.
+	 *
+	 * @defaultValue `2`
+	 */
+	labelOffset: number;
 }
 
 /**

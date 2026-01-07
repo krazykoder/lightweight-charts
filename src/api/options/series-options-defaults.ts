@@ -101,6 +101,7 @@ export const shapeSeriesStyleDefaults: ShapeSeriesStyleOptions = {
 	margin: 10,
 	level: 0,
 	levelSpacing: 5,
+	labelOffset: 2,
 };
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {
