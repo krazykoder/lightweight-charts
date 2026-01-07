@@ -73,3 +73,28 @@
 - [x] Verify Builds (npm run build:prod)
 - [x] Explore examples/website/shape-series.html
 - [x] Add Shape Series link to `index.html`
+
+## 2026-01-07 - Shape Series Advanced Features
+### Core Support
+- [x] **Sparse Shape Support**
+    - [x] Make `shape` optional in options and data
+    - [x] Handle undefined shapes in renderer (draw nothing)
+    - [x] Update `shape-series.html` to demonstrate sparse data
+
+### Anti-Overlap (Levels)
+- [x] **Stacked Levels Support**
+    - [x] Add `level` and `levelSpacing` to `ShapeSeriesOptions`
+    - [x] Implement offset logic in `ShapeSeriesPaneView`
+    - [x] Create `multi-shape-series.html` playbook to demonstrate stacking
+
+### Text Labels
+- [x] **Label Support**
+    - [x] Add `text` property to `ShapeSeriesRendererDataItem`
+    - [x] Implement text rendering in `ShapeSeriesRenderer`
+    - [x] Implement auto-positioning logic (above/below shape)
+    - [x] Implement text truncation (20 chars)
+    - [x] Add `labelOffset` option for configurable spacing
+    - [x] Update examples to demonstrate labels
+
+### Documentation
+- [x] Create `examples/FEATURES.md` documenting new capabilities
