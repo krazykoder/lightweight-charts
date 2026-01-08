@@ -2,8 +2,6 @@ import { ensureNever } from '../helpers/assertions';
 
 import { HoveredObject } from '../model/chart-model';
 import { Coordinate } from '../model/coordinate';
-import { SeriesMarkerShape } from '../model/series-markers';
-import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
 import { ScaledRenderer } from './scaled-renderer';
 import { drawArrow, hitTestArrow } from './series-markers-arrow';
@@ -16,48 +14,24 @@ import { drawPlus, hitTestPlus } from './series-markers-plus';
 import { drawText, hitTestText } from './series-markers-text';
 import { makeFont } from '../helpers/make-font';
 import { TextWidthCache } from '../model/text-width-cache';
+import { ShapeSeriesRendererDataItem, ShapeSeriesRendererData } from './shape-series-renderer';
 
-export interface ShapeSeriesRendererDataItem extends TimedValue {
-    y: Coordinate;
-    size?: number;
-    shape?: SeriesMarkerShape;
-    color?: string;
-    internalId: number;
-    externalId?: string;
-    text?: {
-        content: string;
-        y: Coordinate;
-        width: number;
-        height: number;
+export interface DualShapeSeriesRendererData extends ShapeSeriesRendererData {
+    options: ShapeSeriesRendererData['options'] & {
+        hollowColor: string;
+        hollowShapeBorderWidth: number;
+        hollowShapeSize?: number;
     };
-    hollowColor?: string;
-    labelPosition?: 'above' | 'below';
 }
 
-export interface ShapeSeriesRendererData {
-    items: ShapeSeriesRendererDataItem[];
-    visibleRange: SeriesItemsIndexesRange | null;
-    options: {
-        shape?: SeriesMarkerShape;
-        color: string;
-        size: number;
-        labelOffset: number;
-        backgroundLineVisible: boolean;
-        backgroundLineColor: string;
-        backgroundLineWidth: number;
-        backgroundLineY: Coordinate;
-    };
-    width: number;
-}
-
-export class ShapeSeriesRenderer extends ScaledRenderer {
-    private _data: ShapeSeriesRendererData | null = null;
+export class DualShapeSeriesRenderer extends ScaledRenderer {
+    private _data: DualShapeSeriesRendererData | null = null;
     private _textWidthCache: TextWidthCache = new TextWidthCache();
     private _fontSize: number = -1;
     private _fontFamily: string = '';
     private _font: string = '';
 
-    public setData(data: ShapeSeriesRendererData): void {
+    public setData(data: DualShapeSeriesRendererData): void {
         this._data = data;
     }
 
@@ -104,19 +78,17 @@ export class ShapeSeriesRenderer extends ScaledRenderer {
         ctx.textBaseline = 'middle';
         ctx.font = this._font;
 
+        // Draw Background Line
         if (this._data.options.backgroundLineVisible) {
             ctx.beginPath();
             const y = this._data.options.backgroundLineY;
 
-            // Determine start and end X for the line
             let startX = 0;
-            // If there are no items before the visible range, start at the first visible item
             if (this._data.visibleRange.from === 0 && this._data.items.length > 0) {
                 startX = this._data.items[0].x;
             }
 
             let endX = this._data.width;
-            // If there are no items after the visible range, end at the last visible item
             if (this._data.visibleRange.to === this._data.items.length && this._data.items.length > 0) {
                 endX = this._data.items[this._data.items.length - 1].x;
             }
@@ -132,12 +104,16 @@ export class ShapeSeriesRenderer extends ScaledRenderer {
 
         for (let i = this._data.visibleRange.from; i < this._data.visibleRange.to; i++) {
             const item = this._data.items[i];
+
+            // Draw Hollow Square Background
+            this._drawHollowBackground(ctx, item);
+
+            // Draw Main Shape
             if (item.text !== undefined) {
                 item.text.width = this._textWidthCache.measureText(ctx, item.text.content);
                 item.text.height = this._fontSize;
 
-                // Calculate Y position for text
-                const shapeSize = item.size || this._data.options.size;
+                const shapeSize = this._data.options.size; // PER-POINT SIZE IGNORED for DualShapeSeries
                 const margin = this._data.options.labelOffset;
                 if (item.labelPosition === 'above') {
                     item.text.y = item.y - shapeSize - margin - item.text.height / 2 as Coordinate;
@@ -148,11 +124,43 @@ export class ShapeSeriesRenderer extends ScaledRenderer {
             drawShape(item, this._data.options, ctx);
         }
     }
+
+    private _drawHollowBackground(ctx: CanvasRenderingContext2D, item: ShapeSeriesRendererDataItem): void {
+        if (this._data === null) { return; }
+
+        const size = this._data.options.size; // Base size
+        const hollowSize = this._data.options.hollowShapeSize ?? (size * 1.2); // Default to 1.2x (as diameter) if not set
+        const color = item.hollowColor || this._data.options.hollowColor;
+        const lineWidth = this._data.options.hollowShapeBorderWidth;
+
+        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = color;
+
+        // Draw centered square
+        // drawSquare draws filled square, we want hollow. 
+        // We can use strokeRect.
+        // The size in drawSquare is "half size" (radius-like) or full size? 
+        // Checking drawSquare implementation: 
+        // export function drawSquare(ctx: CanvasRenderingContext2D, centerX: number, centerY: number, size: number, color: string): void { ... ctx.rect(centerX - size, centerY - size, size * 2, size * 2); ... }
+        // So 'size' passed to drawSquare is half-width (radius).
+
+        const halfSize = hollowSize / 2;
+        ctx.beginPath();
+        // ctx.rect(item.x - halfSize, item.y - halfSize, halfSize * 2, halfSize * 2);
+        // Better to use a dedicated drawHollowSquare if we want consistent antialiasing or logic, but direct rect is fine.
+        // To avoid overlapping with the shape if it's too small, we just draw it behind.
+
+        ctx.rect(item.x - halfSize, item.y - halfSize, halfSize * 2, halfSize * 2);
+        ctx.stroke();
+    }
 }
 
 function drawShape(item: ShapeSeriesRendererDataItem, options: ShapeSeriesRendererData['options'], ctx: CanvasRenderingContext2D): void {
     const color = item.color || options.color;
-    const size = item.size || options.size;
+    // CRITICAL: IGNORE item.size for DualShapeSeries as per requirements? 
+    // Plan: "the size property of data points will be totally IGNORED"
+    // So we use options.size.
+    const size = options.size;
     const shape = item.shape || options.shape;
 
     if (!shape || size === 0) {
@@ -199,7 +207,7 @@ function drawShape(item: ShapeSeriesRendererDataItem, options: ShapeSeriesRender
 }
 
 function hitTestShape(item: ShapeSeriesRendererDataItem, options: ShapeSeriesRendererData['options'], x: Coordinate, y: Coordinate): boolean {
-    const size = item.size || options.size;
+    const size = options.size; // IGNORE item.size
     const shape = item.shape || options.shape;
 
     if (!shape || size === 0) {

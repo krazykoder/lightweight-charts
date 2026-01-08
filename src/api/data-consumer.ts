@@ -141,6 +141,11 @@ export interface ShapeSeriesData extends SingleValueData {
 	 * Optional text value for certain data item.
 	 */
 	text?: string;
+
+	/**
+	 * Optional hollow color value for certain data item. If missed, color from options is used.
+	 */
+	hollowColor?: string;
 }
 
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
@@ -185,6 +190,10 @@ export interface SeriesDataItemTypeMap {
 	 * The types of structure series data.
 	 */
 	Shape: ShapeSeriesData | WhitespaceData;
+	/**
+	 * The types of dual shape series data.
+	 */
+	DualShape: ShapeSeriesData | WhitespaceData;
 }
 
 

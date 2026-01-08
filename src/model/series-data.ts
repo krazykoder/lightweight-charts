@@ -26,6 +26,7 @@ export interface ShapeSeriesPlotRow extends PlotRow {
 	readonly shape?: SeriesMarkerShape;
 	readonly size?: number;
 	readonly text?: string;
+	readonly hollowColor?: string;
 }
 
 export interface SeriesPlotRowTypeAtTypeMap {
@@ -36,6 +37,7 @@ export interface SeriesPlotRowTypeAtTypeMap {
 	Line: LinePlotRow;
 	Histogram: HistogramPlotRow;
 	Shape: ShapeSeriesPlotRow;
+	DualShape: ShapeSeriesPlotRow;
 }
 
 

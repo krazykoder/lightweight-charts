@@ -84,6 +84,10 @@ function getShapeSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: Sha
 		res.text = item.text;
 	}
 
+	if ('hollowColor' in item && item.hollowColor !== undefined) {
+		res.hollowColor = item.hollowColor;
+	}
+
 	return res;
 }
 
@@ -122,6 +126,7 @@ const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Histogram: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 	Line: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 	Shape: wrapWhitespaceData(getShapeSeriesPlotRow),
+	DualShape: wrapWhitespaceData(getShapeSeriesPlotRow),
 };
 
 

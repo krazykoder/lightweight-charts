@@ -521,6 +521,32 @@ export interface ShapeSeriesStyleOptions {
 }
 
 /**
+ * Represents style options for a dual shape series.
+ */
+export interface DualShapeSeriesStyleOptions extends ShapeSeriesStyleOptions {
+	/**
+	 * Color of the secondary hollow shape.
+	 *
+	 * @defaultValue `'#FF0000'`
+	 */
+	hollowColor: string;
+
+	/**
+	 * Border width of the secondary hollow shape.
+	 *
+	 * @defaultValue `2`
+	 */
+	hollowShapeBorderWidth: number;
+
+	/**
+	 * Size of the secondary hollow shape.
+	 *
+	 * @defaultValue `undefined` (if not set, it might default to 1.25x size in renderer, but we'll enforce a default in defaults)
+	 */
+	hollowShapeSize?: number;
+}
+
+/**
  * Represents the possible histogram styles.
  */
 export const enum HistogramStyle {
@@ -903,6 +929,15 @@ export type ShapeSeriesOptions = SeriesOptions<ShapeSeriesStyleOptions>;
  */
 export type ShapeSeriesPartialOptions = SeriesPartialOptions<ShapeSeriesStyleOptions>;
 
+/**
+ * Structure describing dual shape series options.
+ */
+export type DualShapeSeriesOptions = SeriesOptions<DualShapeSeriesStyleOptions>;
+/**
+ * Represents dual shape series options where all properties are options.
+ */
+export type DualShapeSeriesPartialOptions = SeriesPartialOptions<DualShapeSeriesStyleOptions>;
+
 
 /**
  * Represents bar series options.
@@ -970,7 +1005,14 @@ export interface SeriesOptionsMap {
 	 * The type of histogram series options.
 	 */
 	Histogram: HistogramSeriesOptions;
+	/**
+	 * The type of shape series options.
+	 */
 	Shape: ShapeSeriesOptions;
+	/**
+	 * The type of dual shape series options.
+	 */
+	DualShape: DualShapeSeriesOptions;
 }
 
 
@@ -1008,6 +1050,10 @@ export interface SeriesPartialOptionsMap {
 	 * The type of shape series partial options.
 	 */
 	Shape: ShapeSeriesPartialOptions;
+	/**
+	 * The type of dual shape series partial options.
+	 */
+	DualShape: DualShapeSeriesPartialOptions;
 }
 
 /**

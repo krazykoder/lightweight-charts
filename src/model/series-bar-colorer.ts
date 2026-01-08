@@ -64,6 +64,7 @@ export class SeriesBarColorer {
 				return this._histogramStyle(seriesOptions as HistogramStyleOptions, barIndex, precomputedBars);
 
 			case 'Shape':
+			case 'DualShape':
 				return this._shapeStyle(seriesOptions as ShapeSeriesOptions, barIndex, precomputedBars);
 		}
 

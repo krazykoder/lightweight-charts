@@ -3,6 +3,7 @@ import {
 	BarStyleOptions,
 	BaselineStyleOptions,
 	CandlestickStyleOptions,
+	DualShapeSeriesStyleOptions,
 	HistogramStyle,
 	HistogramStyleOptions,
 	LastPriceAnimationMode,
@@ -105,6 +106,13 @@ export const shapeSeriesStyleDefaults: ShapeSeriesStyleOptions = {
 	backgroundLineVisible: false,
 	backgroundLineColor: '#26a69a',
 	backgroundLineWidth: 1,
+};
+
+export const dualShapeSeriesStyleDefaults: DualShapeSeriesStyleOptions = {
+	...shapeSeriesStyleDefaults,
+	hollowColor: '#FF0000',
+	hollowShapeBorderWidth: 2,
+	hollowShapeSize: undefined,
 };
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {

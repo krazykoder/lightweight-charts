@@ -19,6 +19,8 @@ import {
 	BaselineSeriesPartialOptions,
 	CandlestickSeriesOptions,
 	CandlestickSeriesPartialOptions,
+	DualShapeSeriesOptions,
+	DualShapeSeriesPartialOptions,
 	fillUpDownCandlesticksColors,
 	HistogramSeriesOptions,
 	HistogramSeriesPartialOptions,
@@ -46,6 +48,7 @@ import {
 	barStyleDefaults,
 	baselineStyleDefaults,
 	candlestickStyleDefaults,
+	dualShapeSeriesStyleDefaults,
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
@@ -320,6 +323,21 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		const series = this._chartWidget.model().createSeries('Shape', strictOptions);
 
 		const res = new SeriesApi<'Shape'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
+	}
+
+	public addDualShapeSeries(options: DualShapeSeriesPartialOptions = {}): ISeriesApi<'DualShape'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), { lastValueVisible: false }, dualShapeSeriesStyleDefaults, options) as DualShapeSeriesOptions;
+		const series = this._chartWidget.model().createSeries('DualShape', strictOptions);
+
+		// reuse SeriesApi<T>
+		const res = new SeriesApi<'DualShape'>(series, this, this);
 		this._seriesMap.set(res, series);
 		this._seriesMapReversed.set(series, res);
 

@@ -4,8 +4,11 @@ set -e
 # Navigate to the repository root (one level up from website/)
 cd "$(dirname "$0")/.."
 
-echo "Copying distribution file to examples/website/dist/..."
-cp dist/lightweight-charts.standalone.production.js examples/website/dist/
+echo "Creating symlink to dist/ in examples/website/..."
+# Remove existing directory/file if it exists to avoid symlink nesting issues or errors
+rm -rf examples/website/dist
+# Create symlink from project root dist to examples/website/dist
+ln -sf "$(pwd)/dist" examples/website/dist
 
 echo "Starting Python HTTP Server in examples/..."
 cd examples
