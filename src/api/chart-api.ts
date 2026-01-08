@@ -21,6 +21,8 @@ import {
 	CandlestickSeriesPartialOptions,
 	DualShapeSeriesOptions,
 	DualShapeSeriesPartialOptions,
+	CharSeriesOptions,
+	CharSeriesPartialOptions,
 	fillUpDownCandlesticksColors,
 	HistogramSeriesOptions,
 	HistogramSeriesPartialOptions,
@@ -32,6 +34,8 @@ import {
 	SeriesType,
 	ShapeSeriesOptions,
 	ShapeSeriesPartialOptions,
+	CharShapeSeriesOptions,
+	CharShapeSeriesPartialOptions,
 } from '../model/series-options';
 
 
@@ -49,10 +53,12 @@ import {
 	baselineStyleDefaults,
 	candlestickStyleDefaults,
 	dualShapeSeriesStyleDefaults,
+	charSeriesStyleDefaults,
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
 	shapeSeriesStyleDefaults,
+	charShapeSeriesStyleDefaults,
 } from './options/series-options-defaults';
 
 import { PriceScaleApi } from './price-scale-api';
@@ -465,5 +471,33 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			customPriceLine: param.customPriceLine,
 			fromPriceString: param.fromPriceString,
 		};
+	}
+
+	public addCharSeries(options: CharSeriesPartialOptions = {}): ISeriesApi<'Char'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), { lastValueVisible: false }, charSeriesStyleDefaults, options) as CharSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Char', strictOptions);
+
+		const res = new SeriesApi<'Char'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
+	}
+
+	public addCharShapeSeries(options: CharShapeSeriesPartialOptions = {}): ISeriesApi<'CharShape'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), { lastValueVisible: false }, charShapeSeriesStyleDefaults, options) as CharShapeSeriesOptions;
+		const series = this._chartWidget.model().createSeries('CharShape', strictOptions);
+
+		const res = new SeriesApi<'CharShape'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
 	}
 }

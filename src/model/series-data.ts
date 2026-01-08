@@ -29,6 +29,19 @@ export interface ShapeSeriesPlotRow extends PlotRow {
 	readonly hollowColor?: string;
 }
 
+export interface CharSeriesPlotRow extends PlotRow {
+	readonly color?: string;
+	readonly char?: string;
+	readonly size?: number;
+}
+
+export interface CharShapeSeriesPlotRow extends PlotRow {
+	readonly color?: string;
+	readonly char?: string;
+	readonly size?: number;
+	readonly text?: string;
+}
+
 export interface SeriesPlotRowTypeAtTypeMap {
 	Bar: BarPlotRow;
 	Candlestick: CandlestickPlotRow;
@@ -38,6 +51,8 @@ export interface SeriesPlotRowTypeAtTypeMap {
 	Histogram: HistogramPlotRow;
 	Shape: ShapeSeriesPlotRow;
 	DualShape: ShapeSeriesPlotRow;
+	Char: CharSeriesPlotRow;
+	CharShape: CharShapeSeriesPlotRow;
 }
 
 

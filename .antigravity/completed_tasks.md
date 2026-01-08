@@ -116,3 +116,25 @@
 - [x] **Example Accuracy**
     - [x] Sync "Shapes on Price Levels" snippet with implementation.
     - [x] Add text labels to price level examples.
+
+## [2026-01-08] Implement CharSeries API
+- Implemented `CharSeries` for displaying UTF characters and emojis on charts.
+- Added `addCharSeries` to `ChartApi`.
+- Created `CharSeriesRenderer` with support for surrogate pairs (emojis) using `Array.from(char)[0]`.
+- Added `SeriesCharPaneView` for data-to-renderer mapping.
+- [x] Integrate into `SeriesOptionsMap`, `SeriesBarColorer`, and data validators.
+- [x] Create interactive playbook `examples/website/char-series.html`.
+
+## 2026-01-08 - CharShapeSeries Implementation
+- [x] Implement `CharShapeSeries` API
+    - [x] Create `CharShapeSeriesRenderer` and `SeriesCharShapePaneView`
+    - [x] Define options interfaces (`CharShapeSeriesOptions`, `CharShapeSeriesStyleOptions`)
+    - [x] Integrate `CharShapeSeries` into `ChartApi` (`addCharShapeSeries`)
+    - [x] Update `Series` model and factories (`series.ts`, `series-bar-colorer.ts`, `get-series-plot-row-creator.ts`)
+    - [x] Fix `SeriesBarColorer` to handle `CharShape` type (resolving "Unknown chart style" error)
+- [x] Create Verification Example
+    - [x] Create `examples/website/char-shape-series.html` with interactive controls
+    - [x] Verify rendering of chars, emojis, and labels
+    - [x] Update `examples/website/index.html` with links
+- [x] Verification
+    - [x] Validated with automated browser test (no console errors, correct visual updates)

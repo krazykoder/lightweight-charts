@@ -3,7 +3,7 @@ import { SeriesPlotRow } from '../model/series-data';
 import { SeriesType } from '../model/series-options';
 import { TimePoint, TimePointIndex } from '../model/time-data';
 
-import { BarData, CandlestickData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap, ShapeSeriesData } from './data-consumer';
+import { BarData, CandlestickData, CharSeriesData, CharShapeSeriesData, HistogramData, isWhitespaceData, LineData, SeriesDataItemTypeMap, ShapeSeriesData } from './data-consumer';
 
 function getLineBasedSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: LineData | HistogramData): Mutable<SeriesPlotRow<'Area' | 'Baseline'>> {
 	const val = item.value;
@@ -108,7 +108,7 @@ type SeriesItemValueFnMap = {
 
 export type TimedSeriesItemValueFn = (time: TimePoint, index: TimePointIndex, item: SeriesDataItemTypeMap[SeriesType]) => Mutable<SeriesPlotRow | WhitespacePlotRow>;
 
-function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow) | (typeof getShapeSeriesPlotRow)): TimedSeriesItemValueFn {
+function wrapWhitespaceData(createPlotRowFn: (typeof getLineBasedSeriesPlotRow) | (typeof getBarSeriesPlotRow) | (typeof getCandlestickSeriesPlotRow) | (typeof getShapeSeriesPlotRow) | (typeof getCharSeriesPlotRow) | (typeof getCharShapeSeriesPlotRow)): TimedSeriesItemValueFn {
 	return (time: TimePoint, index: TimePointIndex, bar: SeriesDataItemTypeMap[SeriesType]) => {
 		if (isWhitespaceData(bar)) {
 			return { time, index };
@@ -127,10 +127,54 @@ const seriesPlotRowFnMap: SeriesItemValueFnMap = {
 	Line: wrapWhitespaceData(getColoredLineBasedSeriesPlotRow),
 	Shape: wrapWhitespaceData(getShapeSeriesPlotRow),
 	DualShape: wrapWhitespaceData(getShapeSeriesPlotRow),
+	Char: wrapWhitespaceData(getCharSeriesPlotRow),
+	CharShape: wrapWhitespaceData(getCharShapeSeriesPlotRow),
 };
 
 
 
 export function getSeriesPlotRowCreator(seriesType: SeriesType): TimedSeriesItemValueFn {
 	return seriesPlotRowFnMap[seriesType] as TimedSeriesItemValueFn;
+}
+
+function getCharSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: CharSeriesData): Mutable<SeriesPlotRow<'Char'>> {
+	const val = item.value;
+	const res: Mutable<SeriesPlotRow<'Char'>> = { index, time, value: [val, val, val, val] };
+
+	if ('color' in item && item.color !== undefined) {
+		res.color = item.color;
+	}
+
+	if ('char' in item && item.char !== undefined) {
+		res.char = item.char;
+	}
+
+	if ('size' in item && item.size !== undefined) {
+		res.size = item.size;
+	}
+
+	return res;
+}
+
+function getCharShapeSeriesPlotRow(time: TimePoint, index: TimePointIndex, item: CharShapeSeriesData): Mutable<SeriesPlotRow<'CharShape'>> {
+	const val = item.value;
+	const res: Mutable<SeriesPlotRow<'CharShape'>> = { index, time, value: [val, val, val, val] };
+
+	if ('color' in item && item.color !== undefined) {
+		res.color = item.color;
+	}
+
+	if ('char' in item && item.char !== undefined) {
+		res.char = item.char;
+	}
+
+	if ('size' in item && item.size !== undefined) {
+		res.size = item.size;
+	}
+
+	if ('text' in item && item.text !== undefined) {
+		res.text = item.text;
+	}
+
+	return res;
 }

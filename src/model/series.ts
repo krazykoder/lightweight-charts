@@ -21,6 +21,8 @@ import { SeriesLastPriceAnimationPaneView } from '../views/pane/series-last-pric
 import { SeriesMarkersPaneView } from '../views/pane/series-markers-pane-view';
 import { SeriesShapePaneView } from '../views/pane/shape-series-pane-view';
 import { SeriesDualShapePaneView } from '../views/pane/dual-shape-series-pane-view';
+import { SeriesCharPaneView } from '../views/pane/char-series-pane-view';
+import { SeriesCharShapePaneView } from '../views/pane/char-shape-series-pane-view';
 import { SeriesPriceLinePaneView } from '../views/pane/series-price-line-pane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view';
@@ -90,6 +92,8 @@ export interface SeriesDataAtTypeMap {
 	Histogram: BarPrice;
 	Shape: BarPrice;
 	DualShape: BarPrice;
+	Char: BarPrice;
+	CharShape: BarPrice;
 }
 
 export interface SeriesUpdateInfo {
@@ -685,6 +689,16 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 			case 'DualShape': {
 				this._paneView = new SeriesDualShapePaneView(this as Series<'DualShape'>, this.model());
+				break;
+			}
+
+			case 'Char': {
+				this._paneView = new SeriesCharPaneView(this as Series<'Char'>, this.model());
+				break;
+			}
+
+			case 'CharShape': {
+				this._paneView = new SeriesCharShapePaneView(this as Series<'CharShape'>, this.model());
 				break;
 			}
 

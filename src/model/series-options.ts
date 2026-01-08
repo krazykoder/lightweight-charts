@@ -547,6 +547,107 @@ export interface DualShapeSeriesStyleOptions extends ShapeSeriesStyleOptions {
 }
 
 /**
+ * Represents style options for a char series.
+ */
+export interface CharSeriesStyleOptions {
+	/**
+	 * Color of the characters.
+	 *
+	 * @defaultValue `'#FF0000'`
+	 */
+	color: string;
+
+	/**
+	 * Font size of the characters in pixels.
+	 *
+	 * @defaultValue `12`
+	 */
+	size: number;
+}
+
+/**
+ * Represents style options for a char shape series.
+ */
+export interface CharShapeSeriesStyleOptions {
+	/**
+	 * Color of the characters.
+	 *
+	 * @defaultValue `'#26a69a'`
+	 */
+	color: string;
+
+	/**
+	 * The size of the characters in pixels.
+	 *
+	 * @defaultValue `12`
+	 */
+	size: number;
+
+	/**
+	 * The position of the series.
+	 *
+	 * @defaultValue `'top'`
+	 */
+	position: ShapeSeriesPosition;
+
+	/**
+	 * The fixed value if position is 'value'.
+	 *
+	 * @defaultValue `0`
+	 */
+	fixedValue: number;
+
+	/**
+	 * The margin (in pixels) from the top or bottom if position is 'top' or 'bottom'.
+	 *
+	 * @defaultValue `10`
+	 */
+	margin: number;
+
+	/**
+	 * The level of the series. Used to offset the series when multiple series are present.
+	 *
+	 * @defaultValue `0`
+	 */
+	level: number;
+
+	/**
+	 * The spacing between levels.
+	 *
+	 * @defaultValue `5`
+	 */
+	levelSpacing: number;
+
+	/**
+	 * Spacing between the shape and the text label.
+	 *
+	 * @defaultValue `2`
+	 */
+	labelOffset: number;
+
+	/**
+	 * Visibility of the background line.
+	 *
+	 * @defaultValue `false`
+	 */
+	backgroundLineVisible: boolean;
+
+	/**
+	 * Color of the background line.
+	 *
+	 * @defaultValue `'#26a69a'`
+	 */
+	backgroundLineColor: string;
+
+	/**
+	 * Width of the background line.
+	 *
+	 * @defaultValue `1`
+	 */
+	backgroundLineWidth: number;
+}
+
+/**
  * Represents the possible histogram styles.
  */
 export const enum HistogramStyle {
@@ -976,6 +1077,28 @@ export type LineSeriesOptions = SeriesOptions<LineStyleOptions>;
 export type LineSeriesPartialOptions = SeriesPartialOptions<LineStyleOptions>;
 
 /**
+ * Represents options for a char series.
+ */
+export type CharSeriesOptions = SeriesOptionsCommon & CharSeriesStyleOptions;
+
+/**
+ * Represents partial options for a char series.
+ */
+export type CharSeriesPartialOptions = DeepPartial<CharSeriesStyleOptions & SeriesOptionsCommon>;
+
+/**
+ * Represents the partial style options for a char shape series.
+ */
+export type CharShapeSeriesPartialOptions = DeepPartial<CharShapeSeriesStyleOptions & SeriesOptionsCommon>;
+
+/**
+ * Represents options for a char shape series.
+ */
+export type CharShapeSeriesOptions = SeriesOptionsCommon & CharShapeSeriesStyleOptions;
+
+
+
+/**
  * Represents the type of options for each series type.
  *
  * For example a bar series has options represented by {@link BarSeriesOptions}.
@@ -1013,6 +1136,14 @@ export interface SeriesOptionsMap {
 	 * The type of dual shape series options.
 	 */
 	DualShape: DualShapeSeriesOptions;
+	/**
+	 * The type of char series options.
+	 */
+	Char: CharSeriesOptions;
+	/**
+	 * The type of char shape series options.
+	 */
+	CharShape: CharShapeSeriesOptions;
 }
 
 
@@ -1054,6 +1185,14 @@ export interface SeriesPartialOptionsMap {
 	 * The type of dual shape series partial options.
 	 */
 	DualShape: DualShapeSeriesPartialOptions;
+	/**
+	 * The type of char series partial options.
+	 */
+	Char: CharSeriesPartialOptions;
+	/**
+	 * The type of char shape series partial options.
+	 */
+	CharShape: CharShapeSeriesPartialOptions;
 }
 
 /**

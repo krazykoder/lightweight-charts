@@ -66,6 +66,8 @@ function getChecker(type: SeriesType): Checker {
 
 		case 'Shape':
 		case 'DualShape':
+		case 'Char':
+		case 'CharShape':
 			return checkShapeItem;
 	}
 }

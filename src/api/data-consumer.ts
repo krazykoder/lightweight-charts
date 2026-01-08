@@ -148,6 +148,51 @@ export interface ShapeSeriesData extends SingleValueData {
 	hollowColor?: string;
 }
 
+/**
+ * Structure describing a single item of data for char series
+ */
+export interface CharSeriesData extends SingleValueData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+
+	/**
+	 * The character or emoji to display.
+	 */
+	char?: string;
+
+	/**
+	 * Optional size of the character in pixels.
+	 */
+	size?: number;
+}
+
+/**
+ * Structure describing a single item of data for char shape series
+ */
+export interface CharShapeSeriesData extends SingleValueData {
+	/**
+	 * Optional color value for certain data item. If missed, color from options is used
+	 */
+	color?: string;
+
+	/**
+	 * The character or emoji to display.
+	 */
+	char?: string;
+
+	/**
+	 * Optional size of the character in pixels.
+	 */
+	size?: number;
+
+	/**
+	 * Optional text value for certain data item.
+	 */
+	text?: string;
+}
+
 export function isWhitespaceData(data: SeriesDataItemTypeMap[SeriesType]): data is WhitespaceData {
 	return (data as Partial<BarData>).open === undefined && (data as Partial<LineData>).value === undefined;
 }
@@ -194,6 +239,14 @@ export interface SeriesDataItemTypeMap {
 	 * The types of dual shape series data.
 	 */
 	DualShape: ShapeSeriesData | WhitespaceData;
+	/**
+	 * The types of char series data.
+	 */
+	Char: CharSeriesData | WhitespaceData;
+	/**
+	 * The types of char shape series data.
+	 */
+	CharShape: CharShapeSeriesData | WhitespaceData;
 }
 
 

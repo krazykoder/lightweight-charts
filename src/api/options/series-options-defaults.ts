@@ -11,6 +11,8 @@ import {
 	PriceLineSource,
 	SeriesOptionsCommon,
 	ShapeSeriesStyleOptions,
+	CharSeriesStyleOptions,
+	CharShapeSeriesStyleOptions,
 } from '../../model/series-options';
 import { LineStyle, LineType } from '../../renderers/draw-line';
 
@@ -114,6 +116,17 @@ export const dualShapeSeriesStyleDefaults: DualShapeSeriesStyleOptions = {
 	hollowShapeBorderWidth: 2,
 	hollowShapeSize: undefined,
 };
+
+export const charSeriesStyleDefaults: CharSeriesStyleOptions = {
+	color: '#FF0000',
+	size: 12,
+};
+
+export const charShapeSeriesStyleDefaults: CharShapeSeriesStyleOptions = {
+	...shapeSeriesStyleDefaults,
+	size: 12,
+};
+
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {
 	title: '',

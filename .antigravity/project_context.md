@@ -51,3 +51,34 @@ The library is structured with a core model, renderers, and views.
     - **Text Labels**: Auto-positioned text with configurable offsets and truncation.
     - **Stacking**: `level` and `levelSpacing` options to prevent overlap of multiple series.
     - **Sparse Data**: Handles `undefined` shapes (draws nothing) for gaps.
+
+## Feature: CharSeries
+- **Description**: Allows plotting textual characters (letters, numbers, symbols, emojis) at data points.
+- **Key Classes**:
+    - `CharSeriesRenderer` (renders text using Canvas API)
+    - `SeriesCharPaneView` (prepares data for renderer)
+    - `CharSeriesOptions` (style configuration)
+- **Usage**:
+    ```javascript
+    const series = chart.addCharSeries({ color: 'red', size: 12 });
+    series.setData([{ time: '2022-01-01', value: 10, char: 'A' }]);
+    ```
+- **Dependencies**: Reacts to `lineWidth` (conceptually for size), `color`.
+- **Known Details**:
+    - Only the first unicode character is rendered (`Array.from(char)[0]`).
+    - Position is determined by the data `value` (price).
+
+## Feature: CharShapeSeries
+- **Description**: Hybid series type combining `ShapeSeries` positioning flexibility with `CharSeries` character markers.
+- **Key Classes**:
+    - `CharShapeSeriesRenderer`
+    - `SeriesCharShapePaneView`
+    - `CharShapeSeriesOptions`
+- **Usage**:
+    ```javascript
+    chart.addCharShapeSeries({ position: 'top', shape: 'rocket' });
+    ```
+- **Capabilities**:
+    - Inherits `ShapeSeries` spacing, stacking, and positioning (`top`/`bottom`/`value`).
+    - Inherits `CharSeries` text rendering (emojis, chars).
+

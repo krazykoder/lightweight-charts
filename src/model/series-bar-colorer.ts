@@ -65,6 +65,8 @@ export class SeriesBarColorer {
 
 			case 'Shape':
 			case 'DualShape':
+			case 'Char':
+			case 'CharShape':
 				return this._shapeStyle(seriesOptions as ShapeSeriesOptions, barIndex, precomputedBars);
 		}
 

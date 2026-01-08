@@ -24,3 +24,30 @@
 ### Next Session Instructions
 - Use `npm run build:prod` and check `examples/website/` to ensure no regressions.
 - Consider exploring other requested features or general library maintenance.
+## Session Log [2026-01-08 01:55:15]
+**Goal:** Implement CharSeries API and Verify.
+
+**Outcome:**
+- Successfully implemented `CharSeries` with emoji support.
+- Fixed surrogate pair rendering issue for emojis.
+- Validated using `examples/website/char-series.html`.
+
+**Workflow Notes:**
+- **Dist Symlink**: The `examples/website/dist` directory is already symlinked to the build output. **Do not copy files manually** to this directory; changes are reflected automatically after a build.
+- **Web Server**: Use `./examples/start-simple-website` to serve the examples. This starts a local server (usually at http://localhost:8000) for testing webviews.
+
+**Next Steps:**
+- Await further user requests.
+
+## Session Log [2026-01-08 2:25:32]
+**Goal:** Implement CharShapeSeries API and Verify.
+
+**Outcome:**
+- Successfully implemented `CharShapeSeries` combining `ShapeSeries` positioning with `CharSeries` rendering.
+- Resolved `unknown chart style` crash by updating `SeriesBarColorer`.
+- Verified using `examples/website/char-shape-series.html` with emojis, labels, and various positions.
+- Updated `index.html` to include new examples.
+
+**Next Steps:**
+- Await further user requests.
+

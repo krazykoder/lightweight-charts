@@ -1,5 +1,14 @@
-# Current Tasks
-
-- [ ] Regression Check
-    - [ ] Run `npm run build:prod`
-    - [ ] Verify `examples/website/` for regressions
+- [x] Implement `CharSeries` API
+    - [x] Plan & Register
+        - [x] Implement `CharSeries` API
+    - [x] Define options interfaces (`defaults`, `style options`, `map`)
+    - [x] Add `CharSeriesData` to `data-consumer`
+    - [x] Implement `getCharSeriesPlotRow` in `get-series-plot-row-creator.ts`
+    - [x] Add `addCharSeries` to `ChartApi`
+    - [x] Implement `CharSeriesRenderer`
+    - [x] Implement `SeriesCharPaneView`
+    - [x] Update `Series` model to handle `Char` type
+    - [x] Create verification example `examples/website/char-series.html`
+    - [x] Verify
+        - [x] Create `char-series.html` example
+        - [x] Verify emojis and single-char limit (Fixed surrogate pair support)
