@@ -563,6 +563,13 @@ export interface CharSeriesStyleOptions {
 	 * @defaultValue `12`
 	 */
 	size: number;
+
+	/**
+	 * Vertical offset in pixels to position the character above (+) or below (-) the data point.
+	 *
+	 * @defaultValue `0`
+	 */
+	offset: number;
 }
 
 /**

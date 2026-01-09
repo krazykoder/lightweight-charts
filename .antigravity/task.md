@@ -1,14 +1,6 @@
-- [x] Implement `CharSeries` API
-    - [x] Plan & Register
-        - [x] Implement `CharSeries` API
-    - [x] Define options interfaces (`defaults`, `style options`, `map`)
-    - [x] Add `CharSeriesData` to `data-consumer`
-    - [x] Implement `getCharSeriesPlotRow` in `get-series-plot-row-creator.ts`
-    - [x] Add `addCharSeries` to `ChartApi`
-    - [x] Implement `CharSeriesRenderer`
-    - [x] Implement `SeriesCharPaneView`
-    - [x] Update `Series` model to handle `Char` type
-    - [x] Create verification example `examples/website/char-series.html`
-    - [x] Verify
-        - [x] Create `char-series.html` example
-        - [x] Verify emojis and single-char limit (Fixed surrogate pair support)
+# Task: Update Data Unpacker
+
+- [ ] Read `examples/unpack-all-data.py` and `examples/data.json`
+- [x] Create implementation plan
+- [x] Update `examples/unpack-all-data.py` to dynamically handle columns
+- [x] Verify the script runs correctly

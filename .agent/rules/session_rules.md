@@ -24,11 +24,15 @@ trigger: always_on
 - As Antigravity's internal **Task List** updates, periodically update the workspace `./.antigravity/task.md` so the file reflects the UI state.
 
 ### 🔴 Session Wrap-up
-1. **Internal-to-File Sync**:
+1. **Document plans and walkthrough**
+- Always save a copy of the final copy implementation plan to `./.antigravity/implementation_plan/` directory after implementaion of a feature or request 
+- Always save a copy of the final copy walkthrough to `./.antigravity/walkthrough/` directory after implementaion of a feature or request 
+
+2. **Internal-to-File Sync**:
     - **Archive**: Move completed items from the internal Task List to `./.antigravity/completed_tasks.md`.
     - **Snapshot**: Generate a "State Snapshot" in `./.antigravity/session_logs.md` including:
         - Current goal status.
         - Blockers or technical debt.
         - The specific instruction for the next session's starting point.
 `./.antigravity/project_context.md`, 
-  - keep updating project context here related to features implpemented 
+  - keep updating project context here related to features implpemented

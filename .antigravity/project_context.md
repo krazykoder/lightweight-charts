@@ -82,3 +82,10 @@ The library is structured with a core model, renderers, and views.
     - Inherits `ShapeSeries` spacing, stacking, and positioning (`top`/`bottom`/`value`).
     - Inherits `CharSeries` text rendering (emojis, chars).
 
+## Feature: Dynamic Data Unpacker
+- **Description**: Updated the Python utility script used to transform `data.json` into a format consumable by web-based examples (`app-data.js`).
+- **Script**: `examples/unpack-all-data.py`
+- **Capabilities**:
+    - Dynamically maps all columns defined in `data.json`'s `columns` field.
+    - Derived fields: Automatically adds `value` and `color` for OHLC data.
+    - Performance: Limits output to 500 data points by default.

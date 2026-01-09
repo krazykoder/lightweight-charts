@@ -51,3 +51,13 @@
 **Next Steps:**
 - Await further user requests.
 
+## Session Log [2026-01-09 10:45:00]
+**Goal:** Update `unpack-all-data.py` to handle dynamic columns.
+
+**Outcome:**
+- Successfully refactored `examples/unpack-all-data.py` to use `columns` and `index` from `data.json` to dynamically build `formatted_data`.
+- Maintained backward compatibility for `value` and `color` fields.
+- Verified using `python3 examples/unpack-all-data.py` and inspecting `app-data.js`.
+
+**Next Steps:**
+- Await further user requests.

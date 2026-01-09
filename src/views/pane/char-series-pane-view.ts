@@ -32,6 +32,7 @@ export class SeriesCharPaneView implements IUpdatablePaneView {
             options: {
                 color: options.color,
                 size: options.size,
+                offset: options.offset,
             },
         };
     }
@@ -55,6 +56,7 @@ export class SeriesCharPaneView implements IUpdatablePaneView {
         const options = this._series.options() as CharSeriesOptions;
         this._data.options.color = options.color;
         this._data.options.size = options.size;
+        this._data.options.offset = options.offset;
 
         this._renderer.setData(this._data);
 

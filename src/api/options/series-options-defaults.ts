@@ -120,6 +120,7 @@ export const dualShapeSeriesStyleDefaults: DualShapeSeriesStyleOptions = {
 export const charSeriesStyleDefaults: CharSeriesStyleOptions = {
 	color: '#FF0000',
 	size: 12,
+	offset: 0,
 };
 
 export const charShapeSeriesStyleDefaults: CharShapeSeriesStyleOptions = {

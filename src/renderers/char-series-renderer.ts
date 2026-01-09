@@ -20,6 +20,7 @@ export interface CharSeriesRendererData {
     options: {
         color: string;
         size: number;
+        offset: number;
     };
 }
 
@@ -78,7 +79,9 @@ function drawChar(item: CharSeriesRendererDataItem, options: CharSeriesRendererD
     ctx.fillStyle = color;
     // Only draw the first character
     const firstChar = Array.from(char)[0];
-    ctx.fillText(firstChar, item.x, item.y);
+    // Apply offset: positive moves char up (smaller y), negative moves down (larger y)
+    const yPosition = item.y - options.offset as Coordinate;
+    ctx.fillText(firstChar, item.x, yPosition);
 }
 
 function hitTestChar(item: CharSeriesRendererDataItem, options: CharSeriesRendererData['options'], x: Coordinate, y: Coordinate): boolean {
@@ -87,8 +90,9 @@ function hitTestChar(item: CharSeriesRendererDataItem, options: CharSeriesRender
         return false;
     }
 
-    // Simple hit test assuming square box centered at x,y
+    // Apply offset to hit test area
+    const yPosition = item.y - options.offset;
     const halfSize = size / 2;
     return x >= item.x - halfSize && x <= item.x + halfSize &&
-        y >= item.y - halfSize && y <= item.y + halfSize;
+        y >= yPosition - halfSize && y <= yPosition + halfSize;
 }

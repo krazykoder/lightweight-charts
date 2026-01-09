@@ -177,6 +177,10 @@
                             Size (px)
                             <input type="number" id="sizeInput" value="20" min="5" step="1" />
                         </label>
+                        <label>
+                            Offset (px)
+                            <input type="number" id="offsetInput" value="0" min="-50" max="50" step="1" />
+                        </label>
                     </div>
 
                     <div class="control-group">
@@ -236,6 +240,27 @@ series.setData([
             <div class="chart-container" id="chart-container-custom"></div>
         </div>
 
+        <!-- Example 3: Offset Positioning -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Vertical Offset Positioning</h3>
+                <p>Use positive offset to position characters above the price point, negative to position below.</p>
+                <pre>
+const series = chart.addCharSeries({
+    size: 20,
+    color: '#333',
+    offset: 15, // Characters appear 15px above the price
+});
+series.setData([
+    { time: '2019-04-11', value: 80, char: '▲' },
+    { time: '2019-04-12', value: 82, char: '▼' },
+    { time: '2019-04-13', value: 85, char: '■' },
+]);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-offset"></div>
+        </div>
+
         <nav>
             <a href="index.html">Home</a>
         </nav>
@@ -263,6 +288,7 @@ series.setData([
             // Inputs
             const colorInput = document.getElementById('colorInput');
             const sizeInput = document.getElementById('sizeInput');
+            const offsetInput = document.getElementById('offsetInput');
             const randomizeInput = document.getElementById('randomizeInput');
             const regenerateBtn = document.getElementById('regenerateBtn');
 
@@ -272,6 +298,7 @@ series.setData([
                 charSeries = chart.addCharSeries({
                     color: colorInput.value,
                     size: parseInt(sizeInput.value, 10),
+                    offset: parseInt(offsetInput.value, 10),
                 });
                 updateData();
             }
@@ -330,6 +357,7 @@ series.setData([
             // Listeners
             colorInput.addEventListener('input', () => charSeries.applyOptions({ color: colorInput.value }));
             sizeInput.addEventListener('input', () => charSeries.applyOptions({ size: parseInt(sizeInput.value, 10) }));
+            offsetInput.addEventListener('input', () => charSeries.applyOptions({ offset: parseInt(offsetInput.value, 10) }));
             randomizeInput.addEventListener('change', updateData);
             regenerateBtn.addEventListener('click', updateData);
 
@@ -384,6 +412,56 @@ series.setData([
                 size: 15 + (i % 3) * 10,
             }));
             series.setData(seriesData);
+        })();
+
+        // --- Hardcoded Example 3: Offset Positioning ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-offset'), {
+                width: 600, height: 300,
+            });
+            const lineSeries = chart.addLineSeries({ color: 'rgba(0,0,0,0.1)' });
+            lineSeries.setData(data);
+
+            const seriesAbove = chart.addCharSeries({
+                color: '#4CAF50',
+                size: 20,
+                offset: 15, // 15px above
+            });
+
+            const seriesBelow = chart.addCharSeries({
+                color: '#f44336',
+                size: 20,
+                offset: -15, // 15px below
+            });
+
+            const seriesAligned = chart.addCharSeries({
+                color: '#2196F3',
+                size: 16,
+                offset: 0, // aligned with price
+            });
+
+            // Filter data to show different patterns
+            const aboveData = data.filter((d, i) => i % 9 === 0).map(d => ({
+                time: d.time,
+                value: d.value,
+                char: '▲'
+            }));
+
+            const belowData = data.filter((d, i) => i % 9 === 3).map(d => ({
+                time: d.time,
+                value: d.value,
+                char: '▼'
+            }));
+
+            const alignedData = data.filter((d, i) => i % 9 === 6).map(d => ({
+                time: d.time,
+                value: d.value,
+                char: '■'
+            }));
+
+            seriesAbove.setData(aboveData);
+            seriesBelow.setData(belowData);
+            seriesAligned.setData(alignedData);
         })();
 
     </script>
