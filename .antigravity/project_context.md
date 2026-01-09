@@ -67,6 +67,7 @@ The library is structured with a core model, renderers, and views.
 - **Known Details**:
     - Only the first unicode character is rendered (`Array.from(char)[0]`).
     - Position is determined by the data `value` (price).
+    - **Vertical Offset**: Added `offset` style option to position characters above (+) or below (-) the price point. Affects both rendering and hit testing.
 
 ## Feature: CharShapeSeries
 - **Description**: Hybid series type combining `ShapeSeries` positioning flexibility with `CharSeries` character markers.

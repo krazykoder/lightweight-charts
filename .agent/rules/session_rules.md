@@ -25,8 +25,8 @@ trigger: always_on
 
 ### 🔴 Session Wrap-up
 1. **Document plans and walkthrough**
-- Always save a copy of the final copy implementation plan to `./.antigravity/implementation_plan/` directory after implementaion of a feature or request 
-- Always save a copy of the final copy walkthrough to `./.antigravity/walkthrough/` directory after implementaion of a feature or request 
+- Always save a copy of the final copy implementation plan to `./.antigravity/implementation_plans/` directory after implementaion of a feature or request 
+- Always save a copy of the final copy walkthrough to `./.antigravity/walkthroughs/` directory after implementaion of a feature or request 
 
 2. **Internal-to-File Sync**:
     - **Archive**: Move completed items from the internal Task List to `./.antigravity/completed_tasks.md`.

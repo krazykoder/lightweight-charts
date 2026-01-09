@@ -142,3 +142,10 @@
 ## 2026-01-09 - Dynamic Data Unpacker
 - [x] Update `examples/unpack-all-data.py` to dynamically handle columns from `examples/data.json`.
 - [x] Verify script execution and output in `examples/app-data.js`.
+
+## 2026-01-09 - CharSeries Offset Option
+- [x] Implement `offset` style option for `CharSeries`.
+- [x] Update `CharSeriesRenderer` to apply vertical offset.
+- [x] Update `SeriesCharPaneView` to sync option.
+- [x] Enhance `char-series.html` with interactive playbook and examples.
+- [x] Verified build and visual correctness via browser.

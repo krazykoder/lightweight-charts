@@ -61,3 +61,16 @@
 
 **Next Steps:**
 - Await further user requests.
+
+## Session Log [2026-01-09 11:06:46]
+**Goal:** Implement vertical `offset` option for `CharSeries`.
+
+**Outcome:**
+- Successfully implemented `offset` option in `CharSeriesStyleOptions`.
+- Updated `CharSeriesRenderer` to shift characters vertically based on `offset`.
+- Updated `SeriesCharPaneView` to propagate the option.
+- Enhanced `examples/website/char-series.html` with an interactive offset control and multiple-series demonstration.
+- Verified build and visual consistency.
+
+**Next Steps:**
+- Await further user requests.
