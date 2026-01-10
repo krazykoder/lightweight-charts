@@ -21,6 +21,7 @@ trigger: always_on
 2. **Rehydrate**: Populate the current Antigravity Chat Task List/Artifacts using the data found in these workspace files to ensure continuity.
 
 ### 🔄 Active Tasking
+- Dont use browser automatically to verify feature. Ask user. If user denies request proceed to next step or wait for user to verify instead. 
 - As Antigravity's internal **Task List** updates, periodically update the workspace `./.antigravity/task.md` so the file reflects the UI state.
 
 ### 🔴 Session Wrap-up

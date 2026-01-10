@@ -149,3 +149,8 @@
 - [x] Update `SeriesCharPaneView` to sync option.
 - [x] Enhance `char-series.html` with interactive playbook and examples.
 - [x] Verified build and visual correctness via browser.
+
+## 2026-01-09 - Disable Pre-commit Verifications
+- [x] Disable `tsc-verify` in pre-commit hook script (`scripts/githooks/pre-commit/lint.js`).
+- [x] Disable all pre-commit verifications by adding an early `process.exit(0)` to the lint script.
+- [x] Verified that Git commits proceed without any automatic linting or checks.
