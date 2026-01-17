@@ -15,3 +15,8 @@
   - Randomization options
 - Uses app-data.js with random 300-point windows
 - All markers properly sorted in ascending time order
+
+### Price Scale Features (2026-01-10)
+- Implemented  as a playbook for dual scales, inversion, and margin controls.
+- Demonstrates how to separate series using  ("No Overlap" example).
+- Shows interactive assignment of series to left/right scales.

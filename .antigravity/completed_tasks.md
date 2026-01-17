@@ -154,3 +154,7 @@
 - [x] Disable `tsc-verify` in pre-commit hook script (`scripts/githooks/pre-commit/lint.js`).
 - [x] Disable all pre-commit verifications by adding an early `process.exit(0)` to the lint script.
 - [x] Verified that Git commits proceed without any automatic linting or checks.
+- [x] Refactor `price-scale.html` layout to match Playbook standard
+- [x] Implement Interactive Playbook for Price Scales (Dual Scales, Series Assignment)
+- [x] Implement Hardcoded Examples (Two Price Scales, Inverted Scale, No Overlap)
+- [x] Verify implementation

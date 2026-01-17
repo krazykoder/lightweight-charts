@@ -1,5 +1,10 @@
-# Task Breakdown - Disable All Pre-commit Verifications
+# Task Breakdown - Price Scale Examples
 
-- [x] Update implementation plan and get approval <!-- id: 0 -->
-- [x] Disable all checks in `scripts/githooks/pre-commit/lint.js` <!-- id: 1 -->
-- [x] Verify that Git commits proceed without any automatic linting or checks <!-- id: 2 -->
+- [x] Refactor `price-scale.html` layout to match Playbook standard <!-- id: 0 -->
+- [x] Implement Interactive Playbook for Price Scales <!-- id: 1 -->
+    - [x] Dual Scale Controls (Left/Right Visibility, Invert, Margins)
+    - [x] Series Assignment Controls (Assign series to Left/Right)
+- [x] Implement Hardcoded Examples <!-- id: 2 -->
+    - [x] Two Price Scales (Tutorial Example: Line + Candles)
+    - [x] Inverted Scale & Customization (Modernized existing example)
+- [x] Verify implementation <!-- id: 3 -->
