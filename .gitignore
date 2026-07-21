@@ -7,6 +7,13 @@ debug.html
 # python
 *.pyc
 
+# macOS
+.DS_Store
+
+# claude / agent tooling (local machine state; curated files stay tracked)
+.claude/settings.local*
+.claude/agent-memory/*
+
 # vscode, idea, sublime
 .idea/**
 .vscode/**
