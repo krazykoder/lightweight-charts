@@ -40,3 +40,4 @@ debug.html
 
 examples/website/dist/*.js
 
+.claude/agent-memory/*
