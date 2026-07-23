@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histogram Area Series Examples</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Histogram Area Series Examples</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="code-container">
+                <h3>Histogram Area Style</h3>
+                <pre>
+const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+    width: 600,
+    height: 300,
+});
+const histogramSeries = chart.addHistogramSeries({
+    // HistogramStyle.Area = 1
+    histogramStyle: 1, 
+});
+const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+const randomSlice1 = getRandomSlice();
+const histogramData = data.map(d => ({
+    time: d.time,
+    value: d.SQZ_Hist,
+    color: sqzColors[d.SQZ_HistC] || 'gray',
+})).slice(randomSlice1.start, randomSlice1.end);
+histogramSeries.setData(histogramData);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container1"></div>
+        </div>
+        <div class="container">
+            <div class="code-container">
+                <h3>Histogram Columns Style (Comparison)</h3>
+                <pre>
+const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+    width: 600,
+    height: 300,
+});
+const histogramSeries2 = chart2.addHistogramSeries({
+    // HistogramStyle.Columns = 0
+    histogramStyle: 0, 
+});
+// Using the same data as above
+histogramSeries2.setData(histogramData);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container2"></div>
+        </div>
+
+        <nav>
+            <a href="histogram-series.html">Prev</a>
+            <a href="index.html">Next</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        function getRandomSlice(maxDataLength = 500, minLength = 50, maxLength = 200) {
+            const start = Math.floor(Math.random() * (maxDataLength - minLength + 1));
+            const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
+            return { start, end };
+        }
+
+        // --- Chart 1: Area Style ---
+        const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
+            width: 600,
+            height: 300,
+        });
+
+        const histogramSeries = chart.addHistogramSeries({
+            // HistogramStyle.Area = 1
+            histogramStyle: 1,
+        });
+
+        const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+        const randomSlice1 = getRandomSlice();
+        const histogramData = data.map(d => ({
+            time: d.time,
+            value: d.SQZ_Hist,
+            color: sqzColors[d.SQZ_HistC] || 'gray',
+        })).slice(randomSlice1.start, randomSlice1.end);
+
+        histogramSeries.setData(histogramData);
+
+        // --- Chart 2: Columns Style (Comparison) ---
+        const chart2 = LightweightCharts.createChart(document.getElementById('chart-container2'), {
+            width: 600,
+            height: 300,
+        });
+
+        const histogramSeries2 = chart2.addHistogramSeries({
+            // HistogramStyle.Columns = 0
+            histogramStyle: 0,
+        });
+
+        // Use the same data slice for direct comparison
+        histogramSeries2.setData(histogramData);
+
+        // --- Synchronization ---
+
+        // Sync crosshairs
+        let isSyncingLeft = false;
+        let isSyncingRight = false;
+
+        chart.subscribeCrosshairMove(param => {
+            if (isSyncingRight) return;
+            isSyncingLeft = true;
+            if (param.point) {
+                chart2.moveCrosshair(param.point);
+            } else {
+                chart2.moveCrosshair(null);
+            }
+            isSyncingLeft = false;
+        });
+
+        chart2.subscribeCrosshairMove(param => {
+            if (isSyncingLeft) return;
+            isSyncingRight = true;
+            if (param.point) {
+                chart.moveCrosshair(param.point);
+            } else {
+                chart.moveCrosshair(null);
+            }
+            isSyncingRight = false;
+        });
+
+        // Sync time scales
+        chart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+            if (range) chart2.timeScale().setVisibleLogicalRange(range);
+        });
+        chart2.timeScale().subscribeVisibleLogicalRangeChange(range => {
+            if (range) chart.timeScale().setVisibleLogicalRange(range);
+        });
+    </script>
+</body>
+
+</html>

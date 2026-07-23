@@ -1,5 +1,6 @@
 import { PlotRow } from './plot-data';
 import { PlotList } from './plot-list';
+import { SeriesMarkerShape } from './series-markers';
 import { SeriesType } from './series-options';
 
 export interface LinePlotRow extends PlotRow {
@@ -20,6 +21,27 @@ export interface CandlestickPlotRow extends PlotRow {
 	readonly wickColor?: string;
 }
 
+export interface ShapeSeriesPlotRow extends PlotRow {
+	readonly color?: string;
+	readonly shape?: SeriesMarkerShape;
+	readonly size?: number;
+	readonly text?: string;
+	readonly hollowColor?: string;
+}
+
+export interface CharSeriesPlotRow extends PlotRow {
+	readonly color?: string;
+	readonly char?: string;
+	readonly size?: number;
+}
+
+export interface CharShapeSeriesPlotRow extends PlotRow {
+	readonly color?: string;
+	readonly char?: string;
+	readonly size?: number;
+	readonly text?: string;
+}
+
 export interface SeriesPlotRowTypeAtTypeMap {
 	Bar: BarPlotRow;
 	Candlestick: CandlestickPlotRow;
@@ -27,7 +49,12 @@ export interface SeriesPlotRowTypeAtTypeMap {
 	Baseline: PlotRow;
 	Line: LinePlotRow;
 	Histogram: HistogramPlotRow;
+	Shape: ShapeSeriesPlotRow;
+	DualShape: ShapeSeriesPlotRow;
+	Char: CharSeriesPlotRow;
+	CharShape: CharShapeSeriesPlotRow;
 }
+
 
 export type SeriesPlotRow<T extends SeriesType = SeriesType> = SeriesPlotRowTypeAtTypeMap[T];
 export type SeriesPlotList<T extends SeriesType = SeriesType> = PlotList<SeriesPlotRow<T>>;

@@ -10,6 +10,8 @@ export interface TimeAxisViewRendererData {
 	color: string;
 	background: string;
 	visible: boolean;
+	tickVisible?: boolean;
+	visibleAtEdge?: boolean;
 }
 
 const optimizationReplacementRe = /[1-9]/g;
@@ -46,12 +48,18 @@ export class TimeAxisViewRenderer implements ITimeAxisViewRenderer {
 		let coordinate = this._data.coordinate;
 		let x1 = Math.floor(coordinate - labelWidthHalf) + 0.5;
 
-		if (x1 < 0) {
-			coordinate = coordinate + Math.abs(0 - x1);
-			x1 = Math.floor(coordinate - labelWidthHalf) + 0.5;
-		} else if (x1 + labelWidth > timeScaleWidth) {
-			coordinate = coordinate - Math.abs(timeScaleWidth - (x1 + labelWidth));
-			x1 = Math.floor(coordinate - labelWidthHalf) + 0.5;
+		if (this._data.visibleAtEdge !== false) {
+			if (x1 < 0) {
+				coordinate = coordinate + Math.abs(0 - x1);
+				x1 = Math.floor(coordinate - labelWidthHalf) + 0.5;
+			} else if (x1 + labelWidth > timeScaleWidth) {
+				coordinate = coordinate - Math.abs(timeScaleWidth - (x1 + labelWidth));
+				x1 = Math.floor(coordinate - labelWidthHalf) + 0.5;
+			}
+		} else {
+			if (x1 + labelWidth < 0 || x1 > timeScaleWidth) {
+				return;
+			}
 		}
 
 		const x2 = x1 + labelWidth;

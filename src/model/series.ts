@@ -19,9 +19,14 @@ import { PanePriceAxisView } from '../views/pane/pane-price-axis-view';
 import { SeriesHorizontalBaseLinePaneView } from '../views/pane/series-horizontal-base-line-pane-view';
 import { SeriesLastPriceAnimationPaneView } from '../views/pane/series-last-price-animation-pane-view';
 import { SeriesMarkersPaneView } from '../views/pane/series-markers-pane-view';
+import { SeriesShapePaneView } from '../views/pane/shape-series-pane-view';
+import { SeriesDualShapePaneView } from '../views/pane/dual-shape-series-pane-view';
+import { SeriesCharPaneView } from '../views/pane/char-series-pane-view';
+import { SeriesCharShapePaneView } from '../views/pane/char-shape-series-pane-view';
 import { SeriesPriceLinePaneView } from '../views/pane/series-price-line-pane-view';
 import { IPriceAxisView } from '../views/price-axis/iprice-axis-view';
 import { SeriesPriceAxisView } from '../views/price-axis/series-price-axis-view';
+import { ITimeAxisView } from '../views/time-axis/itime-axis-view';
 
 import { AutoscaleInfoImpl } from './autoscale-info-impl';
 import { BarPrice, BarPrices } from './bar';
@@ -50,6 +55,8 @@ import {
 	SeriesType,
 } from './series-options';
 import { TimePoint, TimePointIndex } from './time-data';
+import { VerticalLine } from './vertical-line';
+import { VerticalLineOptions } from './vertical-line-options';
 
 export interface LastValueDataResultWithoutData {
 	noData: true;
@@ -83,6 +90,10 @@ export interface SeriesDataAtTypeMap {
 	Baseline: BarPrice;
 	Line: BarPrice;
 	Histogram: BarPrice;
+	Shape: BarPrice;
+	DualShape: BarPrice;
+	Char: BarPrice;
+	CharShape: BarPrice;
 }
 
 export interface SeriesUpdateInfo {
@@ -105,6 +116,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 	private _formatter!: IPriceFormatter;
 	private readonly _priceLineView: SeriesPriceLinePaneView = new SeriesPriceLinePaneView(this);
 	private readonly _customPriceLines: CustomPriceLine[] = [];
+	private readonly _customVerticalLines: VerticalLine[] = [];
 	private readonly _baseHorizontalLineView: SeriesHorizontalBaseLinePaneView = new SeriesHorizontalBaseLinePaneView(this);
 	private _paneView!: IUpdatablePaneView;
 	private readonly _lastPriceAnimationPaneView: SeriesLastPriceAnimationPaneView | null = null;
@@ -306,6 +318,25 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 		return this._customPriceLines;
 	}
 
+	public createVerticalLine(options: VerticalLineOptions): VerticalLine {
+		const result = new VerticalLine(this, options);
+		this._customVerticalLines.push(result);
+		this.model().updateSource(this);
+		return result;
+	}
+
+	public removeVerticalLine(line: VerticalLine): void {
+		const index = this._customVerticalLines.indexOf(line);
+		if (index !== -1) {
+			this._customVerticalLines.splice(index, 1);
+		}
+		this.model().updateSource(this);
+	}
+
+	public verticalLines(): VerticalLine[] {
+		return this._customVerticalLines;
+	}
+
 	public seriesType(): T {
 		return this._seriesType;
 	}
@@ -384,6 +415,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			res.push(...customPriceLine.paneViews());
 		}
 
+		for (const customVerticalLine of this._customVerticalLines) {
+			res.push(...customVerticalLine.paneViews());
+		}
+
 		res.push(
 			this._paneView,
 			this._priceLineView,
@@ -403,6 +438,14 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			result.push(customPriceLine.priceAxisView());
 		}
 		return result;
+	}
+
+	public override timeAxisViews(): readonly ITimeAxisView[] {
+		const res: ITimeAxisView[] = [];
+		for (const customVerticalLine of this._customVerticalLines) {
+			res.push(customVerticalLine.timeAxisView());
+		}
+		return res;
 	}
 
 	public autoscaleInfo(startTimePoint: TimePointIndex, endTimePoint: TimePointIndex): AutoscaleInfoImpl | null {
@@ -435,6 +478,10 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 		for (const customPriceLine of this._customPriceLines) {
 			customPriceLine.update();
+		}
+
+		for (const customVerticalLine of this._customVerticalLines) {
+			customVerticalLine.update();
 		}
 
 		this._priceLineView.update();
@@ -498,7 +545,7 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 			range = range !== null ? range.merge(rangeWithBase) : rangeWithBase;
 		}
 
-		return new AutoscaleInfoImpl(range,	this._markersPaneView.autoScaleMargins());
+		return new AutoscaleInfoImpl(range, this._markersPaneView.autoScaleMargins());
 	}
 
 	private _markerRadius(): number {
@@ -632,6 +679,26 @@ export class Series<T extends SeriesType = SeriesType> extends PriceDataSource i
 
 			case 'Histogram': {
 				this._paneView = new SeriesHistogramPaneView(this as Series<'Histogram'>, this.model());
+				break;
+			}
+
+			case 'Shape': {
+				this._paneView = new SeriesShapePaneView(this as Series<'Shape'>, this.model());
+				break;
+			}
+
+			case 'DualShape': {
+				this._paneView = new SeriesDualShapePaneView(this as Series<'DualShape'>, this.model());
+				break;
+			}
+
+			case 'Char': {
+				this._paneView = new SeriesCharPaneView(this as Series<'Char'>, this.model());
+				break;
+			}
+
+			case 'CharShape': {
+				this._paneView = new SeriesCharShapePaneView(this as Series<'CharShape'>, this.model());
 				break;
 			}
 

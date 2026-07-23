@@ -3,11 +3,16 @@ import {
 	BarStyleOptions,
 	BaselineStyleOptions,
 	CandlestickStyleOptions,
+	DualShapeSeriesStyleOptions,
+	HistogramStyle,
 	HistogramStyleOptions,
 	LastPriceAnimationMode,
 	LineStyleOptions,
 	PriceLineSource,
 	SeriesOptionsCommon,
+	ShapeSeriesStyleOptions,
+	CharSeriesStyleOptions,
+	CharShapeSeriesStyleOptions,
 } from '../../model/series-options';
 import { LineStyle, LineType } from '../../renderers/draw-line';
 
@@ -41,6 +46,7 @@ export const lineStyleDefaults: LineStyleOptions = {
 	crosshairMarkerBorderColor: '',
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
+	pointColorAreaAlpha: 0.5,
 };
 
 export const areaStyleDefaults: AreaStyleOptions = {
@@ -55,6 +61,7 @@ export const areaStyleDefaults: AreaStyleOptions = {
 	crosshairMarkerBorderColor: '',
 	crosshairMarkerBackgroundColor: '',
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
+	pointColorAreaAlpha: 0.5,
 };
 
 export const baselineStyleDefaults: BaselineStyleOptions = {
@@ -80,12 +87,47 @@ export const baselineStyleDefaults: BaselineStyleOptions = {
 	crosshairMarkerBackgroundColor: '',
 
 	lastPriceAnimation: LastPriceAnimationMode.Disabled,
+	pointColorAreaAlpha: 0.5,
 };
 
 export const histogramStyleDefaults: HistogramStyleOptions = {
 	color: '#26a69a',
 	base: 0,
+	histogramStyle: HistogramStyle.Columns,
 };
+
+export const shapeSeriesStyleDefaults: ShapeSeriesStyleOptions = {
+	color: '#26a69a',
+	size: 4,
+	position: 'top',
+	fixedValue: 0,
+	margin: 10,
+	level: 0,
+	levelSpacing: 5,
+	labelOffset: 2,
+	backgroundLineVisible: false,
+	backgroundLineColor: '#26a69a',
+	backgroundLineWidth: 1,
+};
+
+export const dualShapeSeriesStyleDefaults: DualShapeSeriesStyleOptions = {
+	...shapeSeriesStyleDefaults,
+	hollowColor: '#FF0000',
+	hollowShapeBorderWidth: 2,
+	hollowShapeSize: undefined,
+};
+
+export const charSeriesStyleDefaults: CharSeriesStyleOptions = {
+	color: '#FF0000',
+	size: 12,
+	offset: 0,
+};
+
+export const charShapeSeriesStyleDefaults: CharShapeSeriesStyleOptions = {
+	...shapeSeriesStyleDefaults,
+	size: 12,
+};
+
 
 export const seriesOptionsDefaults: SeriesOptionsCommon = {
 	title: '',

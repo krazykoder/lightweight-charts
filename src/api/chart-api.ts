@@ -19,6 +19,10 @@ import {
 	BaselineSeriesPartialOptions,
 	CandlestickSeriesOptions,
 	CandlestickSeriesPartialOptions,
+	DualShapeSeriesOptions,
+	DualShapeSeriesPartialOptions,
+	CharSeriesOptions,
+	CharSeriesPartialOptions,
 	fillUpDownCandlesticksColors,
 	HistogramSeriesOptions,
 	HistogramSeriesPartialOptions,
@@ -28,7 +32,12 @@ import {
 	PriceFormat,
 	PriceFormatBuiltIn,
 	SeriesType,
+	ShapeSeriesOptions,
+	ShapeSeriesPartialOptions,
+	CharShapeSeriesOptions,
+	CharShapeSeriesPartialOptions,
 } from '../model/series-options';
+
 
 import { CandlestickSeriesApi } from './candlestick-series-api';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap } from './data-consumer';
@@ -43,10 +52,15 @@ import {
 	barStyleDefaults,
 	baselineStyleDefaults,
 	candlestickStyleDefaults,
+	dualShapeSeriesStyleDefaults,
+	charSeriesStyleDefaults,
 	histogramStyleDefaults,
 	lineStyleDefaults,
 	seriesOptionsDefaults,
+	shapeSeriesStyleDefaults,
+	charShapeSeriesStyleDefaults,
 } from './options/series-options-defaults';
+
 import { PriceScaleApi } from './price-scale-api';
 import { migrateOptions, SeriesApi } from './series-api';
 import { TimeScaleApi } from './time-scale-api';
@@ -307,6 +321,35 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 		return res;
 	}
 
+	public addShapeSeries(options: ShapeSeriesPartialOptions = {}): ISeriesApi<'Shape'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), { lastValueVisible: false }, shapeSeriesStyleDefaults, options) as ShapeSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Shape', strictOptions);
+
+		const res = new SeriesApi<'Shape'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
+	}
+
+	public addDualShapeSeries(options: DualShapeSeriesPartialOptions = {}): ISeriesApi<'DualShape'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), { lastValueVisible: false }, dualShapeSeriesStyleDefaults, options) as DualShapeSeriesOptions;
+		const series = this._chartWidget.model().createSeries('DualShape', strictOptions);
+
+		// reuse SeriesApi<T>
+		const res = new SeriesApi<'DualShape'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
+	}
+
 	public removeSeries(seriesApi: SeriesApi<SeriesType>): void {
 		const series = ensureDefined(this._seriesMap.get(seriesApi));
 
@@ -337,8 +380,14 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	}
 
 	public moveCrosshair(point: Point | null): void {
-		if (!point) return;
 		const paneWidgets = this._chartWidget.paneWidgets();
+		if (!point) {
+			for (const paneWidget of paneWidgets) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				paneWidget.mouseLeaveEvent({} as any);
+			}
+			return;
+		}
 		const event = {
 			localX: point.x,
 			localY: point.y,
@@ -422,5 +471,33 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			customPriceLine: param.customPriceLine,
 			fromPriceString: param.fromPriceString,
 		};
+	}
+
+	public addCharSeries(options: CharSeriesPartialOptions = {}): ISeriesApi<'Char'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), { lastValueVisible: false }, charSeriesStyleDefaults, options) as CharSeriesOptions;
+		const series = this._chartWidget.model().createSeries('Char', strictOptions);
+
+		const res = new SeriesApi<'Char'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
+	}
+
+	public addCharShapeSeries(options: CharShapeSeriesPartialOptions = {}): ISeriesApi<'CharShape'> {
+		options = migrateOptions(options);
+		patchPriceFormat(options.priceFormat);
+
+		const strictOptions = merge(clone(seriesOptionsDefaults), { lastValueVisible: false }, charShapeSeriesStyleDefaults, options) as CharShapeSeriesOptions;
+		const series = this._chartWidget.model().createSeries('CharShape', strictOptions);
+
+		const res = new SeriesApi<'CharShape'>(series, this, this);
+		this._seriesMap.set(res, series);
+		this._seriesMapReversed.set(series, res);
+
+		return res;
 	}
 }

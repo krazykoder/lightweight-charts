@@ -13,6 +13,7 @@ import {
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
 	SeriesType,
+	ShapeSeriesPartialOptions,
 } from '../model/series-options';
 import { BusinessDay, UTCTimestamp } from '../model/time-data';
 
@@ -155,6 +156,18 @@ export interface IChartApi {
 	 * ```
 	 */
 	addLineSeries(lineOptions?: LineSeriesPartialOptions): ISeriesApi<'Line'>;
+
+	/**
+	 * Creates a shape series with specified parameters.
+	 *
+	 * @param shapeOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addShapeSeries();
+	 * ```
+	 */
+	addShapeSeries(shapeOptions?: ShapeSeriesPartialOptions): ISeriesApi<'Shape'>;
 
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.

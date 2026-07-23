@@ -10,10 +10,12 @@ import {
 	SeriesType,
 } from '../model/series-options';
 import { Range } from '../model/time-data';
+import { VerticalLineOptions } from '../model/vertical-line-options';
 
 import { SeriesDataItemTypeMap, Time } from './data-consumer';
 import { IPriceLine } from './iprice-line';
 import { IPriceScaleApi } from './iprice-scale-api';
+import { IVerticalLine } from './ivertical-line';
 
 /**
  * Represents a range of bars and the number of bars outside the range.
@@ -229,6 +231,20 @@ export interface ISeriesApi<TSeriesType extends SeriesType> {
 	 * ```
 	 */
 	removePriceLine(line: IPriceLine): void;
+
+	/**
+	 * Creates a new vertical line
+	 *
+	 * @param options - Any subset of options.
+	 */
+	createVerticalLine(options: VerticalLineOptions): IVerticalLine;
+
+	/**
+	 * Removes the vertical line that was created before.
+	 *
+	 * @param line - A line to remove.
+	 */
+	removeVerticalLine(line: IVerticalLine): void;
 
 	/**
 	 * Return current series type.

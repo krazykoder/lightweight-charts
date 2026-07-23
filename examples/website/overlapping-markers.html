@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlapping Markers Playbook</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.development.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Overlapping Markers Playbook</h1>
+    </header>
+    <main>
+        <style>
+            :root {
+                --primary-color: #2962FF;
+                --bg-color: #f8f9fa;
+                --surface-color: #ffffff;
+                --text-color: #333333;
+                --border-radius: 8px;
+                --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+            body {
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .playbook-grid {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                gap: 24px;
+                align-items: start;
+            }
+
+            .controls-panel {
+                background: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .chart-wrapper {
+                background: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                min-height: 500px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chart-container {
+                flex: 1;
+                width: 100%;
+                height: 100%;
+            }
+
+            h3 {
+                margin-top: 0;
+                margin-bottom: 16px;
+                font-size: 1.25rem;
+                color: #111;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .control-group:last-child {
+                border-bottom: none;
+            }
+
+            .control-group-title {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #666;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            label {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.9rem;
+            }
+
+            input[type="number"],
+            input[type="range"],
+            select {
+                padding: 6px 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 0.9rem;
+                width: 120px;
+            }
+
+            input[type="range"] {
+                width: 120px;
+            }
+
+            input[type="color"] {
+                border: none;
+                width: 40px;
+                height: 30px;
+                padding: 0;
+                background: none;
+                cursor: pointer;
+            }
+
+            button {
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 10px 16px;
+                border-radius: 6px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s;
+                width: 100%;
+            }
+
+            button:hover {
+                background-color: #1e4bd1;
+            }
+
+            .checkbox-row {
+                justify-content: flex-start;
+                gap: 10px;
+                cursor: pointer;
+            }
+
+            #chart-container-playbook {
+                border: 1px solid #f0f0f0;
+                border-radius: 4px;
+            }
+
+            .note {
+                background: #fff3cd;
+                border: 1px solid #ffc107;
+                border-radius: 4px;
+                padding: 12px;
+                margin-bottom: 20px;
+                color: #856404;
+                font-size: 0.9rem;
+            }
+
+            .note strong {
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            /* Hardcoded examples styling */
+            .code-container {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .code-container h3 {
+                margin-top: 0;
+                margin-bottom: 8px;
+                font-size: 1.1rem;
+                font-weight: 600;
+            }
+
+            .code-container p {
+                margin: 0 0 12px 0;
+                color: #666;
+                font-size: 0.9rem;
+            }
+
+            .code-container pre {
+                background: #f5f7fa;
+                padding: 16px;
+                border-radius: 6px;
+                overflow-x: auto;
+                font-size: 0.85rem;
+                line-height: 1.5;
+                margin: 0;
+            }
+
+            hr {
+                border: none;
+                border-top: 2px solid #e0e0e0;
+                margin: 40px 0;
+            }
+
+            @media (max-width: 900px) {
+                .playbook-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .chart-wrapper {
+                    min-height: 400px;
+                }
+
+                .container {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+        <div class="note">
+            <strong>📝 Experimental Demo</strong>
+            This demo explores how multiple markers interact when placed at the same time point.
+            Based on <a href="https://github.com/tradingview/lightweight-charts/issues/1459#issuecomment-1807246333"
+                target="_blank">GitHub Issue #1459</a>.
+        </div>
+        <!-- Interactive Playbook Section -->
+        <div class="container">
+            <!-- <h3>Interactive Playbook</h3> -->
+            <div class="playbook-grid">
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <div class="control-group-title">Marker Configuration</div>
+                        <label>
+                            Shape
+                            <select id="markerShape">
+                                <option value="circle">Circle</option>
+                                <option value="square">Square</option>
+                                <option value="arrowUp">Arrow Up</option>
+                                <option value="arrowDown">Arrow Down</option>
+                            </select>
+                        </label>
+                        <label>
+                            Position
+                            <select id="markerPosition">
+                                <option value="belowBar">Below Bar</option>
+                                <option value="aboveBar">Above Bar</option>
+                            </select>
+                        </label>
+                        <label>
+                            Color
+                            <input type="color" id="markerColor" value="#2196F3" />
+                        </label>
+                        <label>
+                            Size
+                            <input type="number" id="markerSize" value="1" min="0.5" max="3" step="0.1" />
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Overlap Settings</div>
+                        <label>
+                            Markers Per Point
+                            <input type="number" id="markersPerPoint" value="2" min="1" max="5" step="1" />
+                        </label>
+                        <label>
+                            Overlap Frequency
+                            <span id="overlapFreqValue">20%</span>
+                        </label>
+                        <input type="range" id="overlapFreq" value="20" min="5" max="50" step="5"
+                            style="width: 100%;" />
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Data Generation</div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="randomizeMarkers" checked />
+                            <span>Randomize Markers</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="mixedPositions" />
+                            <span>Mixed Positions</span>
+                        </label>
+                        <button id="regenerateBtn">Regenerate Data</button>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <h3>Preview</h3>
+                    <div id="chart-container-playbook" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Hardcoded Examples Section -->
+        <div class="container">
+            <h2 style="margin-bottom: 20px;">Hardcoded Examples</h2>
+
+            <!-- Example 1: Basic Overlapping Markers -->
+            <div class="container">
+                <div class="code-container">
+                    <h3>Basic Overlapping Markers</h3>
+                    <p>Multiple markers at the same time with different shapes and colors.</p>
+                    <pre>
+const series = chart.addCandlestickSeries();
+series.setData(klines);
+
+const markers = [
+  { time: 1684285200, position: 'belowBar', 
+    color: 'rgba(213, 0, 0, 1)', shape: 'circle' },
+  { time: 1684285200, position: 'belowBar', 
+    color: 'rgba(25, 118, 210, 1)', shape: 'arrowUp' },
+  { time: 1684292400, position: 'aboveBar', 
+    color: 'rgba(25, 118, 210, 1)', shape: 'circle' },
+  { time: 1684292400, position: 'aboveBar', 
+    color: 'rgba(213, 0, 0, 1)', shape: 'arrowDown' }
+];
+series.setMarkers(markers.sort((a, b) => a.time - b.time));
+                    </pre>
+                </div>
+                <div class="chart-container" id="chart1"></div>
+            </div>
+
+            <!-- Example 2: Same Position Overlap -->
+            <div class="container">
+                <div class="code-container">
+                    <h3>Same Position Overlap (Above Bar)</h3>
+                    <p>Two markers at the same time, both positioned above the bar.</p>
+                    <pre>
+const markers = [
+  { time: 1684285200, position: 'aboveBar', 
+    color: 'rgba(25, 118, 210, 1)', shape: 'circle' },
+  { time: 1684285200, position: 'aboveBar', 
+    color: 'rgba(213, 0, 0, 1)', shape: 'arrowDown' }
+];
+series.setMarkers(markers.sort((a, b) => a.time - b.time));
+                    </pre>
+                </div>
+                <div class="chart-container" id="chart2"></div>
+            </div>
+
+            <!-- Example 3: Same Position Overlap Below -->
+            <div class="container">
+                <div class="code-container">
+                    <h3>Same Position Overlap (Below Bar)</h3>
+                    <p>Multiple markers below the bar with varying opacity.</p>
+                    <pre>
+const markers = [
+  { time: 1684350000, position: 'belowBar', 
+    color: 'rgba(213, 0, 0, 0.5)', shape: 'circle' },
+  { time: 1684350000, position: 'belowBar', 
+    color: 'rgba(25, 118, 210, 0.5)', shape: 'arrowUp' },
+  { time: 1684342800, position: 'belowBar', 
+    color: 'rgba(0, 0, 0, 0.7)', shape: 'circle' },
+  { time: 1684342800, position: 'belowBar', 
+    color: 'rgba(0, 0, 0, 0.7)', shape: 'arrowUp' }
+];
+series.setMarkers(markers.sort((a, b) => a.time - b.time));
+                    </pre>
+                </div>
+                <div class="chart-container" id="chart3"></div>
+            </div>
+
+            <!-- Example 4: Mixed Positions -->
+            <div class="container">
+                <div class="code-container">
+                    <h3>Mixed Above and Below</h3>
+                    <p>Same time point with markers both above and below the bar.</p>
+                    <pre>
+const markers = [
+  { time: 1684285200, position: 'aboveBar', 
+    color: 'rgba(213, 0, 0, 1)', shape: 'arrowDown' },
+  { time: 1684285200, position: 'belowBar', 
+    color: 'rgba(25, 118, 210, 1)', shape: 'arrowUp' }
+];
+series.setMarkers(markers.sort((a, b) => a.time - b.time));
+                    </pre>
+                </div>
+                <div class="chart-container" id="chart4"></div>
+            </div>
+
+            <!-- Example 5: Heavy Overlap Scenario -->
+            <div class="container">
+                <div class="code-container">
+                    <h3>Heavy Overlap Scenario</h3>
+                    <p>Stress test with multiple overlapping markers at several time points.</p>
+                    <pre>
+const markers = [
+  // First overlap cluster (3 markers)
+  { time: 1684281600, position: 'aboveBar', 
+    color: 'rgba(213, 0, 0, 1)', shape: 'arrowDown' },
+  { time: 1684281600, position: 'aboveBar', 
+    color: 'rgba(25, 118, 210, 1)', shape: 'circle' },
+  { time: 1684281600, position: 'aboveBar', 
+    color: 'rgba(76, 175, 80, 1)', shape: 'square' },
+  
+  // Second overlap cluster (3 markers)
+  { time: 1684285200, position: 'belowBar', 
+    color: 'rgba(213, 0, 0, 1)', shape: 'circle' },
+  // ...
+];
+series.setMarkers(markers.sort((a, b) => a.time - b.time));
+                    </pre>
+                </div>
+                <div class="chart-container" id="chart5"></div>
+            </div>
+        </div>
+
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </main>
+
+    <script src="../app-data.js"></script>
+    <script>
+        // === INTERACTIVE PLAYBOOK ===
+        (function () {
+            const chartContainer = document.getElementById('chart-container-playbook');
+            const chart = LightweightCharts.createChart(chartContainer, {
+                layout: { background: { type: 'solid', color: '#ffffff' }, textColor: '#333' },
+                grid: { vertLines: { color: '#f0f3fa' }, horzLines: { color: '#f0f3fa' } },
+            });
+
+            let candlestickSeries = chart.addCandlestickSeries();
+
+            // Controls
+            const markerShape = document.getElementById('markerShape');
+            const markerPosition = document.getElementById('markerPosition');
+            const markerColor = document.getElementById('markerColor');
+            const markerSize = document.getElementById('markerSize');
+            const markersPerPoint = document.getElementById('markersPerPoint');
+            const overlapFreq = document.getElementById('overlapFreq');
+            const overlapFreqValue = document.getElementById('overlapFreqValue');
+            const randomizeMarkers = document.getElementById('randomizeMarkers');
+            const mixedPositions = document.getElementById('mixedPositions');
+            const regenerateBtn = document.getElementById('regenerateBtn');
+
+            // Update overlap frequency display
+            overlapFreq.addEventListener('input', () => {
+                overlapFreqValue.textContent = overlapFreq.value + '%';
+            });
+
+            // Generate random candlestick data
+            function generateCandlestickData(numBars = 50) {
+                const basePrice = 1800;
+                const candlesticks = [];
+                let currentTime = Math.floor(Date.now() / 1000) - (numBars * 3600);
+                let lastClose = basePrice;
+
+                for (let i = 0; i < numBars; i++) {
+                    const open = lastClose + (Math.random() - 0.5) * 10;
+                    const close = open + (Math.random() - 0.5) * 20;
+                    const high = Math.max(open, close) + Math.random() * 10;
+                    const low = Math.min(open, close) - Math.random() * 10;
+
+                    candlesticks.push({
+                        time: currentTime,
+                        open: open,
+                        high: high,
+                        low: low,
+                        close: close
+                    });
+
+                    lastClose = close;
+                    currentTime += 3600;
+                }
+
+                return candlesticks;
+            }
+
+            // Generate markers with overlap scenarios
+            function generateMarkers(candleData) {
+                const markers = [];
+                const shapes = ['circle', 'square', 'arrowUp', 'arrowDown'];
+                const colors = ['#E91E63', '#2196F3', '#4CAF50', '#FF9800', '#9C27B0'];
+                const positions = ['aboveBar', 'belowBar'];
+
+                const isRandom = randomizeMarkers.checked;
+                const isMixed = mixedPositions.checked;
+                const numMarkersPerPoint = parseInt(markersPerPoint.value, 10);
+                const overlapChance = parseInt(overlapFreq.value, 10) / 100;
+
+                for (let i = 0; i < candleData.length; i++) {
+                    // Determine if this point should have markers
+                    if (Math.random() > 0.7) { // 30% chance of markers
+                        const shouldOverlap = Math.random() < overlapChance;
+                        const numMarkers = shouldOverlap ? numMarkersPerPoint : 1;
+
+                        for (let j = 0; j < numMarkers; j++) {
+                            const marker = {
+                                time: candleData[i].time,
+                                position: isRandom && isMixed
+                                    ? positions[Math.floor(Math.random() * positions.length)]
+                                    : markerPosition.value,
+                                shape: isRandom
+                                    ? shapes[Math.floor(Math.random() * shapes.length)]
+                                    : markerShape.value,
+                                color: isRandom
+                                    ? colors[Math.floor(Math.random() * colors.length)]
+                                    : markerColor.value,
+                                size: parseFloat(markerSize.value)
+                            };
+                            markers.push(marker);
+                        }
+                    }
+                }
+
+                return markers.sort((a, b) => a.time - b.time);
+            }
+
+            // Update chart
+            function updateChart() {
+                const candleData = generateCandlestickData(50);
+                candlestickSeries.setData(candleData);
+
+                const markers = generateMarkers(candleData);
+                candlestickSeries.setMarkers(markers);
+
+                chart.timeScale().fitContent();
+            }
+
+            // Event listeners
+            markerShape.addEventListener('change', updateChart);
+            markerPosition.addEventListener('change', updateChart);
+            markerColor.addEventListener('input', updateChart);
+            markerSize.addEventListener('input', updateChart);
+            markersPerPoint.addEventListener('input', updateChart);
+            overlapFreq.addEventListener('input', updateChart);
+            randomizeMarkers.addEventListener('change', updateChart);
+            mixedPositions.addEventListener('change', updateChart);
+            regenerateBtn.addEventListener('click', updateChart);
+
+            // Initial render
+            updateChart();
+        })();
+
+        // === HARDCODED EXAMPLES ===
+
+        // Sample klines data
+        const klines = [
+            { close: 1815.74, high: 1817.67, low: 1809.5, open: 1813.09, time: 1684245600, volume: 138076.411 },
+            { close: 1819.37, high: 1822.48, low: 1815.62, open: 1815.74, time: 1684249200, volume: 95175.669 },
+            { close: 1823.12, high: 1829.99, low: 1816.91, open: 1819.38, time: 1684252800, volume: 140238.405 },
+            { close: 1826.39, high: 1828.23, low: 1815.01, open: 1823.12, time: 1684256400, volume: 147819.345 },
+            { close: 1824.76, high: 1832.93, low: 1821.86, open: 1826.39, time: 1684260000, volume: 108458.465 },
+            { close: 1815.74, high: 1826.42, low: 1813.13, open: 1824.76, time: 1684263600, volume: 102192.812 },
+            { close: 1820.4, high: 1823.06, low: 1813.89, open: 1815.74, time: 1684267200, volume: 63578.691 },
+            { close: 1825.35, high: 1828.77, low: 1817.77, open: 1820.4, time: 1684270800, volume: 63680.774 },
+            { close: 1822.77, high: 1827.41, low: 1822.07, open: 1825.35, time: 1684274400, volume: 46862.88 },
+            { close: 1823.53, high: 1825.65, low: 1818.57, open: 1822.77, time: 1684278000, volume: 45974.615 },
+            { close: 1824.69, high: 1827.1, low: 1816.88, open: 1823.52, time: 1684281600, volume: 103225.358 },
+            { close: 1830.51, high: 1837.85, low: 1822.62, open: 1824.69, time: 1684285200, volume: 128343.912 },
+            { close: 1822.31, high: 1831.02, low: 1822.1, open: 1830.51, time: 1684288800, volume: 76779.215 },
+            { close: 1822.8, high: 1825.81, low: 1821.31, open: 1822.3, time: 1684292400, volume: 52905.335 },
+            { close: 1823.12, high: 1825.48, low: 1821.9, open: 1822.8, time: 1684296000, volume: 35563.201 },
+            { close: 1817.99, high: 1823.13, low: 1817.41, open: 1823.12, time: 1684299600, volume: 67959.395 },
+            { close: 1817.48, high: 1818.57, low: 1813.69, open: 1817.99, time: 1684303200, volume: 79608.245 },
+            { close: 1806.76, high: 1820.7, low: 1801.13, open: 1817.47, time: 1684306800, volume: 198775.622 },
+            { close: 1805.49, high: 1808, low: 1801.14, open: 1806.76, time: 1684310400, volume: 162307.159 },
+            { close: 1806.12, high: 1807.66, low: 1800.3, open: 1805.48, time: 1684314000, volume: 84880.968 },
+            { close: 1805, high: 1807, low: 1802.51, open: 1806.12, time: 1684317600, volume: 66017.512 },
+            { close: 1789.41, high: 1805, low: 1787, open: 1804.99, time: 1684321200, volume: 286295.214 },
+            { close: 1793.64, high: 1797, low: 1787.58, open: 1789.41, time: 1684324800, volume: 148906.691 },
+            { close: 1789.74, high: 1799.3, low: 1787.78, open: 1793.63, time: 1684328400, volume: 139168.217 },
+            { close: 1797.08, high: 1799.66, low: 1781, open: 1789.74, time: 1684332000, volume: 241546.369 },
+            { close: 1796.38, high: 1799.5, low: 1791.6, open: 1797.07, time: 1684335600, volume: 96383.26 },
+            { close: 1803.4, high: 1805.7, low: 1793.65, open: 1796.37, time: 1684339200, volume: 153369.48 },
+            { close: 1815.12, high: 1821.99, low: 1799.42, open: 1803.39, time: 1684342800, volume: 249929.471 },
+            { close: 1817.43, high: 1824.59, low: 1815.13, open: 1815.13, time: 1684346400, volume: 186191.271 },
+            { close: 1827.3, high: 1833.88, low: 1817.43, open: 1817.44, time: 1684350000, volume: 247288.977 },
+            { close: 1825.63, high: 1834.79, low: 1822.15, open: 1827.29, time: 1684353600, volume: 126469.53 },
+            { close: 1822.83, high: 1829.2, low: 1821, open: 1825.64, time: 1684357200, volume: 74046.489 },
+            { close: 1819.45, high: 1825.28, low: 1818.56, open: 1822.83, time: 1684360800, volume: 82176.814 },
+            { close: 1821.65, high: 1823.5, low: 1819.38, open: 1819.45, time: 1684364400, volume: 70089.502 },
+            { close: 1819.99, high: 1824.01, low: 1817.01, open: 1821.65, time: 1684368000, volume: 81592.205 }
+        ];
+
+        // Example 1: Basic overlapping markers
+        (function () {
+            const chart1 = LightweightCharts.createChart(document.getElementById('chart1'), {
+                layout: { background: { color: '#FFFFFF' }, textColor: '#333' },
+                grid: { vertLines: { color: '#f0f0f0' }, horzLines: { color: '#f0f0f0' } }
+            });
+            const series1 = chart1.addCandlestickSeries();
+            series1.setData(klines);
+            const markers1 = [
+                { time: 1684285200, position: 'belowBar', color: 'rgba(213, 0, 0, 1)', shape: 'circle' },
+                { time: 1684285200, position: 'belowBar', color: 'rgba(25, 118, 210, 1)', shape: 'arrowUp' },
+                { time: 1684292400, position: 'aboveBar', color: 'rgba(25, 118, 210, 1)', shape: 'circle' },
+                { time: 1684292400, position: 'aboveBar', color: 'rgba(213, 0, 0, 1)', shape: 'arrowDown' }
+            ];
+            series1.setMarkers(markers1.sort((a, b) => a.time - b.time));
+            chart1.timeScale().fitContent();
+        })();
+
+        // Example 2: Same position (above)
+        (function () {
+            const chart2 = LightweightCharts.createChart(document.getElementById('chart2'), {
+                layout: { background: { color: '#FFFFFF' }, textColor: '#333' },
+                grid: { vertLines: { color: '#f0f0f0' }, horzLines: { color: '#f0f0f0' } }
+            });
+            const series2 = chart2.addCandlestickSeries();
+            series2.setData(klines);
+            const markers2 = [
+                { time: 1684285200, position: 'aboveBar', color: 'rgba(25, 118, 210, 1)', shape: 'circle' },
+                { time: 1684285200, position: 'aboveBar', color: 'rgba(213, 0, 0, 1)', shape: 'arrowDown' }
+            ];
+            series2.setMarkers(markers2.sort((a, b) => a.time - b.time));
+            chart2.timeScale().fitContent();
+        })();
+
+        // Example 3: Same position (below) with transparency
+        (function () {
+            const chart3 = LightweightCharts.createChart(document.getElementById('chart3'), {
+                layout: { background: { color: '#FFFFFF' }, textColor: '#333' },
+                grid: { vertLines: { color: '#f0f0f0' }, horzLines: { color: '#f0f0f0' } }
+            });
+            const series3 = chart3.addCandlestickSeries();
+            series3.setData(klines);
+            const markers3 = [
+                { time: 1684350000, position: 'belowBar', color: 'rgba(213, 0, 0, 0.5)', shape: 'circle' },
+                { time: 1684350000, position: 'belowBar', color: 'rgba(25, 118, 210, 0.5)', shape: 'arrowUp' },
+                { time: 1684342800, position: 'belowBar', color: 'rgba(0, 0, 0, 0.7)', shape: 'circle' },
+                { time: 1684342800, position: 'belowBar', color: 'rgba(0, 0, 0, 0.7)', shape: 'arrowUp' }
+            ];
+            series3.setMarkers(markers3.sort((a, b) => a.time - b.time));
+            chart3.timeScale().fitContent();
+        })();
+
+        // Example 4: Mixed positions
+        (function () {
+            const chart4 = LightweightCharts.createChart(document.getElementById('chart4'), {
+                layout: { background: { color: '#FFFFFF' }, textColor: '#333' },
+                grid: { vertLines: { color: '#f0f0f0' }, horzLines: { color: '#f0f0f0' } }
+            });
+            const series4 = chart4.addCandlestickSeries();
+            series4.setData(klines);
+            const markers4 = [
+                { time: 1684285200, position: 'aboveBar', color: 'rgba(213, 0, 0, 1)', shape: 'arrowDown' },
+                { time: 1684285200, position: 'belowBar', color: 'rgba(25, 118, 210, 1)', shape: 'arrowUp' }
+            ];
+            series4.setMarkers(markers4.sort((a, b) => a.time - b.time));
+            chart4.timeScale().fitContent();
+        })();
+
+        // Example 5: Heavy overlap
+        (function () {
+            const chart5 = LightweightCharts.createChart(document.getElementById('chart5'), {
+                layout: { background: { color: '#FFFFFF' }, textColor: '#333' },
+                grid: { vertLines: { color: '#f0f0f0' }, horzLines: { color: '#f0f0f0' } }
+            });
+            const series5 = chart5.addCandlestickSeries();
+            series5.setData(klines);
+            const markers5 = [
+                // First overlap cluster
+                { time: 1684281600, position: 'aboveBar', color: 'rgba(213, 0, 0, 1)', shape: 'arrowDown' },
+                { time: 1684281600, position: 'aboveBar', color: 'rgba(25, 118, 210, 1)', shape: 'circle' },
+                { time: 1684281600, position: 'aboveBar', color: 'rgba(76, 175, 80, 1)', shape: 'square' },
+
+                // Second overlap cluster
+                { time: 1684285200, position: 'belowBar', color: 'rgba(213, 0, 0, 1)', shape: 'circle' },
+                { time: 1684285200, position: 'belowBar', color: 'rgba(25, 118, 210, 1)', shape: 'arrowUp' },
+                { time: 1684285200, position: 'belowBar', color: 'rgba(255, 152, 0, 1)', shape: 'square' },
+
+                // Third overlap cluster
+                { time: 1684292400, position: 'aboveBar', color: 'rgba(25, 118, 210, 1)', shape: 'circle' },
+                { time: 1684292400, position: 'aboveBar', color: 'rgba(213, 0, 0, 1)', shape: 'arrowDown' },
+                { time: 1684292400, position: 'aboveBar', color: 'rgba(156, 39, 176, 1)', shape: 'square' },
+
+                // Fourth overlap cluster
+                { time: 1684342800, position: 'belowBar', color: '#000000', shape: 'circle' },
+                { time: 1684342800, position: 'belowBar', color: '#000000', shape: 'arrowUp' },
+
+                // Fifth overlap cluster with transparency
+                { time: 1684350000, position: 'belowBar', color: 'rgba(213, 0, 0, 0.5)', shape: 'circle' },
+                { time: 1684350000, position: 'belowBar', color: 'rgba(25, 118, 210, 0.5)', shape: 'arrowUp' }
+            ];
+            series5.setMarkers(markers5.sort((a, b) => a.time - b.time));
+            chart5.timeScale().fitContent();
+        })();
+    </script>
+</body>
+
+</html>

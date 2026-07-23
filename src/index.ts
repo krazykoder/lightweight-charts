@@ -6,6 +6,7 @@ export { TrackingModeExitMode } from './model/chart-model';
 export { CrosshairMode } from './model/crosshair';
 export { PriceScaleMode } from './model/price-scale';
 export { PriceLineSource, LastPriceAnimationMode, LasPriceAnimationMode } from './model/series-options';
+export { VerticalLineOptions } from './model/vertical-line-options';
 export { TickMarkType } from './model/time-scale';
 export { ColorType } from './model/layout-options';
 export { PriceFormatter } from './formatters/price-formatter';

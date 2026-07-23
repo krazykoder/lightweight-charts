@@ -1,9 +1,11 @@
 import { PricedValue } from '../model/price-scale';
 import { SeriesItemsIndexesRange, TimedValue } from '../model/time-data';
 
+import { applyAlpha } from '../helpers/color';
 import { LinePoint, LineStyle, LineType, LineWidth, setLineStyle } from './draw-line';
 import { ScaledRenderer } from './scaled-renderer';
 import { walkLine } from './walk-line';
+import { drawPlus } from './series-markers-plus';
 
 export type LineItem = TimedValue & PricedValue & LinePoint & { color?: string };
 
@@ -18,6 +20,10 @@ export interface PaneRendererLineDataBase {
 	lineStyle: LineStyle;
 
 	visibleRange: SeriesItemsIndexesRange | null;
+
+	baseLevelCoordinate?: number;
+
+	pointColorAreaAlpha?: number;
 }
 
 export abstract class PaneRendererLineBase<TData extends PaneRendererLineDataBase> extends ScaledRenderer {
@@ -104,13 +110,16 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 				const prevItem = items[i - 1];
 				const currentStrokeStyle = currItem.color ?? lineColor;
 
-				ctx.lineTo(currItem.x, prevItem.y);
+				const midX = (prevItem.x + currItem.x) / 2;
+
+				ctx.lineTo(midX, prevItem.y);
 
 				if (currentStrokeStyle !== prevStrokeStyle) {
 					changeColor(currentStrokeStyle);
-					ctx.moveTo(currItem.x, prevItem.y);
+					ctx.moveTo(midX, prevItem.y);
 				}
 
+				ctx.lineTo(midX, currItem.y);
 				ctx.lineTo(currItem.x, currItem.y);
 			}
 		} else if (lineType === LineType.WithGaps) {
@@ -138,6 +147,323 @@ export class PaneRendererLine extends PaneRendererLineBase<PaneRendererLineData>
 
 				ctx.lineTo(currItem.x, currItem.y);
 			}
+		} else if (lineType === LineType.Circle) {
+			for (; i < visibleRange.to; i++) {
+				const item = items[i];
+				const itemColor = item.color ?? lineColor;
+
+				if (itemColor !== prevStrokeStyle) {
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = itemColor;
+					ctx.fillStyle = itemColor;
+					prevStrokeStyle = itemColor;
+				}
+
+				ctx.moveTo(item.x + ctx.lineWidth / 2, item.y);
+				ctx.arc(item.x, item.y, ctx.lineWidth / 2, 0, 2 * Math.PI);
+			}
+		} else if (lineType === LineType.Cross) {
+			for (; i < visibleRange.to; i++) {
+				const item = items[i];
+				const itemColor = item.color ?? lineColor;
+
+				if (itemColor !== prevStrokeStyle) {
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = itemColor;
+					prevStrokeStyle = itemColor;
+				}
+
+				const size = ctx.lineWidth * 2; // Making cross slightly bigger for visibility
+				const halfSize = size / 2;
+
+				ctx.moveTo(item.x - halfSize, item.y - halfSize);
+				ctx.lineTo(item.x + halfSize, item.y + halfSize);
+				ctx.moveTo(item.x - halfSize, item.y + halfSize);
+				ctx.lineTo(item.x + halfSize, item.y - halfSize);
+			}
+		} else if (lineType === LineType.Area) {
+			const baseLevel = data.baseLevelCoordinate ?? ctx.canvas.height;
+			const alpha = data.pointColorAreaAlpha ?? 0.5;
+
+			// Fill First
+			for (; i < visibleRange.to; i++) {
+				const currItem = items[i];
+				const prevItem = items[i - 1];
+				const currentStrokeStyle = currItem.color ?? lineColor;
+
+				ctx.beginPath();
+				ctx.fillStyle = applyAlpha(currentStrokeStyle, alpha);
+				ctx.moveTo(prevItem.x, prevItem.y);
+				ctx.lineTo(currItem.x, currItem.y);
+				ctx.lineTo(currItem.x, baseLevel);
+				ctx.lineTo(prevItem.x, baseLevel);
+				ctx.closePath();
+				ctx.fill();
+			}
+
+			// Stroke Second
+			i = visibleRange.from + 1;
+			let prevStrokeStyle = items[visibleRange.from].color ?? lineColor;
+			ctx.beginPath();
+			ctx.strokeStyle = prevStrokeStyle;
+			ctx.moveTo(items[visibleRange.from].x, items[visibleRange.from].y);
+
+			for (; i < visibleRange.to; i++) {
+				const currItem = items[i];
+				const currentStrokeStyle = currItem.color ?? lineColor;
+
+				if (currentStrokeStyle !== prevStrokeStyle) {
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = currentStrokeStyle;
+					prevStrokeStyle = currentStrokeStyle;
+					ctx.moveTo(items[i - 1].x, items[i - 1].y);
+				}
+
+				ctx.lineTo(currItem.x, currItem.y);
+			}
+			ctx.stroke();
+
+		} else if (lineType === LineType.SteppedArea) {
+			const baseLevel = data.baseLevelCoordinate ?? ctx.canvas.height;
+			const alpha = data.pointColorAreaAlpha ?? 0.5;
+
+			// Fill First
+			for (; i < visibleRange.to; i++) {
+				const currItem = items[i];
+				const prevItem = items[i - 1];
+				const prevColor = prevItem.color ?? lineColor;
+				const currColor = currItem.color ?? lineColor;
+
+				const midX = (prevItem.x + currItem.x) / 2;
+
+				// Left half fill (prevColor)
+				ctx.beginPath();
+				ctx.fillStyle = applyAlpha(prevColor, alpha);
+				ctx.moveTo(prevItem.x, prevItem.y);
+				ctx.lineTo(midX, prevItem.y);
+				ctx.lineTo(midX, baseLevel);
+				ctx.lineTo(prevItem.x, baseLevel);
+				ctx.closePath();
+				ctx.fill();
+
+				// Right half fill (currColor)
+				ctx.beginPath();
+				ctx.fillStyle = applyAlpha(currColor, alpha);
+				// Standard stepped logic: vertical line at midX connects prevY to currY
+				// So right half is from midX to currX at currY level
+				// Wait, the vertical drop happens at midX.
+				// The area under the vertical line is technically infinitesimal?
+				// The polygon shape for right half:
+				// Start at (midX, prevY) ? No, the line goes: (prevX, prevY) -> (midX, prevY) -> (midX, currY) -> (currX, currY)
+				// So the area is the polygon enclosed by that line and the baseline.
+				// Left polygon: (prevX, prevY) -> (midX, prevY) -> (midX, base) -> (prevX, base)
+				// Right polygon: (midX, prevY) -> (midX, currY) -> (currX, currY) -> (currX, base) -> (midX, base)
+				// Actually, (midX, prevY) is part of the "cliff".
+				// The area under the vertical segment (midX, prevY) to (midX, currY) is just a line.
+				// So constructing the right polygon: 
+				// Top-Left: (midX, currY) ?
+				// If we strictly follow the line path:
+				// (midX, prevY) -> (midX, currY) -> (currX, currY)
+				// If we close this to base:
+				// (midX, base) -> (midX, prevY) ...
+
+				// Let's look at the stroke logic again:
+				// ctx.lineTo(midX, prevItem.y);
+				// ctx.lineTo(midX, currItem.y);
+				// ctx.lineTo(currItem.x, currItem.y);
+
+				// So the right polygon should cover from midX to currX.
+				// The height at midX changes from prevY to currY.
+				// If we treat the color switch happening AT midX (vertical line), then:
+				// Left of midX is prevColor. Right of midX is currColor.
+				// The vertical line itself is at midX.
+				// If we want the vertical line to be part of the right block (currColor), 
+				// then the Right polygon starts at (midX, prevY).
+
+				ctx.moveTo(midX, prevItem.y);
+				ctx.lineTo(midX, currItem.y);
+				ctx.lineTo(currItem.x, currItem.y);
+				ctx.lineTo(currItem.x, baseLevel);
+				ctx.lineTo(midX, baseLevel);
+				ctx.closePath();
+				ctx.fill();
+			}
+
+			// Stroke Second
+			i = visibleRange.from + 1;
+			let prevStrokeStyle = items[visibleRange.from].color ?? lineColor;
+			ctx.beginPath();
+			ctx.strokeStyle = prevStrokeStyle;
+			ctx.moveTo(items[visibleRange.from].x, items[visibleRange.from].y);
+
+			for (; i < visibleRange.to; i++) {
+				const currItem = items[i];
+				const prevItem = items[i - 1];
+				const currentStrokeStyle = currItem.color ?? lineColor;
+
+				const midX = (prevItem.x + currItem.x) / 2;
+
+				if (currentStrokeStyle !== prevStrokeStyle) {
+					ctx.lineTo(midX, prevItem.y);
+					ctx.stroke();
+
+					ctx.beginPath();
+					ctx.strokeStyle = currentStrokeStyle;
+					prevStrokeStyle = currentStrokeStyle;
+					ctx.moveTo(midX, prevItem.y);
+				}
+
+				ctx.lineTo(midX, prevItem.y);
+				ctx.lineTo(midX, currItem.y);
+				ctx.lineTo(currItem.x, currItem.y);
+			}
+			ctx.stroke();
+		} else if (lineType === LineType.Square) {
+			ctx.fillStyle = prevStrokeStyle;
+			for (; i < visibleRange.to; i++) {
+				const item = items[i];
+				const itemColor = item.color ?? lineColor;
+
+				if (itemColor !== prevStrokeStyle) {
+					ctx.fill();
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = itemColor;
+					ctx.fillStyle = itemColor;
+					prevStrokeStyle = itemColor;
+				}
+
+				const size = ctx.lineWidth;
+				const halfSize = size / 2;
+				ctx.rect(item.x - halfSize, item.y - halfSize, size, size);
+			}
+			ctx.fill();
+		} else if (lineType === LineType.ConnectedCircles) {
+			const circleLineWidth = ctx.lineWidth;
+			const halfLineWidth = Math.max(1, Math.floor(circleLineWidth / 2));
+
+			// 1. Draw connecting lines
+			ctx.beginPath();
+			ctx.lineWidth = halfLineWidth;
+
+			let iLine = visibleRange.from;
+			let prevLineStrokeStyle = items[iLine].color ?? lineColor;
+			ctx.strokeStyle = prevLineStrokeStyle;
+			ctx.moveTo(items[iLine].x, items[iLine].y);
+
+			for (iLine = visibleRange.from + 1; iLine < visibleRange.to; iLine++) {
+				const currItem = items[iLine];
+				const currentStrokeStyle = currItem.color ?? lineColor;
+
+				ctx.lineTo(currItem.x, currItem.y);
+
+				if (currentStrokeStyle !== prevLineStrokeStyle) {
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = currentStrokeStyle;
+					prevLineStrokeStyle = currentStrokeStyle;
+					ctx.moveTo(items[iLine - 1].x, items[iLine - 1].y);
+					ctx.lineTo(currItem.x, currItem.y);
+				}
+			}
+			ctx.stroke();
+
+			// 2. Draw circles
+			ctx.lineWidth = circleLineWidth;
+
+			let i = visibleRange.from;
+			let prevStrokeStyle = items[i].color ?? lineColor;
+			ctx.strokeStyle = prevStrokeStyle;
+			ctx.fillStyle = prevStrokeStyle; // Not used for stroke, but good practice if mixed
+
+			ctx.beginPath();
+			for (; i < visibleRange.to; i++) {
+				const item = items[i];
+				const itemColor = item.color ?? lineColor;
+
+				if (itemColor !== prevStrokeStyle) {
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = itemColor;
+					prevStrokeStyle = itemColor;
+				}
+
+				ctx.moveTo(item.x + ctx.lineWidth / 2, item.y);
+				ctx.arc(item.x, item.y, ctx.lineWidth / 2, 0, 2 * Math.PI);
+			}
+			ctx.stroke();
+
+
+
+		} else if (lineType === LineType.Diamond) {
+			ctx.fillStyle = prevStrokeStyle;
+			for (; i < visibleRange.to; i++) {
+				const item = items[i];
+				const itemColor = item.color ?? lineColor;
+
+				if (itemColor !== prevStrokeStyle) {
+					ctx.fill();
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = itemColor;
+					ctx.fillStyle = itemColor;
+					prevStrokeStyle = itemColor;
+				}
+
+				const size = ctx.lineWidth * 2; // Diamond looks better slightly larger
+				const halfSize = size / 2;
+
+				ctx.moveTo(item.x, item.y - halfSize);
+				ctx.lineTo(item.x + halfSize, item.y);
+				ctx.lineTo(item.x, item.y + halfSize);
+				ctx.lineTo(item.x - halfSize, item.y);
+				ctx.closePath();
+			}
+			ctx.fill();
+		} else if (lineType === LineType.Plus) {
+			const size = ctx.lineWidth * 2;
+			ctx.fillStyle = prevStrokeStyle;
+
+			for (; i < visibleRange.to; i++) {
+				const item = items[i];
+				const itemColor = item.color ?? lineColor;
+
+				if (itemColor !== prevStrokeStyle) {
+					// drawPlus uses its own stroking logic, so we don't need to stroke pending paths here
+					// but it relies on current context state which might be dirty?
+					// no, drawPlus sets strokeStyle from fillStyle, lineWidth, etc.
+					// we just need to update fillStyle
+					prevStrokeStyle = itemColor;
+					ctx.fillStyle = itemColor;
+				}
+
+				drawPlus(ctx, item.x, item.y, size);
+			}
+			// restore context state if needed? 
+			// drawPlus changes lineWidth, strokeStyle, lineCap.
+			// The caller of _drawLine expects to stroke at the end: ctx.stroke() is called in _drawImpl (Wait, _drawImpl calls _drawLine then ctx.stroke()?)
+			// _drawImpl: 
+			// if (items.length === 1) ...
+			// else this._drawLine(ctx, this._data);
+			// 
+			// PaneRendererLine._drawLine overrides the base and DOES NOT return to base to stroke. 
+			// PaneRendererLine._drawLine finishes with ctx.stroke().
+
+			// So after the loop, we might need to be careful if we left any path open? 
+			// drawPlus calls ctx.stroke() internally.
+			// So we are good. 
+
+			// Note: drawPlus changes ctx.lineWidth. We should restore it?
+			// The next frame/series will set it again.
+			// But within the same series ... no, we are done with this series.
+			// However, checking _drawImpl:
+			// ctx.strokeStyle = ...
+			// line-renderer.ts L62 calls _drawLine.
+			// _drawImpl doesn't do anything after _drawLine.
+
 		} else {
 			for (; i < visibleRange.to; i++) {
 				const currItem = items[i];

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi Shape Series Playbook</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Multi Shape Series Playbook</h1>
+    </header>
+    <main>
+        <style>
+            :root {
+                --primary-color: #2962FF;
+                --bg-color: #f8f9fa;
+                --surface-color: #ffffff;
+                --text-color: #333333;
+                --border-radius: 8px;
+                --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+            body {
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .playbook-grid {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                gap: 24px;
+                align-items: start;
+            }
+
+            .controls-panel {
+                background: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .chart-wrapper {
+                background: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                height: 500px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chart-container {
+                flex: 1;
+                width: 100%;
+                height: 100%;
+            }
+
+            h3 {
+                margin-top: 0;
+                margin-bottom: 16px;
+                font-size: 1.25rem;
+                color: #111;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .control-group:last-child {
+                border-bottom: none;
+            }
+
+            .control-group-title {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #666;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            label {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.9rem;
+            }
+
+            input[type="number"],
+            select {
+                padding: 6px 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 0.9rem;
+                width: 120px;
+            }
+
+            input[type="color"] {
+                border: none;
+                width: 40px;
+                height: 30px;
+                padding: 0;
+                background: none;
+                cursor: pointer;
+            }
+
+            button {
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 10px 16px;
+                border-radius: 6px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s;
+                width: 100%;
+            }
+
+            button:hover {
+                background-color: #1e4bd1;
+            }
+
+            .checkbox-row {
+                justify-content: flex-start;
+                gap: 10px;
+                cursor: pointer;
+            }
+
+            #chart-container-playbook {
+                border: 1px solid #f0f0f0;
+                border-radius: 4px;
+            }
+
+            @media (max-width: 900px) {
+                .playbook-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .chart-wrapper {
+                    height: 400px;
+                }
+            }
+        </style>
+
+        <div class="container">
+            <h3>Interactive Multi-Series Playbook</h3>
+            <div class="playbook-grid">
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <div class="control-group-title">Configuration</div>
+                        <label>
+                            Level Spacing
+                            <input type="number" id="levelSpacingInput" value="5" min="0" step="1" />
+                        </label>
+                        <label>
+                            Shape Size
+                            <input type="number" id="shapeSizeInput" value="8" min="2" step="1" />
+                        </label>
+                        <label>
+                            Label Offset
+                            <input type="number" id="labelOffsetInput" value="2" min="0" step="1" />
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Background Line</div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="bgLineVisibleInput" />
+                            <span>Enable Lines</span>
+                        </label>
+                        <label>
+                            Line Color
+                            <input type="color" id="bgLineColorInput" value="#CCCCCC" />
+                        </label>
+                        <label>
+                            Line Width
+                            <input type="number" id="bgLineWidthInput" value="1" min="1" max="10" />
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Data</div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="showTextInput" checked />
+                            <span>Show Labels</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="randomizeInput" checked />
+                            <span>Randomize Data</span>
+                        </label>
+                        <button id="regenerateBtn">Regenerate Data</button>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <h3>Preview</h3>
+                    <div id="chart-container-playbook" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Hardcoded Example 1: Simple Stacking -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Simple Stacking</h3>
+                <p>Two stacked series at different levels (Top & Bottom).</p>
+                <pre>
+chart.addShapeSeries({ position: 'top', level: 0, shape: 'circle' });
+chart.addShapeSeries({ position: 'top', level: 1, shape: 'square' });
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-stack"></div>
+        </div>
+
+        <!-- Hardcoded Example 2: Value Position Lines -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Shapes on Price Levels</h3>
+                <p>Using 'value' position with fixedValue to place shapes at specific prices.</p>
+                <pre>
+// Series at value 20
+const s1 = chart.addShapeSeries({ 
+    position: 'value', 
+    fixedValue: 20, 
+    shape: 'arrowUp', 
+    color: 'red' 
+});
+s1.setData([
+    { time: '2018-12-19', value: 0, text: '20' },
+    ...
+]);
+
+// Series at value 15
+const s2 = chart.addShapeSeries({ 
+    position: 'value', 
+    fixedValue: 15, 
+    shape: 'arrowDown', 
+    color: 'blue' 
+});
+s2.setData([
+    { time: '2018-12-19', value: 0, text: '15' },
+    ...
+]);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-value"></div>
+        </div>
+
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </main>
+    <script src="../app-data.js"></script>
+    <script>
+        (function () {
+            // --- Playbook Chart ---
+            const chartContainer = document.getElementById('chart-container-playbook');
+            const chart = LightweightCharts.createChart(chartContainer, {
+                width: 800,
+                height: 400,
+                layout: { background: { type: 'solid', color: '#ffffff' }, textColor: '#333' },
+                grid: { vertLines: { color: '#f0f3fa' }, horzLines: { color: '#f0f3fa' } },
+            });
+
+            const lineSeries = chart.addLineSeries({ color: 'rgba(0, 0, 0, 0.2)', lineWidth: 1 });
+            const lineData = data.map(d => ({ time: d.time, value: d.value }));
+            lineSeries.setData(lineData);
+
+            let allSeries = [];
+
+            const levelSpacingInput = document.getElementById('levelSpacingInput');
+            const shapeSizeInput = document.getElementById('shapeSizeInput');
+            const labelOffsetInput = document.getElementById('labelOffsetInput');
+            const bgLineVisibleInput = document.getElementById('bgLineVisibleInput');
+            const bgLineColorInput = document.getElementById('bgLineColorInput');
+            const bgLineWidthInput = document.getElementById('bgLineWidthInput');
+            const showTextInput = document.getElementById('showTextInput');
+            const randomizeInput = document.getElementById('randomizeInput');
+            const regenerateBtn = document.getElementById('regenerateBtn');
+
+            function createAllSeries() {
+                allSeries.forEach(s => chart.removeSeries(s));
+                allSeries = [];
+
+                const spacing = parseInt(levelSpacingInput.value, 10);
+                const size = parseInt(shapeSizeInput.value, 10);
+                const offset = parseInt(labelOffsetInput.value, 10);
+                const bgVisible = bgLineVisibleInput.checked;
+                const bgColor = bgLineColorInput.value;
+                const bgWidth = parseInt(bgLineWidthInput.value, 10);
+                const showText = showTextInput.checked;
+                const isRandom = randomizeInput.checked;
+
+                if (isRandom) {
+                    // --- Randomized Logic ---
+                    const possibleShapes = ['square', 'circle', 'diamond', 'triangleUp', 'triangleDown', 'arrowUp', 'arrowDown', undefined];
+                    const possibleColors = ['#E91E63', '#2196F3', '#00E676', '#FF9800', '#9C27B0'];
+
+                    // Top Series (3 Levels)
+                    for (let i = 0; i < 3; i++) {
+                        const series = chart.addShapeSeries({
+                            position: 'top', level: i,
+                            shape: possibleShapes[Math.floor(Math.random() * possibleShapes.length)],
+                            color: possibleColors[Math.floor(Math.random() * possibleColors.length)],
+                            size: size, levelSpacing: spacing, labelOffset: offset,
+                            backgroundLineVisible: bgVisible, backgroundLineColor: bgColor, backgroundLineWidth: bgWidth
+                        });
+
+                        let gapRemaining = 0;
+                        const seriesData = lineData.map((d, itemIndex) => {
+                            const item = { time: d.time, value: d.value };
+                            if (gapRemaining > 0) { gapRemaining--; return item; }
+                            if (Math.random() > 0.9) { gapRemaining = Math.floor(Math.random() * 10) + 5; return item; }
+
+                            if (Math.random() > 0.7) item.shape = possibleShapes[Math.floor(Math.random() * possibleShapes.length)];
+                            if (Math.random() > 0.7) item.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+                            if (showText && Math.random() > 0.6) item.text = "L" + i + " #" + itemIndex;
+                            return item;
+                        }).filter((_, index) => index % 2 === 0);
+                        series.setData(seriesData);
+                        allSeries.push(series);
+                    }
+
+                    // Bottom Series (2 Levels)
+                    for (let i = 0; i < 2; i++) {
+                        const series = chart.addShapeSeries({
+                            position: 'bottom', level: i,
+                            shape: possibleShapes[Math.floor(Math.random() * possibleShapes.length)],
+                            color: possibleColors[Math.floor(Math.random() * possibleColors.length)],
+                            size: size, levelSpacing: spacing, labelOffset: offset,
+                            backgroundLineVisible: bgVisible, backgroundLineColor: bgColor, backgroundLineWidth: bgWidth
+                        });
+                        const seriesData = lineData.filter((_, idx) => idx % 3 === 0).map(d => ({ time: d.time, value: d.value }));
+                        series.setData(seriesData); // Simplified for bottom
+                        allSeries.push(series);
+                    }
+
+                    // Value Series
+                    const valueSeries = chart.addShapeSeries({ position: 'value', shape: 'arrowUp', color: '#000', size: size, labelOffset: offset });
+                    valueSeries.applyOptions({ fixedValue: 20 + Math.random() * 50 });
+                    valueSeries.setData(lineData.filter((_, i) => i % 10 === 0).map(d => ({ time: d.time })));
+                    allSeries.push(valueSeries);
+
+                } else {
+                    // --- Deterministic Logic ---
+                    // Level 0 Top
+                    const s1 = chart.addShapeSeries({ position: 'top', level: 0, shape: 'circle', color: 'blue', size: size, levelSpacing: spacing, labelOffset: offset, backgroundLineVisible: bgVisible, backgroundLineColor: bgColor, backgroundLineWidth: bgWidth });
+                    s1.setData(lineData.filter((_, i) => i % 2 === 0).map(d => ({ time: d.time, value: 0, text: showText ? 'L0' : undefined })));
+                    allSeries.push(s1);
+
+                    // Level 1 Top
+                    const s2 = chart.addShapeSeries({ position: 'top', level: 1, shape: 'square', color: 'green', size: size, levelSpacing: spacing, labelOffset: offset, backgroundLineVisible: bgVisible, backgroundLineColor: bgColor, backgroundLineWidth: bgWidth });
+                    s2.setData(lineData.filter((_, i) => i % 3 === 0).map(d => ({ time: d.time, value: 0, text: showText ? 'L1' : undefined })));
+                    allSeries.push(s2);
+
+                    // Value
+                    const sv = chart.addShapeSeries({ position: 'value', shape: 'arrowRight', color: 'red', size: size, labelOffset: offset, fixedValue: 50 });
+                    // For Value position, using 0 is fine if fixedValue is used, but ideally it should match the price if we wanted variable psoition.
+                    // But here 'fixedValue' is 50.
+                    sv.setData(lineData.filter((_, i) => i % 5 === 0).map(d => ({ time: d.time, value: 0, text: showText ? 'Val' : undefined })));
+                    allSeries.push(sv);
+                }
+            }
+
+            function updateOptions() {
+                const spacing = parseInt(levelSpacingInput.value, 10);
+                const size = parseInt(shapeSizeInput.value, 10);
+                const offset = parseInt(labelOffsetInput.value, 10);
+                const bgVisible = bgLineVisibleInput.checked;
+                const bgColor = bgLineColorInput.value;
+                const bgWidth = parseInt(bgLineWidthInput.value, 10);
+                allSeries.forEach(s => s.applyOptions({
+                    levelSpacing: spacing,
+                    size: size,
+                    labelOffset: offset,
+                    backgroundLineVisible: bgVisible,
+                    backgroundLineColor: bgColor,
+                    backgroundLineWidth: bgWidth
+                }));
+            }
+
+            levelSpacingInput.addEventListener('input', updateOptions);
+            shapeSizeInput.addEventListener('input', updateOptions);
+            labelOffsetInput.addEventListener('input', updateOptions);
+            bgLineVisibleInput.addEventListener('change', updateOptions);
+            bgLineColorInput.addEventListener('input', updateOptions);
+            bgLineWidthInput.addEventListener('input', updateOptions);
+            showTextInput.addEventListener('change', createAllSeries);
+            randomizeInput.addEventListener('change', createAllSeries);
+            regenerateBtn.addEventListener('click', createAllSeries);
+            createAllSeries();
+        })();
+
+        // --- Hardcoded Example 1: Simple Stacking ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-stack'), { width: 600, height: 300 });
+            chart.addLineSeries({ color: 'rgba(0,0,0,0.1)' }).setData(data);
+
+            const s0 = chart.addShapeSeries({ position: 'top', level: 0, shape: 'circle', color: '#2196F3' });
+            s0.setData(data.filter((_, i) => i % 2 === 0).map(d => ({ time: d.time, value: 0 })));
+
+            const s1 = chart.addShapeSeries({ position: 'top', level: 1, shape: 'square', color: '#4CAF50' });
+            s1.setData(data.filter((_, i) => i % 2 === 0).map(d => ({ time: d.time, value: 0 })));
+        })();
+
+        // --- Hardcoded Example 2: Value Position ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-value'), { width: 600, height: 300 });
+            chart.addLineSeries({ color: 'rgba(0,0,0,0.1)' }).setData(data);
+
+            // Fixed at 20
+            const s1 = chart.addShapeSeries({ position: 'value', fixedValue: 20, shape: 'arrowUp', color: 'red' });
+            s1.setData(data.filter((_, i) => i % 5 === 0).map(d => ({ time: d.time, value: 0, text: '20' })));
+
+            // Fixed at 15
+            const s2 = chart.addShapeSeries({ position: 'value', fixedValue: 15, shape: 'arrowDown', color: 'blue' });
+            s2.setData(data.filter((_, i) => i % 6 === 0).map(d => ({ time: d.time, value: 0, text: '15' })));
+        })();
+    </script>
+</body>
+
+</html>

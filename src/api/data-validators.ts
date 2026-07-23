@@ -1,6 +1,7 @@
 import { assert } from '../helpers/assertions';
 
 import { PriceLineOptions } from '../model/price-line-options';
+import { VerticalLineOptions } from '../model/vertical-line-options';
 import { SeriesMarker } from '../model/series-markers';
 import { SeriesType } from '../model/series-options';
 
@@ -13,6 +14,14 @@ export function checkPriceLineOptions(options: PriceLineOptions): void {
 	}
 
 	assert(typeof options.price === 'number', `the type of 'price' price line's property must be a number, got '${typeof options.price}'`);
+}
+
+export function checkVerticalLineOptions(options: VerticalLineOptions): void {
+	if (process.env.NODE_ENV === 'production') {
+		return;
+	}
+
+	assert(options.time !== undefined && options.time !== null, 'time must be provided for vertical line');
 }
 
 export function checkItemsAreOrdered(data: readonly (SeriesMarker<Time> | SeriesDataItemTypeMap[SeriesType])[], allowDuplicates: boolean = false): void {
@@ -54,6 +63,12 @@ function getChecker(type: SeriesType): Checker {
 		case 'Line':
 		case 'Histogram':
 			return checkLineItem.bind(null, type);
+
+		case 'Shape':
+		case 'DualShape':
+		case 'Char':
+		case 'CharShape':
+			return checkShapeItem;
 	}
 }
 
@@ -92,4 +107,23 @@ function checkLineItem(type: 'Area' | 'Baseline' | 'Line' | 'Histogram', lineIte
 	assert(
 		typeof lineData.value === 'number' || lineData.value === null,
 		`${type} series item data value must be a number, got=${typeof lineData.value}, value=${lineData.value}`);
+}
+
+function checkShapeItem(shapeItem: SeriesDataItemTypeMap['Shape']): void {
+	if (!isFulfilledData(shapeItem)) {
+		return;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+	const shapeData = shapeItem as any;
+	assert(
+		typeof shapeData.value === 'number' || shapeData.value === null,
+		`Shape series item data value must be a number, got=${typeof shapeData.value}, value=${shapeData.value}`
+	);
+	if (shapeData.size !== undefined) {
+		assert(
+			typeof shapeData.size === 'number',
+			`Shape series item data size must be a number, got=${typeof shapeData.size}, value=${shapeData.size}`
+		);
+	}
 }

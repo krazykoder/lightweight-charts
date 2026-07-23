@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legends Playbook</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        /* Specific aesthetics for the Legends page */
+        :root {
+            --primary-color: #2962FF;
+            --bg-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --text-color: #333333;
+            --border-radius: 8px;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: block;
+            /* Override flex from style.css */
+        }
+
+        .playbook-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .controls-panel {
+            background: var(--surface-color);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .chart-wrapper {
+            background: var(--surface-color);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            /* Essential for absolute legend positioning */
+        }
+
+        .chart-container {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Legend Component Styles */
+        .legend {
+            position: absolute;
+            left: 36px;
+            top: 36px;
+            z-index: 2;
+            padding: 10px 14px;
+            pointer-events: none;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+            transition: all 0.2s ease;
+        }
+
+        .legend-line {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .legend-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .legend-value {
+            font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+            font-weight: 600;
+        }
+
+        .legend-ohlc {
+            display: flex;
+            gap: 12px;
+            margin-left: 4px;
+        }
+
+        .ohlc-item {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .ohlc-label {
+            color: #777;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Playbook Controls */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .control-group:last-child {
+            border-bottom: none;
+        }
+
+        .control-group-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        select,
+        input[type="number"] {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            width: 140px;
+        }
+
+        .checkbox-row {
+            justify-content: flex-start;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .playbook-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Side-by-side hardcoded section styling */
+        .example-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin-bottom: 48px;
+            align-items: stretch;
+        }
+
+        .example-section .code-container {
+            flex: 1;
+            min-width: 350px;
+        }
+
+        .example-section .chart-container {
+            flex: 1.5;
+            min-width: 450px;
+            position: relative;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            height: 380px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Legends Playbook</h1>
+    </header>
+    <main>
+        <div class="container">
+            <!-- <h3>Interactive Playbook</h3> -->
+            <div class="playbook-grid">
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <div class="control-group-title">Legend Appearance</div>
+                        <label>
+                            Position
+                            <select id="legendPosition">
+                                <option value="left">Top Left</option>
+                                <option value="right">Top Right</option>
+                            </select>
+                        </label>
+                        <label>
+                            Background
+                            <select id="legendBackground">
+                                <option value="none">None (Transparent)</option>
+                                <option value="solid">Solid White</option>
+                                <option value="glass" selected>Glassmorphism</option>
+                            </select>
+                        </label>
+                        <label>
+                            Style
+                            <select id="legendStyle">
+                                <option value="standard" selected>Standard</option>
+                                <option value="compact">Compact</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Series Configuration</div>
+                        <label>
+                            Primary Type
+                            <select id="primaryType">
+                                <option value="candlestick">Candlestick</option>
+                                <option value="bar">Bar</option>
+                                <option value="line">Line</option>
+                                <option value="area">Area</option>
+                            </select>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="showOverlay" checked>
+                            <span>Show SMA 20 (Line)</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="showEMA21">
+                            <span>Show EMA 21 (Line)</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="showEMA42">
+                            <span>Show EMA 42 (Line)</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="showSqueeze" checked>
+                            <span>Show Squeeze (Histogram)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <div id="legend-playbook" class="legend"></div>
+                    <div id="chart-playbook" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Hardcoded Examples Section -->
+        <div class="container">
+
+            <!-- Example 1: Stacked Multi-Line & Squeeze Histogram (Moved to Top) -->
+            <div class="example-section">
+                <div class="code-container" style="flex: 1;">
+                    <h3>Stacked Multi-Line & Squeeze</h3>
+                    <p>Complex legend handling multiple lines (Price, MAs) and Squeeze histogram data simultaneously.
+                    </p>
+                    <pre>
+const infos = [
+    { series: price, title: 'PRICE', type: 'ohlc' },
+    { series: ma1, title: 'SMA 20', type: 'line' },
+    { series: ma2, title: 'SMA 50', type: 'line' },
+    { series: sqz, title: 'SQZ', type: 'squeeze' }
+];
+
+// Helper to format squeeze values
+const formatSqueeze = v => v.toFixed(2);
+                    </pre>
+                </div>
+                <div class="chart-container" style="flex: 2; height: 450px;">
+                    <div id="legend-3" class="legend"></div>
+                    <div id="chart-3" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Example 2: Single Line Legend -->
+            <div class="example-section">
+                <div class="code-container">
+                    <h3>Single Line Legend</h3>
+                    <p>Classic value display with a custom color-coded title.</p>
+                    <pre>
+chart.subscribeCrosshairMove(param => {
+    if (!param.time) {
+        updateLegend(lastData);
+        return;
+    }
+    const data = param.seriesData.get(lineSeries);
+    legend.innerHTML = `&lt;span&gt;Price:&lt;/span&gt; ${data.value}`;
+});
+                    </pre>
+                </div>
+                <div class="chart-container" style="height: 300px;">
+                    <div id="legend-1" class="legend"></div>
+                    <div id="chart-1" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Example 3: OHLC Candlestick Legend -->
+            <div class="example-section">
+                <div class="code-container">
+                    <h3>OHLC Candlestick Legend</h3>
+                    <p>Detailed breakdown of OHLC values for financial charts.</p>
+                    <pre>
+const content = `
+    &lt;div class="ohlc-item"&gt;
+        &lt;span class="label"&gt;O&lt;/span&gt; ${data.open}
+    &lt;/div&gt;
+    &lt;div class="ohlc-item"&gt;
+        &lt;span class="label"&gt;H&lt;/span&gt; ${data.high}
+    &lt;/div&gt;
+    ...
+`;
+                    </pre>
+                </div>
+                <div class="chart-container" style="height: 300px;">
+                    <div id="legend-2" class="legend"></div>
+                    <div id="chart-2" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="../app-data.js"></script>
+    <script>
+        // --- Shared Formatters ---
+        const priceFormatter = new Intl.NumberFormat('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+
+        // --- Core Legend Rendering Logic ---
+        function generateLegendHTML(seriesInfos, crosshairParam, fallbackDataIndex, style = 'standard') {
+            let html = '';
+            const isCompact = style === 'compact';
+
+            if (isCompact) {
+                html += '<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">';
+            }
+
+            seriesInfos.forEach(info => {
+                let sData = null;
+                if (crosshairParam && crosshairParam.seriesData.has(info.series)) {
+                    sData = crosshairParam.seriesData.get(info.series);
+                } else if (fallbackDataIndex !== undefined) {
+                    // Fallback logic
+                    const d = data[fallbackDataIndex];
+                    if (info.type === 'ohlc') {
+                        sData = { open: d.open, high: d.high, low: d.low, close: d.close };
+                    } else if (info.type === 'squeeze') {
+                        sData = { value: d.SQZ_Hist || 0 };
+                    } else {
+                        // Attempt to find matching value in hardcoded data if property exists
+                        // e.g. for EMA_21, we can look up d.EMA_21 if we tagged it
+                        if (info.dataKey && d[info.dataKey] !== undefined) {
+                            sData = { value: d[info.dataKey] };
+                        } else {
+                            sData = { value: d.close }; // Default fallback
+                        }
+                    }
+                }
+
+                if (!sData) return;
+
+                const colorStyle = `color: ${info.color || '#333'}`;
+
+                if (isCompact) {
+                    html += `<div style="display: flex; gap: 4px; align-items: center; ${colorStyle}">`;
+                    html += `<span style="font-weight: 700; font-size: 11px;">${info.title}:</span>`;
+                } else {
+                    html += `<div class="legend-line" style="${colorStyle}">`;
+                    html += `<span class="legend-title">${info.title}:</span>`;
+                }
+
+                if (info.type === 'ohlc') {
+                    if (isCompact) {
+                        html += `<span class="legend-value">${priceFormatter.format(sData.close)}</span>`;
+                    } else {
+                        html += `
+                            <div class="legend-ohlc">
+                                <div class="ohlc-item"><span class="ohlc-label">O</span><span class="legend-value">${priceFormatter.format(sData.open)}</span></div>
+                                <div class="ohlc-item"><span class="ohlc-label">H</span><span class="legend-value">${priceFormatter.format(sData.high)}</span></div>
+                                <div class="ohlc-item"><span class="ohlc-label">L</span><span class="legend-value">${priceFormatter.format(sData.low)}</span></div>
+                                <div class="ohlc-item"><span class="ohlc-label">C</span><span class="legend-value">${priceFormatter.format(sData.close)}</span></div>
+                            </div>
+                        `;
+                    }
+                } else if (info.type === 'squeeze') {
+                    html += `<span class="legend-value">${sData.value.toFixed(2)}</span>`;
+                } else {
+                    html += `<span class="legend-value">${priceFormatter.format(sData.value || 0)}</span>`;
+                }
+
+                html += `</div>`;
+            });
+
+            if (isCompact) {
+                html += '</div>';
+            }
+
+            return html;
+        }
+
+        // --- Interactive Playbook Logic ---
+        (function () {
+            const chartContainer = document.getElementById('chart-playbook');
+            const legendElement = document.getElementById('legend-playbook');
+
+            const chart = LightweightCharts.createChart(chartContainer, {
+                width: chartContainer.clientWidth || 800,
+                height: chartContainer.clientHeight || 450,
+                layout: { background: { type: 'solid', color: '#ffffff' }, textColor: '#333' },
+                grid: { vertLines: { color: '#f0f3fa' }, horzLines: { color: '#f0f3fa' } },
+                rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.1, bottom: 0.2 } },
+                timeScale: { borderVisible: false },
+            });
+
+            new ResizeObserver(entries => {
+                if (entries.length === 0 || entries[0].target !== chartContainer) return;
+                const newRect = entries[0].contentRect;
+                chart.applyOptions({ width: newRect.width, height: newRect.height });
+            }).observe(chartContainer);
+
+            let seriesList = []; // Array of { series, title, type, color, dataKey? }
+
+            const typeSelect = document.getElementById('primaryType');
+            const overlayCheck = document.getElementById('showOverlay');
+            const ema21Check = document.getElementById('showEMA21');
+            const ema42Check = document.getElementById('showEMA42');
+            const sqzCheck = document.getElementById('showSqueeze');
+            const posSelect = document.getElementById('legendPosition');
+            const bgSelect = document.getElementById('legendBackground');
+            const styleSelect = document.getElementById('legendStyle');
+
+            function rebuildSeries() {
+                seriesList.forEach(s => chart.removeSeries(s.series));
+                seriesList = [];
+
+                const mainType = typeSelect.value;
+                let mainSeries;
+                if (mainType === 'candlestick') {
+                    mainSeries = chart.addCandlestickSeries({ upColor: '#26a69a', downColor: '#ef5350', borderVisible: false });
+                    mainSeries.setData(data);
+                    seriesList.push({ series: mainSeries, title: 'Price', type: 'ohlc', color: '#111' });
+                } else if (mainType === 'bar') {
+                    mainSeries = chart.addBarSeries({ upColor: '#26a69a', downColor: '#ef5350' });
+                    mainSeries.setData(data);
+                    seriesList.push({ series: mainSeries, title: 'Price', type: 'ohlc', color: '#111' });
+                } else {
+                    mainSeries = mainType === 'area' ? chart.addAreaSeries() : chart.addLineSeries();
+                    mainSeries.setData(data.map(d => ({ time: d.time, value: d.close })));
+                    seriesList.push({ series: mainSeries, title: 'Price', type: 'line', color: '#2962FF' });
+                }
+
+                if (overlayCheck.checked) {
+                    const ma = chart.addLineSeries({ color: '#ff9800', lineWidth: 2 });
+                    const maData = data.map((d, i) => {
+                        if (i < 20) return null;
+                        const sum = data.slice(i - 20, i).reduce((a, b) => a + b.close, 0);
+                        return { time: d.time, value: sum / 20 };
+                    }).filter(d => d);
+                    ma.setData(maData);
+                    seriesList.push({ series: ma, title: 'SMA 20', type: 'line', color: '#ff9800' });
+                }
+
+                if (ema21Check.checked) {
+                    const ema21 = chart.addLineSeries({ color: '#2196F3', lineWidth: 1 });
+                    ema21.setData(data.map(d => ({ time: d.time, value: d.EMA_21 })));
+                    seriesList.push({ series: ema21, title: 'EMA 21', type: 'line', color: '#2196F3', dataKey: 'EMA_21' });
+                }
+
+                if (ema42Check.checked) {
+                    const ema42 = chart.addLineSeries({ color: '#E040FB', lineWidth: 1 });
+                    ema42.setData(data.map(d => ({ time: d.time, value: d.EMA_42 })));
+                    seriesList.push({ series: ema42, title: 'EMA 42', type: 'line', color: '#E040FB', dataKey: 'EMA_42' });
+                }
+
+                if (sqzCheck.checked) {
+                    const sqzSeries = chart.addHistogramSeries({ priceScaleId: 'sqz', color: 'rgba(38, 166, 154, 0.4)' });
+                    chart.priceScale('sqz').applyOptions({ scaleMargins: { top: 0.8, bottom: 0 } });
+
+                    const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+                    const sqzSeriesData = data.map(d => ({
+                        time: d.time,
+                        value: d.SQZ_Hist || 0,
+                        color: sqzColors[d.SQZ_HistC] || 'gray',
+                    }));
+
+                    sqzSeries.setData(sqzSeriesData);
+                    seriesList.push({ series: sqzSeries, title: 'SQZ', type: 'squeeze', color: '#666' });
+                }
+
+                updateLegendDisplay(null);
+            }
+
+            function updateLegendDisplay(param) {
+                const style = styleSelect.value;
+                if (!param || !param.time || param.point.x < 0) {
+                    legendElement.innerHTML = generateLegendHTML(seriesList, null, data.length - 1, style);
+                } else {
+                    legendElement.innerHTML = generateLegendHTML(seriesList, param, undefined, style);
+                }
+            }
+
+            function updateStyles() {
+                const pos = posSelect.value;
+                const bg = bgSelect.value;
+                legendElement.style.left = pos === 'left' ? '36px' : 'auto';
+                legendElement.style.right = pos === 'right' ? '36px' : 'auto';
+
+                if (bg === 'solid') {
+                    legendElement.style.background = '#fff';
+                    legendElement.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                    legendElement.style.backdropFilter = 'none';
+                    legendElement.style.border = '1px solid #ddd';
+                } else if (bg === 'glass') {
+                    legendElement.style.background = 'rgba(255, 255, 255, 0.6)';
+                    legendElement.style.backdropFilter = 'blur(10px) saturate(180%)';
+                    legendElement.style.boxShadow = '0 8px 32px rgba(31, 38, 135, 0.1)';
+                    legendElement.style.border = '1px solid rgba(255, 255, 255, 0.4)';
+                } else {
+                    legendElement.style.background = 'transparent';
+                    legendElement.style.boxShadow = 'none';
+                    legendElement.style.backdropFilter = 'none';
+                    legendElement.style.border = 'none';
+                }
+                updateLegendDisplay(null); // Force redraw to apply style
+            }
+
+            chart.subscribeCrosshairMove(updateLegendDisplay);
+            [typeSelect, overlayCheck, ema21Check, ema42Check, sqzCheck].forEach(el => el.addEventListener('change', rebuildSeries));
+            [posSelect, bgSelect, styleSelect].forEach(el => el.addEventListener('change', updateStyles));
+
+            rebuildSeries();
+            updateStyles();
+        })();
+
+        // --- Example 1 Logic: Stacked Multi-Line & Squeeze ---
+        (function () {
+            const container = document.getElementById('chart-3');
+            const legend = document.getElementById('legend-3');
+            const chart = LightweightCharts.createChart(container, {
+                width: container.clientWidth,
+                height: 450,
+                rightPriceScale: { scaleMargins: { top: 0.1, bottom: 0.3 } }
+            });
+
+            const price = chart.addCandlestickSeries({ upColor: '#26a69a', downColor: '#ef5350', borderVisible: false });
+            price.setData(data);
+
+            const ma1 = chart.addLineSeries({ color: '#2962FF', lineWidth: 1 });
+            ma1.setData(data.map((d, i) => i < 20 ? null : { time: d.time, value: data.slice(i - 20, i).reduce((a, b) => a + b.close, 0) / 20 }).filter(d => d));
+
+            const ma2 = chart.addLineSeries({ color: '#9c27b0', lineWidth: 1 });
+            ma2.setData(data.map((d, i) => i < 50 ? null : { time: d.time, value: data.slice(i - 50, i).reduce((a, b) => a + b.close, 0) / 50 }).filter(d => d));
+
+            const sqz = chart.addHistogramSeries({ priceScaleId: 'v', color: 'rgba(100, 181, 246, 0.4)' });
+            chart.priceScale('v').applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
+
+            const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+            sqz.setData(data.map(d => ({
+                time: d.time,
+                value: d.SQZ_Hist || 0,
+                color: sqzColors[d.SQZ_HistC] || 'gray',
+            })));
+
+            const info = [
+                { series: price, title: 'PRICE', type: 'ohlc', color: '#111' },
+                { series: ma1, title: 'SMA 20', type: 'line', color: '#2962FF' },
+                { series: ma2, title: 'SMA 50', type: 'line', color: '#9c27b0' },
+                { series: sqz, title: 'SQZ', type: 'squeeze', color: '#64b5f6' }
+            ];
+
+            chart.subscribeCrosshairMove(p => legend.innerHTML = generateLegendHTML(info, p.time ? p : null, data.length - 1));
+            legend.innerHTML = generateLegendHTML(info, null, data.length - 1);
+
+            legend.style.background = 'rgba(255, 255, 255, 0.6)';
+            legend.style.backdropFilter = 'blur(10px)';
+            legend.style.border = '1px solid rgba(255,255,255,0.4)';
+            legend.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+        })();
+
+        // --- Example 2 Logic: Single Line ---
+        (function () {
+            const container = document.getElementById('chart-1');
+            const legend = document.getElementById('legend-1');
+            const chart = LightweightCharts.createChart(container, { width: container.clientWidth, height: 300 });
+            const s = chart.addLineSeries({ color: '#2962FF' });
+            s.setData(data.map(d => ({ time: d.time, value: d.close })));
+            const info = [{ series: s, title: 'Price', type: 'line', color: '#2962FF' }];
+            chart.subscribeCrosshairMove(p => legend.innerHTML = generateLegendHTML(info, p.time ? p : null, data.length - 1));
+            legend.innerHTML = generateLegendHTML(info, null, data.length - 1);
+        })();
+
+        // --- Example 3 Logic: OHLC ---
+        (function () {
+            const container = document.getElementById('chart-2');
+            const legend = document.getElementById('legend-2');
+            const chart = LightweightCharts.createChart(container, { width: container.clientWidth, height: 300 });
+            const s = chart.addCandlestickSeries();
+            s.setData(data);
+            const info = [{ series: s, title: 'Price', type: 'ohlc', color: '#111' }];
+            chart.subscribeCrosshairMove(p => legend.innerHTML = generateLegendHTML(info, p.time ? p : null, data.length - 1));
+            legend.innerHTML = generateLegendHTML(info, null, data.length - 1);
+        })();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            const pb = document.getElementById('chart-playbook');
+            // pb.applyOptions({ width: pb.clientWidth });
+        });
+    </script>
+</body>
+
+</html>

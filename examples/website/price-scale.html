@@ -1,79 +1,494 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Price Scale Examples</title>
     <link rel="stylesheet" href="style.css">
     <script src="dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        /* Override global .container style to allow full-width grid */
+        .container {
+            display: block !important;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .playbook-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 768px) {
+            .playbook-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .controls-panel {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e0e3eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            height: 100%;
+        }
+
+        .chart-wrapper {
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e0e3eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+        }
+
+        .control-group {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f3fa;
+        }
+
+        .control-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .control-group-title {
+            font-weight: 600;
+            color: #131722;
+            margin-bottom: 12px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #404655;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        label.checkbox-row {
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        input[type="checkbox"] {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        select {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #d1d4dc;
+            font-size: 13px;
+            color: #131722;
+            background-color: #fff;
+            cursor: pointer;
+            width: 140px;
+        }
+
+        select:focus {
+            border-color: #2962FF;
+            outline: none;
+        }
+
+        .example-section {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid #e0e3eb;
+        }
+
+        .example-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #131722;
+            margin-bottom: 24px;
+        }
+
+        .code-chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .code-container,
+        .chart-container {
+            border-radius: 8px;
+            border: 1px solid #e0e3eb;
+            overflow: hidden;
+            height: 400px;
+        }
+
+        .code-container {
+            background-color: #f8f9fc;
+            padding: 16px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        pre {
+            margin: 0;
+        }
+    </style>
 </head>
+
 <body>
     <header>
-        <a href="index.html">Home</a>
-        <h1>Price Scale Examples</h1>
+        <a href="index.html" class="back-link">← Back to Examples</a>
+        <h1>Price Scale Features</h1>
     </header>
-    <main>
-        <div class="container">
-            <div class="code-container">
-                <h3>Price Scale Customization</h3>
-                <pre>
-const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
-    width: 600,
-    height: 300,
-    priceScale: {
-        position: 'left',
-        mode: 2,
-        autoScale: false,
-        invertScale: true,
-        alignLabels: false,
-        borderVisible: false,
+
+    <main class="container">
+        <!-- Interactive Playbook -->
+        <div class="playbook-grid">
+            <div class="controls-panel">
+                <div class="control-group">
+                    <div class="control-group-title">Left Scale Options</div>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="leftVisible">
+                        <span>Visible</span>
+                    </label>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="leftInvert">
+                        <span>Invert Scale</span>
+                    </label>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="leftAlignLabels">
+                        <span>Align Labels</span>
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-group-title">Right Scale Options</div>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="rightVisible" checked>
+                        <span>Visible</span>
+                    </label>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="rightInvert">
+                        <span>Invert Scale</span>
+                    </label>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="rightAlignLabels" checked>
+                        <span>Align Labels</span>
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-group-title">Series Assignment</div>
+                    <label>
+                        Series 1 (Candles)
+                        <select id="series1Scale">
+                            <option value="right" selected>Right</option>
+                            <option value="left">Left</option>
+                        </select>
+                    </label>
+                    <label>
+                        Series 2 (Line)
+                        <select id="series2Scale">
+                            <option value="right">Right</option>
+                            <option value="left" selected>Left</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div class="chart-wrapper" id="chart-playbook"></div>
+        </div>
+
+        <!-- Hardcoded Examples -->
+
+        <div class="example-section">
+            <div class="example-title">Two Price Scales</div>
+            <p>This example demonstrates two series using separate price scales (Left and Right). Useful for comparing
+                data with different units or magnitudes.</p>
+            <div class="code-chart-row">
+                <div class="code-container">
+                    <pre>
+const chart = createChart(container, {
+    leftPriceScale: {
+        visible: true,
         borderColor: '#555ffd',
+    },
+    rightPriceScale: {
+        visible: true,
+        borderColor: '#26a69a',
+    },
+});
+
+const candleSeries = chart.addCandlestickSeries({
+    priceScaleId: 'left', // Bind to Left Scale
+    upColor: '#555ffd', 
+    downColor: '#555ffd',
+});
+
+const lineSeries = chart.addLineSeries({
+    color: '#26a69a',
+    priceScaleId: 'right', // Bind to Right Scale
+    lineWidth: 2,
+});
+
+candleSeries.setData(data1);
+lineSeries.setData(data2);
+                    </pre>
+                </div>
+                <div class="chart-container" id="chart-two-scales"></div>
+            </div>
+        </div>
+
+        <div class="example-section">
+            <div class="example-title">Inverted Scale</div>
+            <p>Invert the price scale to show inverse relationships. In this example, the right scale is inverted.</p>
+            <div class="code-chart-row">
+                <div class="code-container">
+                    <pre>
+const chart = createChart(container, {
+    rightPriceScale: {
+        visible: true,
+        invertScale: true, // Invert the scale
+    },
+});
+
+const areaSeries = chart.addAreaSeries({
+    topColor: 'rgba(239, 83, 80, 0.4)',
+    bottomColor: 'rgba(239, 83, 80, 0.05)',
+    lineColor: '#ef5350',
+});
+
+areaSeries.setData(data);
+                    </pre>
+                </div>
+                <div class="chart-container" id="chart-inverted"></div>
+            </div>
+        </div>
+
+        <div class="example-section">
+            <div class="example-title">No Overlap (Margins)</div>
+            <p>Use <code>scaleMargins</code> to prevent series from overlapping. Here, volume is pinned to the bottom
+                20%, and price takes the top 80%.</p>
+            <div class="code-chart-row">
+                <div class="code-container">
+                    <pre>
+const chart = createChart(container, {
+    rightPriceScale: {
         scaleMargins: {
-            top: 0.30,
-            bottom: 0.25,
+            top: 0.1,
+            bottom: 0.3, // Leave space at bottom for volume
         },
     },
 });
-const lineSeries = chart.addLineSeries();
-const randomSlice1 = getRandomSlice();
-lineSeries.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.end));
-                </pre>
+
+const priceSeries = chart.addCandlestickSeries();
+
+// Create a separate scale for volume to manage its margins independently
+const volumeSeries = chart.addHistogramSeries({
+    priceScaleId: 'vol', // Custom ID
+    priceFormat: { type: 'volume' },
+});
+
+chart.priceScale('vol').applyOptions({
+    scaleMargins: {
+        top: 0.8, // Push volume to bottom 20%
+        bottom: 0,
+    },
+});
+                    </pre>
+                </div>
+                <div class="chart-container" id="chart-margins"></div>
             </div>
-            <div class="chart-container" id="chart-container1"></div>
         </div>
-        <nav>
-            <a href="time-scale.html">Prev</a>
-            <a href="customization.html">Next</a>
-        </nav>
+
     </main>
     <script src="../app-data.js"></script>
     <script>
-        function getRandomSlice(maxDataLength = 500, minLength = 50, maxLength = 200) {
-            const start = Math.floor(Math.random() * (maxDataLength - minLength + 1));
-            const end = Math.min(start + Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength, maxDataLength);
-            return { start, end };
-        }
+        // --- Playbook Implementation ---
+        (function () {
+            const container = document.getElementById('chart-playbook');
+            const chart = LightweightCharts.createChart(container, {
+                width: container.clientWidth,
+                height: 500,
+                layout: { background: { type: 'solid', color: '#fff' } },
+                grid: { vertLines: { color: '#f0f3fa' }, horzLines: { color: '#f0f3fa' } },
+                rightPriceScale: { borderVisible: false },
+                leftPriceScale: { borderVisible: false },
+                timeScale: { borderVisible: false },
+            });
 
-        const chart = LightweightCharts.createChart(document.getElementById('chart-container1'), {
-            width: 600,
-            height: 300,
-            priceScale: {
-                position: 'left',
-                mode: 2,
-                autoScale: false,
-                invertScale: true,
-                alignLabels: false,
+            new ResizeObserver(entries => {
+                if (entries.length === 0 || entries[0].target !== container) return;
+                const { width, height } = entries[0].contentRect;
+                chart.applyOptions({ width, height });
+            }).observe(container);
+
+            // Create Two Series
+            const candleSeries = chart.addCandlestickSeries({
+                upColor: '#26a69a',
+                downColor: '#ef5350',
                 borderVisible: false,
-                borderColor: '#555ffd',
-                scaleMargins: {
-                    top: 0.30,
-                    bottom: 0.25,
+                priceScaleId: 'right' // Initial assignment
+            });
+            candleSeries.setData(data);
+
+            const lineSeries = chart.addLineSeries({
+                color: '#2962FF',
+                lineWidth: 2,
+                priceScaleId: 'left' // Initial assignment
+            });
+            // Use different data range for Line to make it distinct
+            const lineData = data.map(d => ({ time: d.time, value: d.high + 5 + Math.random() * 5 }));
+            lineSeries.setData(lineData);
+
+            // Controls
+            const leftVisible = document.getElementById('leftVisible');
+            const leftInvert = document.getElementById('leftInvert');
+            const leftAlign = document.getElementById('leftAlignLabels');
+
+            const rightVisible = document.getElementById('rightVisible');
+            const rightInvert = document.getElementById('rightInvert');
+            const rightAlign = document.getElementById('rightAlignLabels');
+
+            const s1Scale = document.getElementById('series1Scale');
+            const s2Scale = document.getElementById('series2Scale');
+
+            function updateOptions() {
+                chart.applyOptions({
+                    leftPriceScale: {
+                        visible: leftVisible.checked,
+                        invertScale: leftInvert.checked,
+                        alignLabels: leftAlign.checked,
+                    },
+                    rightPriceScale: {
+                        visible: rightVisible.checked,
+                        invertScale: rightInvert.checked,
+                        alignLabels: rightAlign.checked,
+                    },
+                });
+
+                candleSeries.applyOptions({ priceScaleId: s1Scale.value });
+                lineSeries.applyOptions({ priceScaleId: s2Scale.value });
+            }
+
+            // Sync initial state
+            updateOptions();
+
+            // Listeners
+            [leftVisible, leftInvert, leftAlign, rightVisible, rightInvert, rightAlign, s1Scale, s2Scale]
+                .forEach(el => el.addEventListener('change', updateOptions));
+        })();
+
+        // --- Hardcoded Example 1: Two Price Scales ---
+        (function () {
+            const container = document.getElementById('chart-two-scales');
+            const chart = LightweightCharts.createChart(container, {
+                width: container.clientWidth,
+                height: 400,
+                leftPriceScale: { visible: true, borderColor: '#555ffd' },
+                rightPriceScale: { visible: true, borderColor: '#26a69a' },
+                layout: { textColor: '#333', background: { type: 'solid', color: '#fff' } },
+                grid: { vertLines: { visible: false }, horzLines: { color: '#f0f3fa' } },
+                timeScale: { visible: false },
+            });
+
+            // Series 1: Candles on LEFT scale
+            const candleSeries = chart.addCandlestickSeries({
+                priceScaleId: 'left',
+                upColor: '#555ffd', downColor: '#555ffd',
+                borderVisible: false, wicksVisible: true,
+            });
+            // Shift data slightly to simulate different asset
+            const candleData = data.map(d => ({ ...d, open: d.open * 0.8, high: d.high * 0.8, low: d.low * 0.8, close: d.close * 0.8 }));
+            candleSeries.setData(candleData);
+
+            // Series 2: Line on RIGHT scale
+            const lineSeries = chart.addLineSeries({
+                color: '#26a69a',
+                priceScaleId: 'right',
+                lineWidth: 2,
+            });
+            lineSeries.setData(data.map(d => ({ time: d.time, value: d.close })));
+
+            chart.timeScale().fitContent();
+        })();
+
+        // --- Hardcoded Example 2: Inverted Scale ---
+        (function () {
+            const container = document.getElementById('chart-inverted');
+            const chart = LightweightCharts.createChart(container, {
+                width: container.clientWidth,
+                height: 400,
+                rightPriceScale: { visible: true, invertScale: true },
+                layout: { textColor: '#333', background: { type: 'solid', color: '#fff' } },
+                grid: { vertLines: { visible: false }, horzLines: { color: '#f0f3fa' } },
+                timeScale: { visible: false },
+            });
+
+            const areaSeries = chart.addAreaSeries({
+                topColor: 'rgba(239, 83, 80, 0.4)',
+                bottomColor: 'rgba(239, 83, 80, 0.05)',
+                lineColor: '#ef5350',
+                lineWidth: 2,
+            });
+            areaSeries.setData(data.map(d => ({ time: d.time, value: d.close })));
+
+            chart.timeScale().fitContent();
+        })();
+
+        // --- Hardcoded Example 3: No Overlap ---
+        (function () {
+            const container = document.getElementById('chart-margins');
+            const chart = LightweightCharts.createChart(container, {
+                width: container.clientWidth,
+                height: 400,
+                rightPriceScale: {
+                    scaleMargins: { top: 0.1, bottom: 0.3 }
                 },
-            },
-        });
-        const lineSeries = chart.addLineSeries();
-        const randomSlice1 = getRandomSlice();
-        lineSeries.setData(data.map(d => ({ time: d.time, value: d.value })).slice(randomSlice1.start, randomSlice1.end));
+                layout: { textColor: '#333', background: { type: 'solid', color: '#fff' } },
+                grid: { vertLines: { visible: false }, horzLines: { color: '#f0f3fa' } },
+                timeScale: { visible: false },
+            });
+
+            const priceSeries = chart.addCandlestickSeries({
+                upColor: '#26a69a', downColor: '#ef5350', borderVisible: false
+            });
+            priceSeries.setData(data);
+
+            const volSeries = chart.addHistogramSeries({
+                priceScaleId: 'vol',
+                priceFormat: { type: 'volume' },
+                color: 'rgba(41, 98, 255, 0.5)',
+            });
+
+            chart.priceScale('vol').applyOptions({
+                scaleMargins: { top: 0.8, bottom: 0 }
+            });
+
+            volSeries.setData(data.map(d => ({
+                time: d.time,
+                value: d.volume || Math.random() * 100000
+            })));
+
+            chart.timeScale().fitContent();
+        })();
     </script>
 </body>
+
 </html>

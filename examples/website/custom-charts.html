@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Charts Playbook</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="dist/lightweight-charts.standalone.production.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="index.html">Home</a>
+        <h1>Custom Charts Playbook</h1>
+    </header>
+    <main>
+        <style>
+            :root {
+                --primary-color: #2962FF;
+                --bg-color: #f8f9fa;
+                --surface-color: #ffffff;
+                --text-color: #333333;
+                --border-radius: 8px;
+                --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+            body {
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .playbook-grid {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                gap: 24px;
+                align-items: start;
+            }
+
+            .controls-panel {
+                background: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .chart-wrapper {
+                background: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                height: 500px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .chart-container {
+                flex: 1;
+                width: 100%;
+                height: 100%;
+            }
+
+            h3 {
+                margin-top: 0;
+                margin-bottom: 16px;
+                font-size: 1.25rem;
+                color: #111;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .control-group:last-child {
+                border-bottom: none;
+            }
+
+            .control-group-title {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #666;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            label {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.9rem;
+            }
+
+            input[type="number"],
+            select {
+                padding: 6px 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 0.9rem;
+                width: 120px;
+            }
+
+            input[type="color"] {
+                border: none;
+                width: 40px;
+                height: 30px;
+                padding: 0;
+                background: none;
+                cursor: pointer;
+            }
+
+            input[type="range"] {
+                width: 120px;
+            }
+
+            button {
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 10px 16px;
+                border-radius: 6px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s;
+                width: 100%;
+            }
+
+            button:hover {
+                background-color: #1e4bd1;
+            }
+
+            .checkbox-row {
+                justify-content: flex-start;
+                gap: 10px;
+                cursor: pointer;
+            }
+
+            #chart-container-playbook {
+                border: 1px solid #f0f0f0;
+                border-radius: 4px;
+            }
+
+            @media (max-width: 900px) {
+                .playbook-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .chart-wrapper {
+                    height: 400px;
+                }
+            }
+        </style>
+
+        <div class="container">
+            <h3>Interactive Playbook: Advanced Multi-Scale Chart</h3>
+            <div class="playbook-grid">
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <div class="control-group-title">Configuration</div>
+                        <label>
+                            Price Series Type
+                            <select id="priceTypeSelect">
+                                <option value="area">Area</option>
+                                <option value="line">Line</option>
+                                <option value="candlestick">Candlestick</option>
+                            </select>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="volumeVisibleInput" checked />
+                            <span>Show Volume</span>
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="squeezeVisibleInput" checked />
+                            <span>Show Squeeze Data</span>
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Price Style</div>
+                        <label>
+                            Color
+                            <input type="color" id="priceColorInput" value="#26c6da" />
+                        </label>
+                        <label>
+                            Line Width
+                            <input type="number" id="priceLineWidthInput" value="2" min="1" max="10" />
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Volume Style</div>
+                        <label>
+                            Opacity
+                            <input type="range" id="volumeOpacityInput" value="0.8" min="0" max="1" step="0.1" />
+                            <span id="volumeOpacityValue">0.8</span>
+                        </label>
+                        <label>
+                            Bull Color
+                            <input type="color" id="volumeBullColorInput" value="#009688" />
+                        </label>
+                        <label>
+                            Bear Color
+                            <input type="color" id="volumeBearColorInput" value="#ff5252" />
+                        </label>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-group-title">Scale Margins</div>
+                        <label>
+                            Price Top
+                            <input type="range" id="priceTopMarginInput" value="0.25" min="0" max="0.9" step="0.05" />
+                            <span id="priceTopMarginValue">0.25</span>
+                        </label>
+                        <label>
+                            Price Bottom
+                            <input type="range" id="priceBottomMarginInput" value="0.25" min="0" max="0.7"
+                                step="0.05" />
+                            <span id="priceBottomMarginValue">0.25</span>
+                        </label>
+                        <label>
+                            Volume Top
+                            <input type="range" id="volumeTopMarginInput" value="0.9" min="0" max="0.95" step="0.05" />
+                            <span id="volumeTopMarginValue">0.9</span>
+                        </label>
+                        <label>
+                            Squeeze Top
+                            <input type="range" id="squeezeTopMarginInput" value="0" min="0" max="0.5" step="0.05" />
+                            <span id="squeezeTopMarginValue">0</span>
+                        </label>
+                        <label>
+                            Squeeze Bottom
+                            <input type="range" id="squeezeBottomMarginInput" value="0.75" min="0.5" max="0.95"
+                                step="0.05" />
+                            <span id="squeezeBottomMarginValue">0.75</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <h3>Preview</h3>
+                    <div id="chart-container-playbook" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Hardcoded Examples Section -->
+
+        <!-- Example 1: Classic Price-Volume Chart -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Classic Price-Volume Chart</h3>
+                <p>Demonstrates combining an area series with a volume histogram using separate price scales.</p>
+                <pre>
+const chart = LightweightCharts.createChart(container, {
+    width: 700,
+    height: 300,
+    rightPriceScale: {
+        scaleMargins: { top: 0.3, bottom: 0.25 },
+    },
+});
+
+const areaSeries = chart.addAreaSeries({
+    topColor: 'rgba(38,198,218, 0.56)',
+    bottomColor: 'rgba(38,198,218, 0.04)',
+    lineColor: 'rgba(38,198,218, 1)',
+    lineWidth: 2,
+});
+
+const volumeSeries = chart.addHistogramSeries({
+    color: '#26a69a',
+    priceFormat: { type: 'volume' },
+    priceScaleId: '', // Unset the price scale ID
+});
+
+chart.priceScale('').applyOptions({
+    scaleMargins: { top: 0.8, bottom: 0 },
+});
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-1"></div>
+        </div>
+
+        <!-- Example 2: Candlestick with Volume -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Candlestick with Volume</h3>
+                <p>Price candlesticks combined with volume histogram on separate scales.</p>
+                <pre>
+const candlestickSeries = chart.addCandlestickSeries({
+    upColor: '#26a69a',
+    downColor: '#ef5350',
+});
+
+const volumeSeries = chart.addHistogramSeries({
+    priceScaleId: '',
+});
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-2"></div>
+        </div>
+
+        <!-- Example 3: Line Chart with Volume -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Line Chart with Volume</h3>
+                <p>Simple line chart overlaid with volume bars.</p>
+                <pre>
+const lineSeries = chart.addLineSeries({
+    color: '#2196F3',
+    lineWidth: 2,
+});
+
+const volumeSeries = chart.addHistogramSeries({
+    priceScaleId: '',
+});
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-3"></div>
+        </div>
+
+        <!-- Example 4: Histogram with Squeeze Data -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Candlestick with Squeeze Histogram</h3>
+                <p>Candlestick chart overlaid with color-coded squeeze indicator histogram on separate scales.</p>
+                <pre>
+const candlestickSeries = chart.addCandlestickSeries({
+    upColor: '#26a69a',
+    downColor: '#ef5350',
+});
+
+const sqzHistogram = chart.addHistogramSeries({
+    priceScaleId: '',  // Use separate price scale
+});
+
+chart.priceScale('').applyOptions({
+    scaleMargins: { top: 0.7, bottom: 0 },
+});
+
+const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+const sqzData = data.map(d => ({
+    time: d.time,
+    value: d.SQZ_Hist || 0,
+    color: sqzColors[d.SQZ_HistC] || 'gray',
+}));
+sqzHistogram.setData(sqzData);
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-4"></div>
+        </div>
+
+        <!-- Example 5: Candlestick with Volume and Squeeze Data -->
+        <div class="container">
+            <div class="code-container">
+                <h3>Candlestick with Volume and Squeeze Data</h3>
+                <p>Advanced example showing three separate scales: candlesticks (middle), volume (bottom), and squeeze
+                    histogram (top).</p>
+                <pre>
+const chart = LightweightCharts.createChart(container, {
+    rightPriceScale: {
+        scaleMargins: { top: 0.25, bottom: 0.35 },
+    },
+});
+
+const candlestickSeries = chart.addCandlestickSeries({
+    upColor: '#26a69a',
+    downColor: '#ef5350',
+});
+
+// Volume at the bottom (priceScaleId: 'volume')
+const volumeSeries = chart.addHistogramSeries({
+    priceFormat: { type: 'volume' },
+    priceScaleId: 'volume',
+});
+chart.priceScale('volume').applyOptions({
+    scaleMargins: { top: 0.9, bottom: 0 },
+});
+
+// Squeeze Data at the top (priceScaleId: '')
+const sqzHistogram = chart.addHistogramSeries({
+    priceScaleId: 'sqzHistogram',
+});
+chart.priceScale('sqzHistogram').applyOptions({
+    scaleMargins: { top: 0, bottom: 0.75 },
+});
+                </pre>
+            </div>
+            <div class="chart-container" id="chart-container-5"></div>
+        </div>
+
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </main>
+
+    <script src="../app-data.js"></script>
+    <script>
+        // --- Interactive Playbook ---
+        (function () {
+            const chartContainer = document.getElementById('chart-container-playbook');
+            const chart = LightweightCharts.createChart(chartContainer, {
+                width: 800,
+                height: 400,
+                rightPriceScale: {
+                    scaleMargins: {
+                        top: 0.25,
+                        bottom: 0.35,
+                    },
+                    borderVisible: false,
+                },
+                layout: {
+                    background: { type: 'solid', color: '#131722' },
+                    textColor: '#d1d4dc',
+                },
+                grid: {
+                    vertLines: { color: 'rgba(42, 46, 57, 0)' },
+                    horzLines: { color: 'rgba(42, 46, 57, 0.6)' },
+                },
+            });
+
+            let priceSeries = null;
+            let volumeSeries = null;
+            let squeezeSeries = null;
+
+            // Input elements
+            const priceTypeSelect = document.getElementById('priceTypeSelect');
+            const volumeVisibleInput = document.getElementById('volumeVisibleInput');
+            const squeezeVisibleInput = document.getElementById('squeezeVisibleInput');
+            const priceColorInput = document.getElementById('priceColorInput');
+            const priceLineWidthInput = document.getElementById('priceLineWidthInput');
+            const volumeOpacityInput = document.getElementById('volumeOpacityInput');
+            const volumeOpacityValue = document.getElementById('volumeOpacityValue');
+            const volumeBullColorInput = document.getElementById('volumeBullColorInput');
+            const volumeBearColorInput = document.getElementById('volumeBearColorInput');
+            const priceTopMarginInput = document.getElementById('priceTopMarginInput');
+            const priceTopMarginValue = document.getElementById('priceTopMarginValue');
+            const priceBottomMarginInput = document.getElementById('priceBottomMarginInput');
+            const priceBottomMarginValue = document.getElementById('priceBottomMarginValue');
+            const volumeTopMarginInput = document.getElementById('volumeTopMarginInput');
+            const volumeTopMarginValue = document.getElementById('volumeTopMarginValue');
+            const squeezeTopMarginInput = document.getElementById('squeezeTopMarginInput');
+            const squeezeTopMarginValue = document.getElementById('squeezeTopMarginValue');
+            const squeezeBottomMarginInput = document.getElementById('squeezeBottomMarginInput');
+            const squeezeBottomMarginValue = document.getElementById('squeezeBottomMarginValue');
+
+            // Prepare data
+            const priceData = data.map(d => ({
+                time: d.time,
+                value: d.value,
+                open: d.open,
+                high: d.high,
+                low: d.low,
+                close: d.close,
+            }));
+
+            function createPriceSeries() {
+                if (priceSeries) chart.removeSeries(priceSeries);
+
+                const seriesType = priceTypeSelect.value;
+                const color = priceColorInput.value;
+                const lineWidth = parseInt(priceLineWidthInput.value, 10);
+
+                if (seriesType === 'area') {
+                    priceSeries = chart.addAreaSeries({
+                        topColor: color + '8F',
+                        bottomColor: color + '0A',
+                        lineColor: color,
+                        lineWidth: lineWidth,
+                    });
+                    priceSeries.setData(priceData.map(d => ({ time: d.time, value: d.value })));
+                } else if (seriesType === 'line') {
+                    priceSeries = chart.addLineSeries({
+                        color: color,
+                        lineWidth: lineWidth,
+                    });
+                    priceSeries.setData(priceData.map(d => ({ time: d.time, value: d.value })));
+                } else if (seriesType === 'candlestick') {
+                    priceSeries = chart.addCandlestickSeries({
+                        upColor: '#26a69a',
+                        downColor: '#ef5350',
+                        borderVisible: false,
+                        wickUpColor: '#26a69a',
+                        wickDownColor: '#ef5350',
+                    });
+                    priceSeries.setData(priceData.map(d => ({
+                        time: d.time,
+                        open: d.open,
+                        high: d.high,
+                        low: d.low,
+                        close: d.close,
+                    })));
+                }
+
+                updatePriceScale();
+            }
+
+            function createVolumeSeries() {
+                if (volumeSeries) chart.removeSeries(volumeSeries);
+                if (!volumeVisibleInput.checked) return;
+
+                volumeSeries = chart.addHistogramSeries({
+                    priceFormat: { type: 'volume' },
+                    priceScaleId: 'volume',
+                });
+
+                updateVolumeData();
+                updateVolumeScale();
+            }
+
+            function createSqueezeSeries() {
+                if (squeezeSeries) chart.removeSeries(squeezeSeries);
+                if (!squeezeVisibleInput.checked) return;
+
+                squeezeSeries = chart.addHistogramSeries({
+                    priceScaleId: '',
+                });
+
+                updateSqueezeData();
+                updateSqueezeScale();
+            }
+
+            function updateVolumeData() {
+                if (!volumeSeries) return;
+
+                const opacity = parseFloat(volumeOpacityInput.value);
+                const bullColor = volumeBullColorInput.value;
+                const bearColor = volumeBearColorInput.value;
+
+                // Convert hex to rgba
+                const hexToRgba = (hex, alpha) => {
+                    const r = parseInt(hex.slice(1, 3), 16);
+                    const g = parseInt(hex.slice(3, 5), 16);
+                    const b = parseInt(hex.slice(5, 7), 16);
+                    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                };
+
+                const volumeData = data.map((d, i) => {
+                    const isUp = i === 0 || d.close >= data[i - 1].close;
+                    return {
+                        time: d.time,
+                        value: d.volume || Math.random() * 50000000,
+                        color: isUp ? hexToRgba(bullColor, opacity) : hexToRgba(bearColor, opacity),
+                    };
+                });
+
+                volumeSeries.setData(volumeData);
+            }
+
+            function updateSqueezeData() {
+                if (!squeezeSeries) return;
+
+                const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+                const sqzData = data.map(d => ({
+                    time: d.time,
+                    value: d.SQZ_Hist || 0,
+                    color: sqzColors[d.SQZ_HistC] || 'gray',
+                }));
+
+                squeezeSeries.setData(sqzData);
+            }
+
+            function updatePriceScale() {
+                const top = parseFloat(priceTopMarginInput.value);
+                const bottom = parseFloat(priceBottomMarginInput.value);
+                chart.priceScale('right').applyOptions({
+                    scaleMargins: { top: top, bottom: bottom },
+                });
+            }
+
+            function updateVolumeScale() {
+                const top = parseFloat(volumeTopMarginInput.value);
+                chart.priceScale('volume').applyOptions({
+                    scaleMargins: { top: top, bottom: 0 },
+                });
+            }
+
+            function updateSqueezeScale() {
+                const top = parseFloat(squeezeTopMarginInput.value);
+                const bottom = parseFloat(squeezeBottomMarginInput.value);
+                chart.priceScale('').applyOptions({
+                    scaleMargins: { top: top, bottom: bottom },
+                });
+            }
+
+            // Event listeners
+            priceTypeSelect.addEventListener('change', createPriceSeries);
+            volumeVisibleInput.addEventListener('change', createVolumeSeries);
+            squeezeVisibleInput.addEventListener('change', createSqueezeSeries);
+
+            priceColorInput.addEventListener('input', createPriceSeries);
+            priceLineWidthInput.addEventListener('input', createPriceSeries);
+
+            volumeOpacityInput.addEventListener('input', () => {
+                volumeOpacityValue.textContent = volumeOpacityInput.value;
+                updateVolumeData();
+            });
+            volumeBullColorInput.addEventListener('input', updateVolumeData);
+            volumeBearColorInput.addEventListener('input', updateVolumeData);
+
+            priceTopMarginInput.addEventListener('input', () => {
+                priceTopMarginValue.textContent = priceTopMarginInput.value;
+                updatePriceScale();
+            });
+            priceBottomMarginInput.addEventListener('input', () => {
+                priceBottomMarginValue.textContent = priceBottomMarginInput.value;
+                updatePriceScale();
+            });
+            volumeTopMarginInput.addEventListener('input', () => {
+                volumeTopMarginValue.textContent = volumeTopMarginInput.value;
+                updateVolumeScale();
+            });
+            squeezeTopMarginInput.addEventListener('input', () => {
+                squeezeTopMarginValue.textContent = squeezeTopMarginInput.value;
+                updateSqueezeScale();
+            });
+            squeezeBottomMarginInput.addEventListener('input', () => {
+                squeezeBottomMarginValue.textContent = squeezeBottomMarginInput.value;
+                updateSqueezeScale();
+            });
+
+            // Initialize
+            createPriceSeries();
+            createVolumeSeries();
+            createSqueezeSeries();
+        })();
+
+        // --- Example 1: Classic Price-Volume Chart ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-1'), {
+                width: 700,
+                height: 300,
+                rightPriceScale: {
+                    scaleMargins: { top: 0.3, bottom: 0.25 },
+                    borderVisible: false,
+                },
+                layout: {
+                    background: { type: 'solid', color: '#131722' },
+                    textColor: '#d1d4dc',
+                },
+                grid: {
+                    vertLines: { color: 'rgba(42, 46, 57, 0)' },
+                    horzLines: { color: 'rgba(42, 46, 57, 0.6)' },
+                },
+            });
+
+            const areaSeries = chart.addAreaSeries({
+                topColor: 'rgba(38,198,218, 0.56)',
+                bottomColor: 'rgba(38,198,218, 0.04)',
+                lineColor: 'rgba(38,198,218, 1)',
+                lineWidth: 2,
+            });
+
+            const volumeSeries = chart.addHistogramSeries({
+                color: '#26a69a',
+                priceFormat: { type: 'volume' },
+                priceScaleId: '',
+            });
+
+            chart.priceScale('').applyOptions({
+                scaleMargins: { top: 0.8, bottom: 0 },
+            });
+
+            areaSeries.setData(data.map(d => ({ time: d.time, value: d.value })));
+            volumeSeries.setData(data.map((d, i) => ({
+                time: d.time,
+                value: d.volume || Math.random() * 50000000,
+                color: (i === 0 || d.close >= data[i - 1].close) ? 'rgba(0, 150, 136, 0.8)' : 'rgba(255,82,82, 0.8)',
+            })));
+        })();
+
+        // --- Example 2: Candlestick with Volume ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-2'), {
+                width: 700,
+                height: 300,
+                rightPriceScale: {
+                    scaleMargins: { top: 0.3, bottom: 0.25 },
+                },
+            });
+
+            const candlestickSeries = chart.addCandlestickSeries({
+                upColor: '#26a69a',
+                downColor: '#ef5350',
+                borderVisible: false,
+                wickUpColor: '#26a69a',
+                wickDownColor: '#ef5350',
+            });
+
+            const volumeSeries = chart.addHistogramSeries({
+                priceFormat: { type: 'volume' },
+                priceScaleId: '',
+            });
+
+            chart.priceScale('').applyOptions({
+                scaleMargins: { top: 0.8, bottom: 0 },
+            });
+
+            candlestickSeries.setData(data.map(d => ({
+                time: d.time,
+                open: d.open,
+                high: d.high,
+                low: d.low,
+                close: d.close,
+            })));
+
+            volumeSeries.setData(data.map((d, i) => ({
+                time: d.time,
+                value: d.volume || Math.random() * 50000000,
+                color: (i === 0 || d.close >= data[i - 1].close) ? 'rgba(0, 150, 136, 0.5)' : 'rgba(255,82,82, 0.5)',
+            })));
+        })();
+
+        // --- Example 3: Line Chart with Volume ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-3'), {
+                width: 700,
+                height: 300,
+                rightPriceScale: {
+                    scaleMargins: { top: 0.3, bottom: 0.25 },
+                },
+            });
+
+            const lineSeries = chart.addLineSeries({
+                color: '#2196F3',
+                lineWidth: 2,
+            });
+
+            const volumeSeries = chart.addHistogramSeries({
+                priceFormat: { type: 'volume' },
+                priceScaleId: '',
+            });
+
+            chart.priceScale('').applyOptions({
+                scaleMargins: { top: 0.8, bottom: 0 },
+            });
+
+            lineSeries.setData(data.map(d => ({ time: d.time, value: d.value })));
+            volumeSeries.setData(data.map((d, i) => ({
+                time: d.time,
+                value: d.volume || Math.random() * 50000000,
+                color: (i === 0 || d.close >= data[i - 1].close) ? 'rgba(0, 150, 136, 0.6)' : 'rgba(255,82,82, 0.6)',
+            })));
+        })();
+
+        // --- Example 4: Candlestick with Squeeze Histogram ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-4'), {
+                width: 700,
+                height: 300,
+                rightPriceScale: {
+                    scaleMargins: { top: 0.3, bottom: 0.25 },
+                },
+            });
+
+            const candlestickSeries = chart.addCandlestickSeries({
+                upColor: '#26a69a',
+                downColor: '#ef5350',
+                borderVisible: false,
+                wickUpColor: '#26a69a',
+                wickDownColor: '#ef5350',
+            });
+
+            const sqzHistogram = chart.addHistogramSeries({
+                priceScaleId: '',
+            });
+
+            chart.priceScale('').applyOptions({
+                scaleMargins: { top: 0.7, bottom: 0 },
+            });
+
+            candlestickSeries.setData(data.map(d => ({
+                time: d.time,
+                open: d.open,
+                high: d.high,
+                low: d.low,
+                close: d.close,
+            })));
+
+            const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+            const sqzData = data.map(d => ({
+                time: d.time,
+                value: d.SQZ_Hist || 0,
+                color: sqzColors[d.SQZ_HistC] || 'gray',
+            }));
+            sqzHistogram.setData(sqzData);
+        })();
+
+        // --- Example 5: Candlestick with Volume and Squeeze Data ---
+        (function () {
+            const chart = LightweightCharts.createChart(document.getElementById('chart-container-5'), {
+                width: 700,
+                height: 300,
+                rightPriceScale: {
+                    scaleMargins: { top: 0.25, bottom: 0.35 },
+                },
+            });
+
+            const candlestickSeries = chart.addCandlestickSeries({
+                upColor: '#26a69a',
+                downColor: '#ef5350',
+                borderVisible: false,
+                wickUpColor: '#26a69a',
+                wickDownColor: '#ef5350',
+            });
+
+            // Volume at the bottom - using custom priceScaleId
+            const volumeSeries = chart.addHistogramSeries({
+                priceFormat: { type: 'volume' },
+                priceScaleId: 'volume',
+            });
+
+            chart.priceScale('volume').applyOptions({
+                scaleMargins: { top: 0.9, bottom: 0 },
+            });
+
+            // Squeeze Data at the top - using empty priceScaleId
+            const sqzHistogram = chart.addHistogramSeries({
+                priceScaleId: 'sqzHistogram',
+            });
+
+            chart.priceScale('sqzHistogram').applyOptions({
+                scaleMargins: { top: 0, bottom: 0.75 },
+            });
+
+            // Set data
+            candlestickSeries.setData(data.map(d => ({
+                time: d.time,
+                open: d.open,
+                high: d.high,
+                low: d.low,
+                close: d.close,
+            })));
+
+            volumeSeries.setData(data.map((d, i) => ({
+                time: d.time,
+                value: d.volume || Math.random() * 50000000,
+                color: (i === 0 || d.close >= data[i - 1].close) ? 'rgba(0, 150, 136, 0.5)' : 'rgba(255,82,82, 0.5)',
+            })));
+
+            const sqzColors = { 1: '#26a69a', 2: '#ef5350', 3: '#64b5f6', 4: '#ffc107' };
+            const sqzData = data.map(d => ({
+                time: d.time,
+                value: d.SQZ_Hist || 0,
+                color: sqzColors[d.SQZ_HistC] || 'gray',
+            }));
+            sqzHistogram.setData(sqzData);
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,22 +1,22 @@
 # Project Context
 
-*This file captures the high-level context, architecture decisions, and current state of the project. It should be updated synchronously as new features and major components are added.*
+## Features Implemented
 
-## Phase 1: Foundation
-- Pre-built library: TradingView Lightweight Charts v3.8.0-local
-- Source fully present in `src/`; no implementation work required
-- Architecture documentation captured in `.workflow/02_architecture/`
+### Overlapping Markers Demo (2026-01-10)
+- Created experimental demo exploring marker overlap behavior at same time points
+- Based on GitHub Issue #1459
+- Two versions created:
+  - `overlapping-markers.html` - Basic demo with 5 hardcoded examples
+  - `overlapping-markers-enhanced.html` - Enhanced with interactive playbook
+- Interactive controls:
+  - Series type selector (Candlestick, Bar, Line)
+  - Marker shape, position, color, size
+  - Overlap frequency and markers per point
+  - Randomization options
+- Uses app-data.js with random 300-point windows
+- All markers properly sorted in ascending time order
 
-## Current State
-- Architecture documentation complete (2026-03-24)
-- No active implementation tasks
-- Build, lint, and test commands documented in `CLAUDE.md`
-
-## Architecture Notes
-- Five-layer stack: API → GUI → Model → Views → Renderers
-- Single runtime dependency: `fancy-canvas@0.2.2`
-- Invalidation-based deferred repaint via `InvalidateMask`
-- Nominal types (`Coordinate`, `TimePointIndex`, `UTCTimestamp`) enforce type safety
-- Full reference: `.workflow/02_architecture/Full_Reference.md`
-- Module inventory: `.workflow/02_architecture/module_map.md`
-- Frozen invariants: `.workflow/02_architecture/ARCHITECTURE_CONTRACT.md`
+### Price Scale Features (2026-01-10)
+- Implemented  as a playbook for dual scales, inversion, and margin controls.
+- Demonstrates how to separate series using  ("No Overlap" example).
+- Shows interactive assignment of series to left/right scales.

@@ -17,7 +17,15 @@ export const enum LineType {
 	 * A stepped line.
 	 */
 	WithSteps,
-	WithGaps
+	WithGaps,
+	Circle,
+	Cross,
+	Square,
+	Diamond,
+	Plus,
+	ConnectedCircles,
+	Area,
+	SteppedArea,
 }
 
 /**
