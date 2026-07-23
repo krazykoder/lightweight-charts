@@ -10,6 +10,9 @@ import {
 	BarSeriesPartialOptions,
 	BaselineSeriesPartialOptions,
 	CandlestickSeriesPartialOptions,
+	CharSeriesPartialOptions,
+	CharShapeSeriesPartialOptions,
+	DualShapeSeriesPartialOptions,
 	HistogramSeriesPartialOptions,
 	LineSeriesPartialOptions,
 	SeriesType,
@@ -168,6 +171,42 @@ export interface IChartApi {
 	 * ```
 	 */
 	addShapeSeries(shapeOptions?: ShapeSeriesPartialOptions): ISeriesApi<'Shape'>;
+
+	/**
+	 * Creates a dual-shape series with specified parameters.
+	 *
+	 * @param dualShapeOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addDualShapeSeries();
+	 * ```
+	 */
+	addDualShapeSeries(dualShapeOptions?: DualShapeSeriesPartialOptions): ISeriesApi<'DualShape'>;
+
+	/**
+	 * Creates a char series with specified parameters.
+	 *
+	 * @param charOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addCharSeries();
+	 * ```
+	 */
+	addCharSeries(charOptions?: CharSeriesPartialOptions): ISeriesApi<'Char'>;
+
+	/**
+	 * Creates a char-shape series with specified parameters.
+	 *
+	 * @param charShapeOptions - Customization parameters of the series being created.
+	 * @returns An interface of the created series.
+	 * @example
+	 * ```js
+	 * const series = chart.addCharShapeSeries();
+	 * ```
+	 */
+	addCharShapeSeries(charShapeOptions?: CharShapeSeriesPartialOptions): ISeriesApi<'CharShape'>;
 
 	/**
 	 * Removes a series of any type. This is an irreversible operation, you cannot do anything with the series after removing it.
